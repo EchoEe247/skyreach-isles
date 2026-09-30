@@ -1,4 +1,5 @@
 import * as T from "three";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import "./style.css";
 import {createRng,clamp as cl,lerp as lp,smoothstep as sm,angleDelta as ad} from "./core/math.js";
 import {loadProgress,saveProgress,loadSettings,saveSettings} from "./core/storage.js";
@@ -68,7 +69,11 @@ const skins=[0xf1c8a0,0xc68a5f,0x8d5a3b,0xe9b98a],cols=[0xd9534f,0x4a90a4,0xe8b0
 const NP=[];for(let i=0;i<24;i++){const g=human(skins[i%4],cols[i%6],0x3b3f52,[0x2a1a10,0xc8a04a,0x999999][i%3]);const a=rnd()*6.28,r=10+rnd()*40;g.position.set(Math.cos(a)*r,6,Math.sin(a)*r);g.ph=rnd()*9;g.scale.setScalar(.92+rnd()*.16);g.tg=g.position.clone();g.w=0;g.n=i%8;g.sp=1.4+rnd()*1.2;S.add(g);NP.push(g)}
 // vehicles
 const V=[];function reg(g,o){g.rotation.order='YXZ';Object.assign(o,{g,sp:0,h:0});const mk=new T.Mesh(new T.ConeGeometry(1.4,3.2,4),new T.MeshBasicMaterial({color:o.type=='car'?0xff5a3a:o.type=='boat'?0x38e0ff:0xffd23a,fog:false,depthTest:false,transparent:true,opacity:.9}));mk.rotation.x=Math.PI;mk.renderOrder=9;g.add(mk);o.mk=mk;S.add(g);V.push(o);return o}
-const car=new T.Group();box(car,2,.7,4.2,M(0xd9342b),0,.8,0);box(car,1.7,.6,2,new T.MeshPhongMaterial({color:0x101828,shininess:150,specular:0x99aabb}),0,1.4,-.3);box(car,.2,.15,.3,M(0x222222),-1.1,1.15,.7);box(car,.2,.15,.3,M(0x222222),1.1,1.15,.7);box(car,2.05,.25,.25,M(0x222222),0,.55,2.1);box(car,2.05,.25,.25,M(0x222222),0,.55,-2.1);[[-1,1.4],[1,1.4],[-1,-1.4],[1,-1.4]].forEach(([x,z])=>{const w=cyl(car,.45,.45,.4,M(0x222222),x*1.05,.45,z,10);w.rotation.z=Math.PI/2});box(car,.5,.25,.1,M(0xfff2b0,0xfff2b0,1),-.6,.9,2.1);box(car,.5,.25,.1,M(0xfff2b0,0xfff2b0,1),.6,.9,2.1);box(car,1.6,.2,.1,M(0xff2222,0xff2222,1),0,.9,-2.1);
+const CAR_COLORS=[0xd9342b,0xffc233,0x3a86d9,0x53b96a,0xf2f2f2];
+function fallbackCar(color){const g=new T.Group();box(g,2,.7,4.2,M(color),0,.8,0);box(g,1.7,.6,2,new T.MeshPhongMaterial({color:0x101828,shininess:150,specular:0x99aabb}),0,1.4,-.3);box(g,.2,.15,.3,M(0x222222),-1.1,1.15,.7);box(g,.2,.15,.3,M(0x222222),1.1,1.15,.7);box(g,2.05,.25,.25,M(0x222222),0,.55,2.1);box(g,2.05,.25,.25,M(0x222222),0,.55,-2.1);[[-1,1.4],[1,1.4],[-1,-1.4],[1,-1.4]].forEach(([x,z])=>{const w=cyl(g,.45,.45,.4,M(0x222222),x*1.05,.45,z,10);w.rotation.z=Math.PI/2});box(g,.5,.25,.1,M(0xfff2b0,0xfff2b0,1),-.6,.9,2.1);box(g,.5,.25,.1,M(0xfff2b0,0xfff2b0,1),.6,.9,2.1);box(g,1.6,.2,.1,M(0xff2222,0xff2222,1),0,.9,-2.1);return g}
+function sportsCarClone(source,color,traffic=false){const model=source.clone(true),paint=new Map();const recolor=m=>{if(!m||String(m.name).toLowerCase()!='paint')return m;if(!paint.has(m)){const c=m.clone();c.color.setHex(color);paint.set(m,c)}return paint.get(m)};model.traverse(o=>{if(!o.isMesh)return;o.material=Array.isArray(o.material)?o.material.map(recolor):recolor(o.material);o.castShadow=!traffic;o.receiveShadow=!traffic});return model}
+function replaceCarVisual(holder,source,color,traffic=false){if(holder.userData.visual)holder.remove(holder.userData.visual);const visual=sportsCarClone(source,color,traffic);holder.add(visual);holder.userData.visual=visual}
+const car=new T.Group(),carVisual=fallbackCar(CAR_COLORS[0]);car.add(carVisual);car.userData.visual=carVisual;
 const cV=reg(car,{name:'car',type:'car',ch:2.5,dist:10,max:40});car.position.set(9,hf(9,14),14);
 const boat=new T.Group();box(boat,2.6,1,6,M(0xf3f0e6),0,.3,0);const bw=new T.Mesh(new T.ConeGeometry(1.8,3,4),M(0xf3f0e6));bw.rotation.set(Math.PI/2,0,Math.PI/4);bw.scale.set(.75,1,.5);bw.position.set(0,.3,4.4);boat.add(bw);box(boat,2.6,.3,6,M(0x1f6f8b),0,.9,0).scale.set(1.02,1,1.02);box(boat,1.8,1.4,2,M(0xffffff),0,1.7,-.8);box(boat,1.9,.5,2.1,M(0x1a2233),0,2,-.8);
 const bV=reg(boat,{name:'boat',type:'boat',ch:3,dist:14,max:30});let ba=.8,br=150;while(hf(Math.cos(ba)*br,Math.sin(ba)*br)>-1.5)br+=2;const bx=Math.cos(ba)*br,bz=Math.sin(ba)*br;boat.position.set(bx,0,bz);bV.h=Math.atan2(Math.cos(ba),Math.sin(ba));
@@ -78,8 +83,10 @@ const dk=(x,z)=>{const u=x*dkc+z*dks,w=-x*dks+z*dkc;return Math.abs(w)<1.7&&u>br
 const pl=new T.Group();const fu=cyl(pl,.6,.35,6,M(0xf6f1e4),0,0,0,10);fu.rotation.x=Math.PI/2;box(pl,11,.15,1.6,M(0xd9342b),0,.2,.3);box(pl,.15,1.4,1.2,M(0xd9342b),0,.8,-2.8);box(pl,3.5,.12,.8,M(0xd9342b),0,.2,-2.8);const cp=new T.Mesh(new T.SphereGeometry(.55,8,6),M(0x1a2233,0x335577,.4));cp.position.set(0,.5,.6);pl.add(cp);
 const prop=new T.Group();prop.position.z=3.1;box(prop,3,.2,.1,M(0x222222),0,0,0);box(prop,.2,3,.1,M(0x222222),0,0,0);pl.add(prop);
 const pV=reg(pl,{name:'plane',type:'plane',ch:2.5,dist:18,max:90,pt:0,rl:0});pl.position.set(0,7.3,-26);pV.h=Math.PI;pl.rotation.y=Math.PI;
-const TR=[0xffc233,0x3a86d9,0x53b96a,0xf2f2f2].map((c,i)=>{const q=car.clone(true);q.remove(q.children[q.children.length-1]);q.children[0].material=M(c);q.rotation.order='YXZ';q.sg=i%2?1:-1;q.ax=i<2?0:1;q.u=q.sg*(20+i*8);q.dir=1;S.add(q);return q});
+const TR=CAR_COLORS.slice(1).map((c,i)=>{const q=new T.Group(),visual=fallbackCar(c);q.add(visual);q.userData.visual=visual;q.rotation.order='YXZ';q.sg=i%2?1:-1;q.ax=i<2?0:1;q.u=q.sg*(20+i*8);q.dir=1;S.add(q);return q});
 const hl=new T.SpotLight(0xfff0c8,0,90,.5,.5);hl.position.set(0,1,2.2);hl.target.position.set(0,.5,22);car.add(hl,hl.target);
+const carModelUrl=new URL('assets/vehicles/sports_car.glb',document.baseURI).href;
+new GLTFLoader().load(carModelUrl,gltf=>{replaceCarVisual(car,gltf.scene,CAR_COLORS[0]);TR.forEach((q,i)=>replaceCarVisual(q,gltf.scene,CAR_COLORS[i+1],true));car.userData.model='sports_car.glb';TR.forEach(q=>q.userData.model='sports_car.glb')},undefined,e=>{console.warn('sports car model failed; using fallback',e);if(started)toast('Detailed car model could not load. Using fallback.',3500)});
 // lighthouse
 const lh=new T.Group();let la=3.6,lr=150;while(hf(Math.cos(la)*lr,Math.sin(la)*lr)>.5)lr+=2;lh.position.set(Math.cos(la)*(lr-4),hf(Math.cos(la)*(lr-4),Math.sin(la)*(lr-4)),Math.sin(la)*(lr-4));
 for(let i=0;i<4;i++)cyl(lh,3-i*.4,3.4-i*.4,8,M(i%2?0xd9342b:0xf6f1e4),0,i*8+4,0,10);const lamp=new T.Mesh(new T.SphereGeometry(2,10,8),new T.MeshBasicMaterial({color:0xfff0b0}));lamp.position.y=34;lh.add(lamp);

@@ -1,0 +1,17 @@
+{
+  "asset": "sports_car.glb",
+  "source": "User-supplied asset uploaded in the Skyreach Isles development conversation",
+  "creation_note": "Repository owner states the model was created for them by Claude",
+  "sha256": "4f7e979e2bd9c07fc92b5ff94bb6d9076c9a56744a7178506f751d915cc64b2c",
+  "size_bytes": 1408500,
+  "approx_dimensions_m": {
+    "width": 2.2594,
+    "height": 1.39,
+    "length": 4.775
+  },
+  "integration": {
+    "paint_material": "paint",
+    "player_color": "#d9342b",
+    "traffic_colors": ["#ffc233", "#3a86d9", "#53b96a", "#f2f2f2"]
+  }
+}

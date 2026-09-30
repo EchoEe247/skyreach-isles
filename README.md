@@ -9,7 +9,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 ## Current gameplay
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
-- Driveable car, sailboat, and airplane
+- Detailed user-supplied sports car for the player and color-varied town traffic, plus sailboat and airplane
 - Six beacon objectives and eight airborne rings
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, hidden Skyshards, and landmark discoveries
@@ -40,7 +40,7 @@ npm run build
 npm run preview -- --host 0.0.0.0
 ```
 
-## Repository layout
+## Vehicle asset\n\nThe player car and four town traffic cars use \`public/assets/vehicles/sports_car.glb\`. Only the named \`paint\` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback. Asset provenance is recorded beside the GLB.\n\n## Repository layout
 
 ```text
 index.html
