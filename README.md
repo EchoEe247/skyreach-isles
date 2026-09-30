@@ -12,7 +12,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
 
-Tap **Explore** (or press **M**) to chart a destination or locate your speedboat. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+Tap **Explore** (or press **M**) to chart a destination, locate your speedboat, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 

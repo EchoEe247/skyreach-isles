@@ -1,6 +1,6 @@
 import {terrainHeight} from '../core/world.js';
 
-export function createAtlas({places,vehicles,onSelect,onOpen}) {
+export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
   const toggle=document.createElement('button');
   toggle.id='atlas-toggle';toggle.className='g';toggle.type='button';toggle.textContent='Explore';
   toggle.setAttribute('aria-label','Open island chart');document.getElementById('ui').append(toggle);
@@ -19,6 +19,11 @@ export function createAtlas({places,vehicles,onSelect,onOpen}) {
   }b.putImageData(im,0,0);
   const entries=document.getElementById('atlas-places');
   const listed=[...places.slice(5),...places.slice(0,5)];
+  const destinationCards=destinations.map((p,n)=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='atlas-place atlas-destination';btn.dataset.destination=p.id||p.name;
+    btn.innerHTML='<span class="atlas-number">'+(p.icon||'◆')+'</span><span><strong>'+p.name+'</strong><small>'+(p.description||'Set a course to this destination.')+'</small><em>'+(p.category||'DESTINATION')+'</em></span>';
+    btn.onclick=()=>{onSelect(p);close();};entries.append(btn);return btn;
+  });
   const cards=listed.map(p=>{
     const n=places.indexOf(p);
     const btn=document.createElement('button');btn.type='button';btn.className='atlas-place';
@@ -30,7 +35,7 @@ export function createAtlas({places,vehicles,onSelect,onOpen}) {
   boatBtn.innerHTML='<span class="atlas-number">↗</span><span><strong>Find my speedboat</strong><small>Plot a course to wherever you last left it.</small></span>';
   boatBtn.onclick=()=>{const boat=vehicles.find(v=>v.type==='boat');onSelect({name:'Your speedboat',get x(){return boat.g.position.x},get z(){return boat.g.position.z}});close()};entries.prepend(boatBtn);
   function close(){panel.hidden=true;onOpen(false);toggle.focus()}
-  function open(){panel.hidden=false;onOpen(true);cards.forEach((c,n)=>c.classList.toggle('visited',!!listed[n].on));draw(lastPosition,lastTarget);panel.querySelector('.atlas-close').focus()}
+  function open(){panel.hidden=false;onOpen(true);cards.forEach((c,n)=>c.classList.toggle('visited',!!listed[n].on));destinationCards.forEach((c,n)=>c.classList.toggle('selected',destinations[n]===lastTarget));draw(lastPosition,lastTarget);panel.querySelector('.atlas-close').focus()}
   toggle.onclick=()=>panel.hidden?open():close();
   panel.querySelector('.atlas-close').onclick=close;
   panel.querySelector('#atlas-clear').onclick=()=>{onSelect(null);close()};
@@ -55,6 +60,10 @@ export function createAtlas({places,vehicles,onSelect,onOpen}) {
       const[x,y]=point(p);ctx.fillStyle=p===target?'#edc77e':'#bed6c9';ctx.beginPath();ctx.arc(x,y,p===target?6:3,0,Math.PI*2);ctx.fill();
       if(places.indexOf(p)>=5){ctx.font='600 12px system-ui';ctx.textAlign='center';ctx.fillStyle='#f6ecd4';ctx.fillText(p.name,x,y-16)}
     }
+    for(const p of destinations){
+      const[x,y]=point(p);ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle=p===target?'#ffd487':'#ff9b38';ctx.fillRect(-4,-4,8,8);ctx.restore();
+      ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffd7a0';ctx.fillText(p.shortName||p.name,x,y-13);
+    }
     const[x,y]=point(position);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
   }
   return {
@@ -65,7 +74,8 @@ export function createAtlas({places,vehicles,onSelect,onOpen}) {
       context.drawImage(base,((-.5*extent-position.x)/span+.5)*size,((-.5*extent-position.z)/span+.5)*size,extent/span*size,extent/span*size);
       const pt=p=>[(p.x-position.x)/span*size+60,(p.z-position.z)/span*size+60];
       for(const p of places){const[x,y]=pt(p);context.fillStyle=p.on?'#aac8b5':'#e7cc8d';context.fillRect(x-2,y-2,4,4)}
-      for(const v of vehicles){const[x,y]=pt(v.g.position);context.fillStyle=v.type==='boat'?'#6fe7f1':v.type==='car'?'#ef7556':'#f5d27a';context.fillRect(x-2,y-2,4,4)}
+      for(const p of destinations){const[x,y]=pt(p);context.fillStyle='#ff9b38';context.save();context.translate(x,y);context.rotate(Math.PI/4);context.fillRect(-3,-3,6,6);context.restore()}
+      for(const v of vehicles){const[x,y]=pt(v.g.position);context.fillStyle=v.type==='boat'?'#6fe7f1':v.type==='car'?'#ef7556':v.type==='rocket'?'#ff9b38':'#f5d27a';context.fillRect(x-2,y-2,4,4)}
       for(const marker of markers){if(marker.on)continue;const[x,y]=pt(marker);context.fillStyle=marker.color||'#8ff7ff';context.beginPath();context.arc(x,y,2,0,Math.PI*2);context.fill()}
       if(target){
         let[x,y]=pt(target);const dx=x-60,dy=y-60,r=Math.hypot(dx,dy);

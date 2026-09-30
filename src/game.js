@@ -189,8 +189,9 @@ const puff=(x,y,z,c,sz,vy)=>{const q=PT[pi++%60];q.position.set(x,y,z);q.materia
 // input
 const keys={};let jx=0,jy=0,jid=null,jumpF=0,boostF=0,yaw=Math.PI,pitch=.35,off=0,started=0,mode='foot',cur=null,dragId=null,lx=0,ly=0;
 let atlasOpen=false,selectedWaypoint=null;
+const launchDestination={id:'nasa-launch-complex',name:'NASA Launch Complex',shortName:'NASA SLS',x:rocketPadX,z:rocketPadZ,icon:'▲',category:'HOME ISLAND · SLS LAUNCH',description:'Launch pad for the controllable NASA Space Launch System. Board the SLS here and fly continuously from Earth into space.'};
 function releaseInput(){Object.keys(keys).forEach(k=>delete keys[k]);jx=jy=jumpF=boostF=0;jid=dragId=null;$('knob').style.transform=''}
-const atlas=createAtlas({places:LM,vehicles:V,onSelect:p=>{selectedWaypoint=p;if(p)toast('Course set: '+p.name,2800)},onOpen:open=>{atlasOpen=open;releaseInput()}});
+const atlas=createAtlas({places:LM,vehicles:V,destinations:[launchDestination],onSelect:p=>{selectedWaypoint=p;if(p)toast('Course set: '+p.name,2800)},onOpen:open=>{atlasOpen=open;releaseInput()}});
 addEventListener('blur',releaseInput);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInput()});
 addEventListener('keydown',e=>{if(atlasOpen||!started)return;keys[e.code]=1;if(e.code=='KeyE'&&!e.repeat)act()});addEventListener('keyup',e=>keys[e.code]=0);
