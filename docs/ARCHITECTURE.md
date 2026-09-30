@@ -40,18 +40,18 @@ The maintained game uses detailed GLB visuals while keeping the original procedu
 - `public/assets/vehicles/sports_car.glb`: player car and four traffic variants; only the named `paint` material is recolored.
 - `public/assets/boats/speedboat.glb`: source scale, rotated -90° around Y so its +X bow matches Skyreach's +Z forward convention.
 - `public/assets/aircraft/airliner.glb`: uniform 0.30 scale; its +Z nose already matches the flight rig.
-- `public/assets/space/nasa-sls-block1.stl`: official NASA SLS Block 1 geometry, normalized at load time and colored in-engine for the orange core/white boosters.
+- `public/assets/space/nasa-sls-block1.stl`: official NASA SLS Block 1 geometry, normalized at load time; only the printable display-plinth triangles are discarded before rendering, then the rocket is colored in-engine for the orange core/white boosters.
 - `public/assets/space/nasa-blue-marble-2048.png`: NASA Blue Marble texture for the high-altitude Earth representation.
 
 Driving, sailing, and flight physics remain owned by the existing gameplay simulation rather than by the visual models.
 
 ## Continuous Earth-to-space flight
 
-The SLS is part of the same vehicle registry and main simulation loop as the car, boat, and airplane. There is no scene transition at altitude boundaries. Full-thrust ascent starts from the launch pad, then `src/core/spaceflight.js` updates physical altitude, vertical/horizontal speed, heading, pitch, atmosphere density, gravity, and drag deterministically.
+The SLS is part of the same vehicle registry and main simulation loop as the car, boat, and airplane. There is no scene transition at altitude boundaries. `src/core/spaceflight.js` updates physical altitude, vertical/horizontal speed, body heading, inertial horizontal-velocity heading, pitch/yaw rates, atmosphere density, gravity, drag, throttle response, SAS damping, and the gravity-turn assist deterministically.
 
 For numerical stability, physical rocket altitude is mapped to render height with a logarithmic function and can be inverted by tests. This preserves useful meter-scale ground coordinates while still representing the 100 km Kármán line and higher altitudes in the same Three.js scene. Visual atmosphere blending begins gradually above the lower atmosphere; fog/cloud contribution falls away, stars become fully visible, and the NASA Earth globe fades into view continuously.
 
-The mobile HUD exposes speed, physical altitude, and the current atmospheric region. The live browser smoke test has loaded the exact NASA STL as `rocket: ready` and rendered the controllable SLS at 110 km in the `SPACE` state.
+The mobile HUD exposes separate speed, physical altitude, and atmospheric-region cells plus a 20–100% throttle preset and SAS toggle. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. The live browser smoke checks cover ~105 m, 16.6 km, 44.2 km, and ~297 km.
 
 ## World continuity
 

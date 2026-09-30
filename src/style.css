@@ -32,3 +32,26 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
   #nav{top:126px;left:10px;transform:none;min-width:0}
   #quality{top:158px}
 }
+/* Rocket flight HUD and controls */
+#rocketCtl{display:none}
+#ui.rocket-mode #spd{left:10px;right:10px;top:128px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px 9px;background:rgba(20,24,58,.72);backdrop-filter:blur(7px);border:1px solid rgba(255,243,214,.28);border-radius:13px;text-shadow:none;font-size:12px;line-height:1.1;z-index:3}
+#ui.rocket-mode #spd .metric{min-width:0;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+#ui.rocket-mode #spd .metric small{font-size:8px;letter-spacing:.13em;color:#d8d2c2;opacity:.85}
+#ui.rocket-mode #spd .metric b{font-size:13px;color:var(--amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui.rocket-mode #nav{top:176px;left:10px;right:150px;transform:none;min-width:0;max-width:none;overflow:hidden;justify-content:flex-start}
+#ui.rocket-mode #navText{overflow:hidden;text-overflow:ellipsis}
+#ui.rocket-mode #quality{top:176px}
+#ui.rocket-mode #rocketCtl{position:absolute;right:108px;bottom:calc(38px + env(safe-area-inset-bottom,0px));width:122px;display:grid;grid-template-columns:34px 1fr 34px;gap:5px;padding:6px;pointer-events:auto;z-index:4}
+#rocketCtl button{min-width:0;height:32px;border:1px solid rgba(255,243,214,.24);border-radius:9px;background:rgba(10,18,40,.72);color:var(--cream);font:700 14px system-ui;touch-action:manipulation}
+#rocketCtl button:active{transform:scale(.95)}
+#thrRead{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+#thrRead small{font-size:7px;letter-spacing:.08em;opacity:.72}
+#thrRead strong{font-size:12px;color:var(--amber);margin-top:3px}
+#sas{grid-column:1/-1;font-size:11px!important;color:#9ff0c7!important}
+#sas.off{color:#ffd39a!important}
+@media (max-width:620px){
+  #ui.rocket-mode #spd{top:128px}
+  #ui.rocket-mode #nav{top:176px;right:142px}
+  #ui.rocket-mode #quality{top:176px}
+  #ui.rocket-mode #atlas-toggle{top:216px}
+}

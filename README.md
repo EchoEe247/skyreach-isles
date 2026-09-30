@@ -72,13 +72,13 @@ The boat uses `public/assets/boats/speedboat.glb` at its source scale. The sourc
 
 The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
 
-The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `public/assets/space/nasa-sls-block1.stl`. The original NASA geometry is kept intact at runtime; Skyreach normalizes orientation/scale and applies the recognizable orange-core/white-booster presentation in Three.js. A procedural SLS-shaped fallback remains available only if the STL fails to load. `public/assets/space/nasa-blue-marble-2048.png` provides the NASA Earth texture used for the high-altitude view. Provenance metadata is stored beside both NASA assets.
+The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `public/assets/space/nasa-sls-block1.stl`. Skyreach normalizes orientation/scale, removes only the STL's large printable display plinth so it does not fly with the vehicle, and applies the recognizable orange-core/white-booster presentation in Three.js. A procedural SLS-shaped fallback remains available only if the STL fails to load. `public/assets/space/nasa-blue-marble-2048.png` provides the NASA Earth texture used for the high-altitude view. Provenance metadata is stored beside both NASA assets.
 
 ### Earth-to-space flight
 
 `src/core/spaceflight.js` owns the deterministic rocket-flight model. Atmosphere density decays continuously with altitude, gravity follows the inverse-square Earth-radius relationship, aerodynamic drag falls away with atmospheric density, and thrust/steering continue without switching scenes. The game maps physical altitude into a compressed render coordinate so a mobile WebGL scene can represent tens to hundreds of kilometers without destroying near-surface precision.
 
-The HUD reports altitude and atmospheric region, including the Kármán-line transition at 100 km. Crossing that line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation.
+The mobile flight HUD separates speed, altitude, and atmospheric region so objective guidance no longer overlaps telemetry. Rocket throttle is adjustable from 20–100% before/while holding THRUST, and SAS can be toggled: SAS damps rotation and adds a gentle gravity-turn assist, while SAS OFF preserves pitch/yaw inertia for manual flight. Horizontal velocity keeps its own travel heading in space instead of snapping instantly to the rocket nose. Crossing the 100 km Kármán line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation.
 
 Asset provenance is recorded beside each detailed vehicle/space asset.
 
