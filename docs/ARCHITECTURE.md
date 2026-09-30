@@ -22,7 +22,7 @@ The first extracted modules are:
 
 Beacon, sky-ring, Skyshard, and landmark completion are persisted under a versioned storage key. Quality preference is persisted separately. Corrupt or unavailable localStorage data fails safely to defaults.
 
-## Performance
+## World continuity\n\nThe island remains a finite authored/procedural landmass, but boat collision is intentionally finite as well: shoreline checks protect the island coast while open ocean has no artificial coordinate wall. The far mathematical seafloor is capped to keep long-distance height queries numerically stable. Water and sky follow the camera, and cloud positions wrap around the player so long ocean trips do not leave the atmosphere behind.\n\n## Audio\n\nAudio starts only after the player's start gesture to satisfy browser autoplay rules. The soundscape is generated locally with WebAudio rather than streamed assets: surface-aware footsteps, wind, surf, open-ocean wash, land and town ambience, car engine/road noise, boat engine/wake, airliner engine/jet noise, and sparse day/night wildlife. Mix levels react continuously to speed, altitude, coast proximity, town proximity, vehicle mode, and time of day.\n\n## Performance
 
 Automatic quality chooses a conservative preset from browser-reported device memory/CPU information when available. The player can cycle Auto, Low, Medium, and High without leaving the game. Pixel ratio and shadow rendering are the first runtime controls because they have a large GPU cost on mobile.
 
@@ -36,7 +36,7 @@ As features grow, extract these in small verified steps:
 
 1. world generation: terrain, water, town, vegetation, lighthouse
 2. entities: player, NPCs, vehicles
-3. systems: input, camera, objectives, particles, audio, day/night
+3. systems: input, camera, objectives, particles, day/night
 4. UI: HUD, minimap, settings
 
 Each extraction should preserve the legacy build as the behavioral reference and be followed by a production build plus browser smoke test.

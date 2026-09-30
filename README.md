@@ -10,7 +10,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
 - Detailed user-supplied sports car for the player and color-varied town traffic
-- Detailed speedboat using the existing sailing controls and physics
+- Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
 - Detailed airliner using the existing flight controls and physics
 - Six beacon objectives and eight airborne rings
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
@@ -20,7 +20,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - Five named landmarks with discovery feedback and minimap history
 - Stronger objective feedback with screen pulses and supported-device haptics
 - Runtime quality selector with an automatic mobile-friendly default
-- Installable/offline-capable PWA shell after the first successful load
+- Adaptive offline WebAudio soundscape: footsteps by surface, wind, surf, ocean wash, town/land ambience, car/road audio, boat engine/wake, airliner engine/jet, birds, and night insects\n- Installable/offline-capable PWA shell after the first successful load
 
 ## Run locally
 
@@ -46,7 +46,7 @@ npm run preview -- --host 0.0.0.0
 
 The player car and four town traffic cars use `public/assets/vehicles/sports_car.glb`. Only the named `paint` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback.
 
-The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. The procedural boat is retained only as a load-failure fallback.
+The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shoreline collision is finite around the island; once the boat is in open ocean there is no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
 
 The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
 
