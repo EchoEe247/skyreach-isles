@@ -16,7 +16,7 @@ Tap **Explore** (or press **M**) to chart a destination, locate your speedboat, 
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 
-The day/night cycle is intentionally weighted toward exploration: daylight lasts 9 minutes and night lasts 3 minutes. Night keeps cool moonlight plus ambient/hemisphere fill so terrain, vehicles, and the player remain readable instead of dropping to near-black. Fireflies still appear near land after dark. All additions are locally generated in the existing stylized art direction.
+The day/night cycle is intentionally weighted toward exploration: daylight lasts 9 minutes and night lasts 3 minutes. Night keeps cool moonlight plus ambient/hemisphere fill so terrain, vehicles, and the player remain readable instead of dropping to near-black. Fireflies still appear near land after dark. The procedural foundation is enriched with a curated CC0 Quaternius model selection in the existing stylized art direction.
 
 ## Living Isles
 
@@ -26,7 +26,7 @@ Weather is coupled to rendering and audio: rain particles, cloud cover/speed, fo
 
 See [Living Isles](docs/LIVING-ISLES.md) for the simulation contract and verification notes.
 
-The next environment-content pass is documented in [Curated Free Asset Integration Plan](docs/ASSET-INTEGRATION-PLAN.md). It treats free packs as source libraries, selects only models that fit a specific existing location, and keeps public-web licensing and mobile performance as hard constraints.
+The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: planted island biomes, Ember's ruined courts and entrance arch, town street furniture, launch-service details, and six animated animals across three species. Regions load on approach; repeated scenery is instanced and faraway animal animation stops. The motorcycle remains deferred pending a suitable public-web-safe model.
 
 ## Current gameplay
 
@@ -94,7 +94,7 @@ Asset provenance is recorded beside each detailed vehicle/space asset.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v10`.
+`public/sw.js` currently uses cache version `skyreach-v11`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

@@ -31,4 +31,7 @@ Palms, rocks and stepping stones are instanced. Wakes use a fixed 64-instance po
 
 Verification used software-rendered Chromium in a separate Xvfb display, with no Android Display 0 actions. It verifies rendering and interactions, not native Android GPU performance. Native Chrome frame pacing and the subjective audio mix still need player feedback.
 
-No downloaded assets were added. Terrain, scenery and shaders were authored in the repository. Existing user-provided vehicle assets and their provenance are unchanged.
+The original expansion used repository-authored terrain, scenery and shaders. The subsequent [curated CC0 asset pass](CURATED-ASSETS.md) adds selected imported scenery and animals. Existing user-provided vehicle assets and their provenance are unchanged.
+## Curated enrichment
+
+See [Curated assets](CURATED-ASSETS.md) for the subsequent planted biomes, Ember ruined courts, urban/launch detail, curated wildlife and source provenance. Terrain height, island coordinates, inlet and sea-arch navigation contracts are unchanged.

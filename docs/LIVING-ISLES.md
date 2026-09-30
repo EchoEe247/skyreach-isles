@@ -57,3 +57,7 @@ Events announce once when they begin. Reaching the event radius resolves the cur
 ## Deliberate boundaries
 
 This update does not add interiors, a full economy, combat, NPC dialogue trees, traffic AI collision, or persistent event rewards. Those would be separate systems and should not be hidden inside the living-world controller.
+
+## Curated animals
+
+A later [CC0 asset pass](CURATED-ASSETS.md) adds six animated animals across three species in a separate environment controller. Cached models retain Idle/Eating/Walk animations, with small local routes and distance-based animation suspension. Existing NPC schedules, ferries, events and dolphins are unchanged.

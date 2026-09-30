@@ -12,6 +12,9 @@ Vite owns development and production bundling. Three.js is installed through npm
 
 Current extracted modules:
 
+- `src/core/environment-layout.js`: curated regional model placements and six animal home ranges.
+- `src/systems/environment-assets.js`: demand-loaded CC0 GLBs, cached sources, per-region static instancing, lightweight collisions and distance-throttled skeletal animals.
+
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
@@ -102,7 +105,7 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v10`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v11`.
 
 Service-worker behavior:
 

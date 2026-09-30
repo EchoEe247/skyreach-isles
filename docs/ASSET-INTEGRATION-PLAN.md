@@ -1,5 +1,7 @@
 # Curated Free Asset Integration Plan
 
+**Implemented September 30, 2026:** see [delivered selection, substitutions, performance and remaining scope](CURATED-ASSETS.md). The plan below records design intent; it is not a claim that every candidate pack or optional motorcycle/NPC upgrade shipped.
+
 ## Goal
 
 Enrich Skyreach Isles in one coordinated pass using selected free assets that fit the existing world. Asset packs are source libraries, not content dumps. Only pieces that improve a specific location, interaction, or visual gap are imported.

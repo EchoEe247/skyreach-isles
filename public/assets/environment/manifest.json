@@ -1,0 +1,830 @@
+{
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "retrieved": "2026-09-30",
+  "mirrorCommit": "db3df04d1e4714298a09510b26fb6de6645138a2",
+  "assets": [
+    {
+      "file": "environment/nature/Fern_1.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/Fern_1.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/Fern_1.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "e7ed8de355c4bfed7ce719fdb2a790e505e71f23d60eb922f662cc8a9e565ff1",
+      "bytes": 12968,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/db740769d39a7a44214f.png"
+      ],
+      "triangles": 288
+    },
+    {
+      "file": "environment/nature/Bush_Common_Flowers.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/Bush_Common_Flowers.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/Bush_Common_Flowers.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "2d9e5a675a2b4cb01b12efb0d1b726aa0a40c94ddb3e1ff5d1a6feef56a8d500",
+      "bytes": 131612,
+      "textures": [
+        {
+          "source": [
+            1024,
+            1024
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            1008,
+            981
+          ],
+          "output": [
+            512,
+            498
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/e9595477cf05a3ef9188.png",
+        "environment/textures/a0910ad5017a88c2272c.png"
+      ],
+      "triangles": 1368
+    },
+    {
+      "file": "environment/nature/Grass_Common_Short.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/Grass_Common_Short.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/Grass_Common_Short.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "55edb26111779ac79a6c4e604b3bf0b2227a1a6b585d22c5347670b546274100",
+      "bytes": 8532,
+      "textures": [
+        {
+          "source": [
+            512,
+            512
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/4b7542d5b737738cedd2.png"
+      ],
+      "triangles": 155
+    },
+    {
+      "file": "environment/nature/Rock_Medium_1.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/Rock_Medium_1.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/Rock_Medium_1.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "11a9b376fbb2b7cdbeea0547cbf53a64b2f66b191f486a18c80f913d0d241d0f",
+      "bytes": 14624,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/6a7a29cb6a423f44c2ee.png"
+      ],
+      "triangles": 342
+    },
+    {
+      "file": "environment/urban/StreetLights.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/StreetLights.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/StreetLights.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "e68aa424e4164af764907677ebfffa0382d9ef6c7baa807d009397f78d846adb",
+      "bytes": 15748,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 426
+    },
+    {
+      "file": "environment/urban/PlasticBarrier.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/PlasticBarrier.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/PlasticBarrier.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "7ef057a251e2e46bead0b2212b1c5c93d3e4c2b06ddecbe41f96c4786d3b793c",
+      "bytes": 38936,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 852
+    },
+    {
+      "file": "environment/nature/Flower_3_Group.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/Flower_3_Group.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/Flower_3_Group.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "988b9e607707fdc4063fa9fbb7d4889f956c4bed180b3e236b7138589ab5cd89",
+      "bytes": 30440,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            1008,
+            981
+          ],
+          "output": [
+            512,
+            498
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/db740769d39a7a44214f.png",
+        "environment/textures/a0910ad5017a88c2272c.png"
+      ],
+      "triangles": 755
+    },
+    {
+      "file": "environment/urban/TrafficCone_1.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/TrafficCone_1.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/TrafficCone_1.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "1350069bd4798f36cd1dc71a3f4e74eb8480374939fc5beb6b6596f36e86928d",
+      "bytes": 6708,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 134
+    },
+    {
+      "file": "environment/urban/FireHydrant.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/FireHydrant.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/FireHydrant.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "5c2a40501cca66f61c0e2eeae3a1845aa592dac100f4572c7b6045a8c7152d54",
+      "bytes": 38140,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 976
+    },
+    {
+      "file": "environment/urban/Pallet.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/Pallet.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/Pallet.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "2bbad9781917f8f7a681576e2d5e7b92cb5347bccb718866f9897ba5d08e3e44",
+      "bytes": 18060,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 240
+    },
+    {
+      "file": "environment/urban/Pipes.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/Pipes.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/Pipes.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "9a6cf3d5f65d4ec488ad1e1e4cc028fad80d174e92fb682a8a86b6d722d7c9ae",
+      "bytes": 52424,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 1496
+    },
+    {
+      "file": "environment/urban/TownSign.glb",
+      "author": "Quaternius",
+      "pack": "Zombie Apocalypse Kit - March 2024",
+      "sourceFile": "Zombie Apocalypse Kit - March 2024/Environment/glTF/TownSign.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Zombie%20Apocalypse%20Kit%20-%20March%202024/Environment/glTF/TownSign.gltf",
+      "officialSource": "https://quaternius.com/packs/zombieapocalypsekit.html",
+      "license": "CC0-1.0",
+      "sha256": "a5c054fe828b4b66abaf85f2c22d5f4f0d7c075a95941566f6da391dfa6908d3",
+      "bytes": 61624,
+      "textures": [],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/a6cbb7205be11a4ce29f.png"
+      ],
+      "triangles": 1397
+    },
+    {
+      "file": "environment/nature/CommonTree_1.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/CommonTree_1.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/CommonTree_1.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "cf5962bac41da294ff3435403fbdc0f014b2458c9676b3afffaeb094b4ee5dcc",
+      "bytes": 494416,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            1024,
+            1024
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/4398decc07ba3e62eb93.png",
+        "environment/textures/a800cb97b5dc135ed690.png",
+        "environment/textures/e9595477cf05a3ef9188.png"
+      ],
+      "triangles": 6265
+    },
+    {
+      "file": "environment/nature/TwistedTree_1.glb",
+      "author": "Quaternius",
+      "pack": "Stylized Nature MegaKit[Standard]",
+      "sourceFile": "Stylized Nature MegaKit[Standard]/glTF/TwistedTree_1.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Stylized%20Nature%20MegaKit%5BStandard%5D/glTF/TwistedTree_1.gltf",
+      "officialSource": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "9279ac09ae13e62ce8a220b2e3d860d8b5b21bfe5a931f5a51a5596d9f6b3ee7",
+      "bytes": 735252,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            1024,
+            1024
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/f3a644026586af9d47e9.png",
+        "environment/textures/d18f04c3a6bc4a0469fb.png",
+        "environment/textures/eb2762ded765abc9a61b.png"
+      ],
+      "triangles": 9564
+    },
+    {
+      "file": "animals/Deer.glb",
+      "author": "Quaternius",
+      "pack": "Ultimate Animated Animals - July 2021",
+      "sourceFile": "Ultimate Animated Animals - July 2021/glTF/Deer.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Ultimate%20Animated%20Animals%20-%20July%202021/glTF/Deer.gltf",
+      "officialSource": "https://quaternius.com/packs/ultimateanimatedanimals.html",
+      "license": "CC0-1.0",
+      "sha256": "19a3ee311cbec9f0dfb5fc5038c1c49455c7d76a14e7678c61978672e3bddf25",
+      "bytes": 2013688,
+      "textures": [],
+      "animations": [
+        "Attack_Headbutt",
+        "Attack_Kick",
+        "Death",
+        "Eating",
+        "Gallop",
+        "Gallop_Jump",
+        "Idle",
+        "Idle_2",
+        "Idle_Headlow",
+        "Idle_HitReact1",
+        "Idle_HitReact2",
+        "Jump_toIdle",
+        "Walk"
+      ],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 2098
+    },
+    {
+      "file": "animals/Fox.glb",
+      "author": "Quaternius",
+      "pack": "Ultimate Animated Animals - July 2021",
+      "sourceFile": "Ultimate Animated Animals - July 2021/glTF/Fox.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Ultimate%20Animated%20Animals%20-%20July%202021/glTF/Fox.gltf",
+      "officialSource": "https://quaternius.com/packs/ultimateanimatedanimals.html",
+      "license": "CC0-1.0",
+      "sha256": "46c849f445d9ae25b11568b72c09a75ed3e17c79b36c5e8bc58ffadb41812ecf",
+      "bytes": 1909976,
+      "textures": [],
+      "animations": [
+        "Attack",
+        "Death",
+        "Eating",
+        "Gallop",
+        "Gallop_Jump",
+        "Idle",
+        "Idle_2",
+        "Idle_2_HeadLow",
+        "Idle_HitReact1",
+        "Idle_HitReact2",
+        "Jump_ToIdle",
+        "Walk"
+      ],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 1848
+    },
+    {
+      "file": "animals/ShibaInu.glb",
+      "author": "Quaternius",
+      "pack": "Ultimate Animated Animals - July 2021",
+      "sourceFile": "Ultimate Animated Animals - July 2021/glTF/ShibaInu.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Ultimate%20Animated%20Animals%20-%20July%202021/glTF/ShibaInu.gltf",
+      "officialSource": "https://quaternius.com/packs/ultimateanimatedanimals.html",
+      "license": "CC0-1.0",
+      "sha256": "8302af941f144185c1afbde4ad8cc79358b575311deea23be4fbcd3d367f50a8",
+      "bytes": 1752268,
+      "textures": [],
+      "animations": [
+        "Attack",
+        "Death",
+        "Eating",
+        "Gallop",
+        "Gallop_Jump",
+        "Idle",
+        "Idle_2",
+        "Idle_2_HeadLow",
+        "Idle_HitReact1",
+        "Idle_HitReact2",
+        "Jump_ToIdle",
+        "Walk"
+      ],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 1950
+    },
+    {
+      "file": "environment/urban/Crate_Wooden.glb",
+      "author": "Quaternius",
+      "pack": "Fantasy Props MegaKit[Standard]",
+      "sourceFile": "Fantasy Props MegaKit[Standard]/Exports/glTF/Crate_Wooden.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Fantasy%20Props%20MegaKit%5BStandard%5D/Exports/glTF/Crate_Wooden.gltf",
+      "officialSource": "https://quaternius.com/packs/fantasypropsmegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "dce6b0437468a3598799c43217bc68584dcd3d6e5c353fb1f7b08149675c6ef9",
+      "bytes": 69692,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/589415b05e880b350260.png",
+        "environment/textures/d8f9b80a44421eec3c2a.png",
+        "environment/textures/20bcb5b0456184ed71ff.png",
+        "environment/textures/dd1595384b5ae5ea9340.png",
+        "environment/textures/03abb7637d9a21b30798.png",
+        "environment/textures/54f8fe2d817599d712fe.png"
+      ],
+      "triangles": 1576
+    },
+    {
+      "file": "environment/urban/Bench.glb",
+      "author": "Quaternius",
+      "pack": "Fantasy Props MegaKit[Standard]",
+      "sourceFile": "Fantasy Props MegaKit[Standard]/Exports/glTF/Bench.gltf",
+      "download": "https://raw.githubusercontent.com/agentkaerf/FreeModels/db3df04d1e4714298a09510b26fb6de6645138a2/Fantasy%20Props%20MegaKit%5BStandard%5D/Exports/glTF/Bench.gltf",
+      "officialSource": "https://quaternius.com/packs/fantasypropsmegakit.html",
+      "license": "CC0-1.0",
+      "sha256": "7ae186b3ffdc1ae1efadcd26de5f151940839f8e17f0b5108e0c174f86f70e72",
+      "bytes": 22416,
+      "textures": [
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        },
+        {
+          "source": [
+            2048,
+            2048
+          ],
+          "output": [
+            512,
+            512
+          ]
+        }
+      ],
+      "animations": [],
+      "conversion": "glTF buffers packed to GLB; textures capped at 512px; skeletal animations retained; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [
+        "environment/textures/589415b05e880b350260.png",
+        "environment/textures/d8f9b80a44421eec3c2a.png",
+        "environment/textures/20bcb5b0456184ed71ff.png",
+        "environment/textures/dd1595384b5ae5ea9340.png",
+        "environment/textures/03abb7637d9a21b30798.png",
+        "environment/textures/54f8fe2d817599d712fe.png"
+      ],
+      "triangles": 404
+    },
+    {
+      "file": "environment/ruins/Column.glb",
+      "author": "Quaternius",
+      "pack": "Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Modular Dungeon Pack - Jan 2018/FBX/Column.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Modular%20Dungeon%20Pack%20-%20Jan%202018/FBX/Column.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "29d36f89dd682a5c498dce30ec01c1b2b8cc435554b4b9035f7ab085a5f69113",
+      "bytes": 25516,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 332
+    },
+    {
+      "file": "environment/ruins/Column_Broken.glb",
+      "author": "Quaternius",
+      "pack": "Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Modular Dungeon Pack - Jan 2018/FBX/Column_Broken.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Modular%20Dungeon%20Pack%20-%20Jan%202018/FBX/Column_Broken.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "787da70a1cec2cfe95e5c9a9652ca2c095f6164133b77b609bab312024491338",
+      "bytes": 11804,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 140
+    },
+    {
+      "file": "environment/ruins/Column_Broken2.glb",
+      "author": "Quaternius",
+      "pack": "Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Modular Dungeon Pack - Jan 2018/FBX/Column_Broken2.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Modular%20Dungeon%20Pack%20-%20Jan%202018/FBX/Column_Broken2.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "8d2fc13e843fcfd834afbc6377933794c5d40a8474222a746e0602fcecb4d636",
+      "bytes": 14016,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 172
+    },
+    {
+      "file": "environment/ruins/WallRocks.glb",
+      "author": "Quaternius",
+      "pack": "Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Modular Dungeon Pack - Jan 2018/FBX/WallRocks.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Modular%20Dungeon%20Pack%20-%20Jan%202018/FBX/WallRocks.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "e0b41de0e2ad5c196545b96b625fd22b7fe8f1d0b3bfaffa6589624f6df12630",
+      "bytes": 36180,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 480
+    },
+    {
+      "file": "environment/ruins/Arch.glb",
+      "author": "Quaternius",
+      "pack": "Updated Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Updated Modular Dungeon - May 2019/FBX/Arch.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Updated%20Modular%20Dungeon%20-%20May%202019/FBX/Arch.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "d3677412eeb68e41d74688d72094128966004fb31488758d27afe46951a26bd0",
+      "bytes": 324472,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 4484
+    },
+    {
+      "file": "environment/ruins/Wall_Modular.glb",
+      "author": "Quaternius",
+      "pack": "Updated Modular Dungeon",
+      "sourceFile": "FreeModels by Quaternius[Patreon]/Medieval/Updated Modular Dungeon - May 2019/FBX/Wall_Modular.fbx",
+      "download": "https://raw.githubusercontent.com/beep2bleep/FreeAssetsByKenneyNLandQuaternius/dea756baf3b3a4889d8c245e456a4791f961578a/FreeModels%20by%20Quaternius%5BPatreon%5D/Medieval/Updated%20Modular%20Dungeon%20-%20May%202019/FBX/Wall_Modular.fbx",
+      "officialSource": "https://quaternius.com/packs/medievaldungeon.html",
+      "license": "CC0-1.0",
+      "sha256": "7f69bb823f27a7299a220243813f8fc5c091c4878f41528486d53e0603dc2ee9",
+      "bytes": 121868,
+      "conversion": "FBX to GLB via Three.js; normalized units; shared weathered-stone material; unused UV/color removed; identical textures deduplicated into external shared PNGs",
+      "imageDependencies": [],
+      "triangles": 1670
+    }
+  ],
+  "sharedTextures": [
+    {
+      "file": "environment/textures/03abb7637d9a21b30798.png",
+      "bytes": 178957,
+      "sha256": "03abb7637d9a21b30798c5145de98b428fc3e7bd54f45eb07d08063d3348a0b8"
+    },
+    {
+      "file": "environment/textures/20bcb5b0456184ed71ff.png",
+      "bytes": 164554,
+      "sha256": "20bcb5b0456184ed71ff1ba2004308965bad55a1dfa02dc49b157146f058388d"
+    },
+    {
+      "file": "environment/textures/4398decc07ba3e62eb93.png",
+      "bytes": 274209,
+      "sha256": "4398decc07ba3e62eb931d2fb60f6d1ac4434922c93426298d84f7cecd57ca57"
+    },
+    {
+      "file": "environment/textures/4b7542d5b737738cedd2.png",
+      "bytes": 32432,
+      "sha256": "4b7542d5b737738cedd22675352fad8b3cc8498ae0c26a4bdfb5ab38cd39493f"
+    },
+    {
+      "file": "environment/textures/54f8fe2d817599d712fe.png",
+      "bytes": 161129,
+      "sha256": "54f8fe2d817599d712feee6504b80805ca450b30a0f07d1fdbf8382562e26d21"
+    },
+    {
+      "file": "environment/textures/589415b05e880b350260.png",
+      "bytes": 227331,
+      "sha256": "589415b05e880b350260d5d6d8d42c8a9b034a144410c0e62e3d5ec5340030f4"
+    },
+    {
+      "file": "environment/textures/6a7a29cb6a423f44c2ee.png",
+      "bytes": 304643,
+      "sha256": "6a7a29cb6a423f44c2ee586e709fa3a5189b7a2d718c15e395cad47a33e6af3e"
+    },
+    {
+      "file": "environment/textures/a0910ad5017a88c2272c.png",
+      "bytes": 161499,
+      "sha256": "a0910ad5017a88c2272c07b11d760c0083a13ceb75745d596c518350167d9031"
+    },
+    {
+      "file": "environment/textures/a6cbb7205be11a4ce29f.png",
+      "bytes": 3524,
+      "sha256": "a6cbb7205be11a4ce29f1a56924abf4dcc1570698249b92c31bfd245c83c4d78"
+    },
+    {
+      "file": "environment/textures/a800cb97b5dc135ed690.png",
+      "bytes": 233682,
+      "sha256": "a800cb97b5dc135ed690f71c941a126077c68e634c48b61c575469139a887465"
+    },
+    {
+      "file": "environment/textures/d18f04c3a6bc4a0469fb.png",
+      "bytes": 267653,
+      "sha256": "d18f04c3a6bc4a0469fb5b6f06880743590817bcd04b21f7dce77f706c742ef6"
+    },
+    {
+      "file": "environment/textures/d8f9b80a44421eec3c2a.png",
+      "bytes": 228620,
+      "sha256": "d8f9b80a44421eec3c2ad93cfa8867e2b2c5f9fe3208d71782cc219f2a5c61b1"
+    },
+    {
+      "file": "environment/textures/db740769d39a7a44214f.png",
+      "bytes": 193807,
+      "sha256": "db740769d39a7a44214f7ed22ccf0fb2ebbee1613310eaa4017d6f1304109255"
+    },
+    {
+      "file": "environment/textures/dd1595384b5ae5ea9340.png",
+      "bytes": 263252,
+      "sha256": "dd1595384b5ae5ea934075ac87a1137a14c7d82208c140bf6ae75f4d985d75ad"
+    },
+    {
+      "file": "environment/textures/e9595477cf05a3ef9188.png",
+      "bytes": 65760,
+      "sha256": "e9595477cf05a3ef91886ccbe6e3cd0a1175f79654342bffe021a1a4e6f0ffa5"
+    },
+    {
+      "file": "environment/textures/eb2762ded765abc9a61b.png",
+      "bytes": 46846,
+      "sha256": "eb2762ded765abc9a61b99e1bd997ea1e6108d7692e48cca3e433b25e9041b66"
+    },
+    {
+      "file": "environment/textures/f3a644026586af9d47e9.png",
+      "bytes": 355973,
+      "sha256": "f3a644026586af9d47e959a4b477dce293402749742bb3db01636e6122a0df21"
+    }
+  ]
+}

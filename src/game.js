@@ -6,6 +6,7 @@ import "./atlas.css";
 import {ISLANDS} from "./core/archipelago.js";
 import {advanceSunAngle,lightingAt} from "./core/daylight.js";
 import {npcScheduleTarget} from "./core/living-world.js";
+import {createEnvironmentAssets} from "./systems/environment-assets.js";
 import {createIslandScenery} from "./systems/island-scenery.js";
 import {createLivingWorld} from "./systems/living-world.js";
 import {createAtlas} from "./systems/atlas.js";
@@ -165,6 +166,7 @@ const LM=[
  ...ISLANDS.map(i=>({...i,r:i.radius*.8,on:0}))
 ];
 const islandScenery=createIslandScenery(S,BL);
+const environmentAssets=createEnvironmentAssets(S,BL);
 const livingWorld=createLivingWorld(S,{
  heightAt:hf,
  routes:[
@@ -270,6 +272,7 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
  const nav=selectedWaypoint?{item:selectedWaypoint,distance:distance2D(selectedWaypoint,P)}:nearestPending(BC,P)||nearestPending(XR,P),navArrow=$('navArrow'),navText=$('navText'),heading=mode=='foot'?hero.rotation.y:(cur?.h??yaw);if(nav){const isBeacon=BC.includes(nav.item);navArrow.style.transform='rotate('+relativeBearing(P,nav.item,heading)+'rad)';navText.textContent=(selectedWaypoint?selectedWaypoint.name+' · ':isBeacon?'Beacon ':'Skyshard ')+(nav.distance>=1000?(nav.distance/1000).toFixed(1)+'km':Math.round(nav.distance)+'m')}else{navArrow.style.transform='rotate(0rad)';navText.textContent='Compass clear ✓'}
  atlas.drawRadar(mc,P,heading,selectedWaypoint,[...BC.map(b=>({...b,color:"#ffc24a"})),...RG.map(q=>({...q,color:"#ffd23a"})),...XR.filter(q=>distance2D(q,P)<95)]);atlas.update(P,selectedWaypoint);
  waterTime.value=tm_;
+ environmentAssets.update({position:P,dt,time:livingTime});
  islandScenery.update({time:tm_,dt,daylight:k,position:P,boat:mode==='veh'&&cur?.type==='boat',speed:cur?.sp||0,heading:cur?.h||0,quality});
  const ah=hf(P.x,P.z),ar=Math.hypot(P.x,P.z),rawAudioMode=mode=='veh'?(cur?.type||'foot'):'foot',audioMode=rawAudioMode=='rocket'?'plane':rawAudioMode,audioSpeed=mode=='veh'?Math.abs(cur?.sp||0):Math.hypot(jX,jY)*(bo?11:6.5),audioOcean=cl((1.2-ah)/5,0,1)*(1-space),audioCoast=cl(1-Math.abs(ah)/4.5,0,1)*(1-space),audioTown=cl(1-ar/90,0,1)*(1-space),audioAlt=audioMode=='plane'?Math.max(0,P.y-ah):0;
  worldAudio.update({dt,waterfall:cl(1-Math.hypot(P.x-(ISLANDS[2].x-5),P.z-ISLANDS[2].z)/90,0,1),mode:audioMode,speed:audioSpeed,walking:mode=='foot'&&Math.hypot(jX,jY)>.08,sprinting:!!bo,grounded:mode=='foot'&&Math.abs(P.y-Math.max(gr(P.x,P.z),-.7))<.15,surface:surfaceAt(P.x,P.z),ocean:audioOcean,coast:audioCoast,town:audioTown,daylight:k,altitude:audioAlt,rain:weather.rain,weatherWind:weather.wind,storm:weather.kind==='storm'?1:0});
@@ -277,8 +280,9 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
 if(import.meta.env.PROD&&'serviceWorker' in navigator){addEventListener('load',async()=>{const hadController=!!navigator.serviceWorker.controller;let reloading=false;if(hadController)navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()},{once:true});try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});reg.update().catch(()=>{})}catch{}})}
 if(import.meta.env.DEV){
  globalThis.__skyreach={
+  environment:()=>environmentAssets.status(),
   snapshot:()=>({position:P.toArray(),mode,vehicle:cur?.type||null,atlasOpen,waypoint:selectedWaypoint?.name,places:LM.map(l=>({name:l.name,on:l.on})),models:{boat:boat.userData.modelState,plane:pl.userData.modelState,rocket:rocket.userData.modelState},space:{altitude:rV.altitude,verticalSpeed:rV.verticalSpeed,horizontalSpeed:rV.horizontalSpeed,velocityHeading:rV.velocityHeading,throttle:rocketThrottle,sas:rocketSas,region:atmosphereLabel(rV.altitude),blend:spaceBlend(rV.altitude)},angle:ang,lighting:lightingAt(ang),world:{time:livingTime,weather:lastLiving.weather,event:lastLiving.event?.id||null,eventResolved:!!lastLiving.resolved,lightning:lastLiving.lightning,ferries:lastLiving.ferries,npcPeriods:[...new Set(NP.map(n=>n.period))]},drawCalls:R.info.render.calls,triangles:R.info.render.triangles}),
-  inspect:(x,z,vehicle='foot',y=null)=>{releaseInput();started=1;$('start').style.display='none';if(vehicle==='foot'){setMode('foot',null);P.set(x,y??Math.max(gr(x,z),-.7),z);hero.visible=true}else{const v=V.find(v=>v.type===vehicle);if(!v)throw new Error('unknown vehicle '+vehicle);if(v.type==='rocket'){v.altitude=0;v.verticalSpeed=0;v.horizontalSpeed=0;v.heading=Math.PI;v.velocityHeading=Math.PI;v.pitch=v.pitchRate=v.yawRate=0;v.h=v.heading;v.launchY=y??rocketPadY;v.g.position.set(x,v.launchY,z)}else{v.g.position.set(x,y??Math.max(0,hf(x,z))+1,z);v.sp=0;v.h=0}P.copy(v.g.position);hero.visible=false;setMode('veh',v)}yaw=Math.PI;pitch=.45;C.position.set(P.x,P.y+7,P.z+14);C.lookAt(P.x,P.y+2,P.z);hero.position.copy(P);R.render(S,C)},
+  inspect:(x,z,vehicle='foot',y=null)=>{atlasOpen=false;releaseInput();started=1;$('start').style.display='none';if(vehicle==='foot'){setMode('foot',null);P.set(x,y??Math.max(gr(x,z),-.7),z);hero.visible=true}else{const v=V.find(v=>v.type===vehicle);if(!v)throw new Error('unknown vehicle '+vehicle);if(v.type==='rocket'){v.altitude=0;v.verticalSpeed=0;v.horizontalSpeed=0;v.heading=Math.PI;v.velocityHeading=Math.PI;v.pitch=v.pitchRate=v.yawRate=0;v.h=v.heading;v.launchY=y??rocketPadY;v.g.position.set(x,v.launchY,z)}else{v.g.position.set(x,y??Math.max(0,hf(x,z))+1,z);v.sp=0;v.h=0}P.copy(v.g.position);hero.visible=false;setMode('veh',v)}yaw=Math.PI;pitch=.45;C.position.set(P.x,P.y+7,P.z+14);C.lookAt(P.x,P.y+2,P.z);hero.position.copy(P);R.render(S,C)},
   rocketAltitude:a=>{rV.altitude=Math.max(0,Number(a)||0);rV.verticalSpeed=rV.horizontalSpeed=rV.pitchRate=rV.yawRate=0;rV.velocityHeading=rV.heading;rocket.position.y=rV.launchY+renderAltitude(rV.altitude);P.copy(rocket.position);R.render(S,C);return rV.altitude},
   hour:a=>ang=a,
   worldTime:t=>livingTime=Math.max(0,Number(t)||0),
