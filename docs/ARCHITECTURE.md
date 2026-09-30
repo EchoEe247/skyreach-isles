@@ -15,11 +15,12 @@ The first extracted modules are:
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
+- `src/systems/exploration.js`: navigation, 2D proximity/bearing helpers, and lightweight haptic feedback.
 - `src/style.css`: presentation separated from game logic.
 
 ## State and persistence
 
-Beacon and sky-ring completion are persisted under a versioned storage key. Quality preference is persisted separately. Corrupt or unavailable localStorage data fails safely to defaults.
+Beacon, sky-ring, Skyshard, and landmark completion are persisted under a versioned storage key. Quality preference is persisted separately. Corrupt or unavailable localStorage data fails safely to defaults.
 
 ## Performance
 

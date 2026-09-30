@@ -19,3 +19,16 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 
 #quality{position:absolute;right:14px;top:158px;pointer-events:auto;border:1px solid rgba(255,243,214,.25);padding:7px 10px;color:var(--cream);font:600 12px system-ui,sans-serif;touch-action:manipulation}
 #quality:active{transform:scale(.96)}
+
+#rg,#shards,#discoveries{opacity:.9;margin-top:2px}
+#nav{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 12px;min-width:130px;justify-content:center;font-size:12px;text-shadow:0 1px 3px #000}
+#navArrow{display:inline-block;color:var(--amber);font-size:18px;line-height:1;transform-origin:50% 55%;transition:transform .12s linear}
+#navText{white-space:nowrap}
+#ui.objective-pulse::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px 18px rgba(255,211,90,.45);animation:objectivePulse .65s ease-out forwards}
+@keyframes objectivePulse{0%{opacity:1}100%{opacity:0}}
+.skyshard-flash{animation:shardFlash .55s ease-out}
+@keyframes shardFlash{0%{filter:brightness(1.65)}100%{filter:none}}
+@media (max-width:620px){
+  #nav{top:126px;left:10px;transform:none;min-width:0}
+  #quality{top:158px}
+}

@@ -12,7 +12,11 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - Driveable car, sailboat, and airplane
 - Six beacon objectives and eight airborne rings
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
-- Progress persistence for completed beacons and rings
+- Progress persistence for beacons, sky rings, hidden Skyshards, and landmark discoveries
+- Nearest-objective compass with live distance guidance
+- Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
+- Five named landmarks with discovery feedback and minimap history
+- Stronger objective feedback with screen pulses and supported-device haptics
 - Runtime quality selector with an automatic mobile-friendly default
 - Installable/offline-capable PWA shell after the first successful load
 
@@ -21,6 +25,12 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 ```bash
 npm install
 npm run dev -- --host 0.0.0.0
+```
+
+Regression tests:
+
+```bash
+npm test
 ```
 
 Production build:

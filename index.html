@@ -1,6 +1,22 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>Skyreach Isles</title><meta name="theme-color" content="#14183a"><link rel="manifest" href="./manifest.webmanifest">
 </head><body>
 <div id="start"><h1>Skyreach Isles</h1><p>A living archipelago at golden hour. Six beacons sleep across the island, on peaks, shores and out at sea.</p><p>Walk, drive, sail and fly to light them all.</p><p class="t">Tap to begin</p></div>
-<div id="ui"><div id="obj" class="g">Beacons <b id="cnt">0/6</b><div id="mode" style="opacity:.8">On foot</div><div id="rg" style="opacity:.9">Sky rings 0/8</div></div><canvas id="map" class="g" width="120" height="120"></canvas><div id="spd"></div><button id="quality" class="g" type="button">Quality Auto</button><div id="toast" class="g"></div>
-<div id="joy" class="g"><div id="knob"></div></div><div id="act" class="b g">Board</div><div id="jump" class="b g">Jump</div><div id="boost" class="b">Boost</div></div>
+<div id="ui">
+  <div id="obj" class="g">
+    <div>Beacons <b id="cnt">0/6</b></div>
+    <div id="mode" style="opacity:.8">On foot</div>
+    <div id="rg">Sky rings 0/8</div>
+    <div id="shards">Skyshards 0/10</div>
+    <div id="discoveries">Places 0/5</div>
+  </div>
+  <div id="nav" class="g"><span id="navArrow">▲</span><span id="navText">Finding beacon…</span></div>
+  <canvas id="map" class="g" width="120" height="120"></canvas>
+  <div id="spd"></div>
+  <button id="quality" class="g" type="button">Quality Auto</button>
+  <div id="toast" class="g"></div>
+  <div id="joy" class="g"><div id="knob"></div></div>
+  <div id="act" class="b g">Board</div>
+  <div id="jump" class="b g">Jump</div>
+  <div id="boost" class="b">Boost</div>
+</div>
 <script type="module" src="/src/game.js"></script></body></html>

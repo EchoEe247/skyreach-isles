@@ -5,11 +5,15 @@ const parse=(value,fallback)=>{
   try{return value?JSON.parse(value):fallback}catch{return fallback}
 };
 
+const bools=(value,count)=>Array.isArray(value)?value.slice(0,count).map(Boolean):[];
+
 export function loadProgress(){
   const value=parse(localStorage.getItem(PROGRESS_KEY),{});
   return {
-    beacons:Array.isArray(value.beacons)?value.beacons.slice(0,6):[],
-    rings:Array.isArray(value.rings)?value.rings.slice(0,8):[]
+    beacons:bools(value.beacons,6),
+    rings:bools(value.rings,8),
+    shards:bools(value.shards,10),
+    discoveries:bools(value.discoveries,5)
   };
 }
 
