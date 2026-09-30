@@ -26,6 +26,8 @@ Weather is coupled to rendering and audio: rain particles, cloud cover/speed, fo
 
 See [Living Isles](docs/LIVING-ISLES.md) for the simulation contract and verification notes.
 
+The next environment-content pass is documented in [Curated Free Asset Integration Plan](docs/ASSET-INTEGRATION-PLAN.md). It treats free packs as source libraries, selects only models that fit a specific existing location, and keeps public-web licensing and mobile performance as hard constraints.
+
 ## Current gameplay
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
