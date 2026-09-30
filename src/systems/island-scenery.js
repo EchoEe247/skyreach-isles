@@ -144,28 +144,55 @@ export function createIslandScenery(scene, obstacles) {
   }
   add(new T.DodecahedronGeometry(1,1),darkStone,ax,21,az,[8,7,23]);
 
-  // Water runs over the terrace profile and finishes in a pool, with spray.
-  const streamPositions=[],streamUvs=[],streamIndices=[];
-  for(let n=0;n<=24;n++){
-    const x=falls.x-27+n*1.6;
-    for(const side of [-1,1]){const z=falls.z+Math.sin(n*.29)*.65+side*(2.5+Math.sin(n*.8)*.4);streamPositions.push(x,terrainHeight(x,z)+.24,z);streamUvs.push(side===-1?0:1,n/24)}
-    if(n<24){const b=n*2;streamIndices.push(b,b+2,b+1,b+1,b+2,b+3)}
+
+  // A terrain-conforming cascade with soft, irregular edges and a grounded pool.
+  const streamPositions=[],streamUvs=[],streamIndices=[],rows=80,columns=8;
+  for(let n=0;n<=rows;n++){
+    const t=n/rows,x=falls.x-25+t*42,centre=falls.z+Math.sin(t*7)*.45;
+    const halfWidth=2.25+Math.sin(t*11)*.28;
+    for(let j=0;j<=columns;j++){
+      const u=j/columns,z=centre+(u*2-1)*halfWidth;
+      streamPositions.push(x,terrainHeight(x,z)+.09,z);streamUvs.push(u,t);
+      if(n<rows&&j<columns){const v=n*(columns+1)+j;streamIndices.push(v,v+columns+1,v+1,v+1,v+columns+1,v+columns+2)}
+    }
   }
-  const waterfallUniforms={time:{value:0}};
+  const waterfallUniforms={time:{value:0},daylight:{value:1}};
   const waterfallMat=new T.ShaderMaterial({uniforms:waterfallUniforms,transparent:true,side:T.DoubleSide,depthWrite:false,
     vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:`varying vec2 vUv;uniform float time;void main(){
-      float flow=.5+.5*sin(vUv.y*100.-time*10.+sin(vUv.x*63.)*2.);
-      float stripe=.5+.5*sin(vUv.x*89.+vUv.y*5.);
-      float edge=smoothstep(0.,.12,vUv.x)*smoothstep(0.,.12,1.-vUv.x);
-      gl_FragColor=vec4(mix(vec3(.32,.72,.76),vec3(.91,.98,1.),flow*.6+stripe*.3),edge*.88);
-    }`});
+    fragmentShader:`varying vec2 vUv;uniform float time;uniform float daylight;
+      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+      void main(){
+        vec2 flow=vec2(vUv.x*24.,vUv.y*14.-time*1.9);
+        float n=noise(flow)*.65+noise(flow*2.3)*.35;
+        float ribbons=smoothstep(.43,.8,n);
+        float irregular=.045*noise(vec2(vUv.y*25.,time*.45));
+        float edge=smoothstep(irregular,.16+irregular,vUv.x)*smoothstep(irregular,.16+irregular,1.-vUv.x);
+        edge*=smoothstep(0.,.08,vUv.y)*smoothstep(0.,.12,1.-vUv.y);
+        vec3 colour=mix(vec3(.26,.53,.57),vec3(.81,.9,.91),ribbons);
+        colour*=.52+.48*daylight;
+        gl_FragColor=vec4(colour,edge*(.5+ribbons*.35));
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`});
   const streamG=new T.BufferGeometry();streamG.setAttribute('position',new T.Float32BufferAttribute(streamPositions,3));streamG.setAttribute('uv',new T.Float32BufferAttribute(streamUvs,2));streamG.setIndex(streamIndices);streamG.computeVertexNormals();scene.add(new T.Mesh(streamG,waterfallMat));
-  const poolX=falls.x+12,poolY=terrainHeight(poolX,falls.z)+.12;
-  const pool=add(new T.CircleGeometry(4.5,28),new T.MeshPhongMaterial({color:0x58bcc0,transparent:true,opacity:.85,shininess:95}),poolX,poolY,falls.z);pool.rotation.x=-Math.PI/2;
+
+  // A shallow puddle follows the same terrain triangles, avoiding a floating disc.
+  const poolX=falls.x+13,poolG=new T.CircleGeometry(5.5,40,0,Math.PI*2);
+  poolG.rotateX(-Math.PI/2);
+  const pp=poolG.attributes.position;
+  for(let n=0;n<pp.count;n++){const x=pp.getX(n)+poolX,z=pp.getZ(n)+falls.z;pp.setXYZ(n,x,terrainHeight(x,z)+.065,z)}
+  poolG.computeVertexNormals();
+  const pool=new T.Mesh(poolG,new T.MeshPhongMaterial({color:0x4e969f,transparent:true,opacity:.42,shininess:80,depthWrite:false}));scene.add(pool);
+  const mistCanvas=document.createElement('canvas');mistCanvas.width=mistCanvas.height=64;
+  const mistContext=mistCanvas.getContext('2d'),gradient=mistContext.createRadialGradient(32,32,1,32,32,31);
+  gradient.addColorStop(0,'rgba(255,255,255,.8)');gradient.addColorStop(.35,'rgba(255,255,255,.35)');gradient.addColorStop(1,'rgba(255,255,255,0)');
+  mistContext.fillStyle=gradient;mistContext.fillRect(0,0,64,64);
+  const mistTexture=new T.CanvasTexture(mistCanvas);
   const sprayPositions=new Float32Array(48*3);
   const sprayG=new T.BufferGeometry();sprayG.setAttribute('position',new T.BufferAttribute(sprayPositions,3));
-  const spray=new T.Points(sprayG,new T.PointsMaterial({color:0xe2ffff,size:.35,transparent:true,opacity:.45,depthWrite:false}));scene.add(spray);
+  const spray=new T.Points(sprayG,new T.PointsMaterial({map:mistTexture,color:0xcce0e3,size:1.3,transparent:true,opacity:.22,depthWrite:false}));scene.add(spray);
 
   // Wet boulders break up the cascade's base and its silhouette.
   for(let n=0;n<12;n++){
@@ -186,7 +213,7 @@ export function createIslandScenery(scene, obstacles) {
   }
   // Near-field fireflies: one draw call; invisible in daylight.
   const flyData=new Float32Array(72*3),flyG=new T.BufferGeometry();flyG.setAttribute('position',new T.BufferAttribute(flyData,3));
-  const flyMat=new T.PointsMaterial({color:0xd8ffc4,size:.13,transparent:true,opacity:0,depthWrite:false});
+  const flyMat=new T.PointsMaterial({map:mistTexture,color:0xd8ffc4,size:.13,transparent:true,opacity:0,depthWrite:false});
   const flies=new T.Points(flyG,flyMat);scene.add(flies);
 
   // Bounded wake pool; the foam stays behind instead of following the hull.
@@ -197,10 +224,10 @@ export function createIslandScenery(scene, obstacles) {
     jetty,
     surfaceHeight(x,z){if(Math.hypot(x-ruin.x,z-ruin.z)<12)return Math.max(terrainHeight(x,z),cy+.3);return Math.abs(x-jetty.x)<jetty.halfX&&Math.abs(z-jetty.z)<jetty.halfZ?Math.max(terrainHeight(x,z),jetty.y):terrainHeight(x,z)},
     update({time,dt,daylight,position,boat,speed,heading,quality}){
-      foamUniforms.time.value=time;waterfallUniforms.time.value=time;
+      foamUniforms.time.value=time;waterfallUniforms.time.value=time;waterfallUniforms.daylight.value=daylight;spray.material.opacity=.12+.10*daylight;
       const nearFalls=Math.hypot(position.x-falls.x,position.z-falls.z)<260;
       spray.visible=nearFalls;
-      if(nearFalls){for(let n=0;n<48;n++){const t=(time*.7+n/48)%1;sprayPositions[n*3]=falls.x+2+Math.sin(n*5.7)*t*8;sprayPositions[n*3+1]=terrainHeight(falls.x+2,falls.z)+.5+Math.sin(t*Math.PI)*3;sprayPositions[n*3+2]=falls.z+Math.cos(n*3)*t*7}sprayG.attributes.position.needsUpdate=true}
+      if(nearFalls){for(let n=0;n<48;n++){const t=(time*.7+n/48)%1;sprayPositions[n*3]=falls.x-3+Math.sin(n*5.7)*t*5;sprayPositions[n*3+1]=terrainHeight(falls.x-3,falls.z)+.25+Math.sin(t*Math.PI)*1.6;sprayPositions[n*3+2]=falls.z+Math.cos(n*3)*t*4}sprayG.attributes.position.needsUpdate=true}
       dolphins.forEach((g,n)=>{
         const a=time*.095+n*.1,leap=Math.max(0,Math.sin(time*1.6-n*.8));
         g.position.set(cove.x+205+Math.cos(a)*40+n*3,-.8+leap*2.8,cove.z+Math.sin(a)*72+n*4);

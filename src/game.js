@@ -3,6 +3,7 @@ import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import "./style.css";
 import "./atlas.css";
 import {ISLANDS} from "./core/archipelago.js";
+import {advanceSunAngle,lightingAt} from "./core/daylight.js";
 import {createIslandScenery} from "./systems/island-scenery.js";
 import {createAtlas} from "./systems/atlas.js";
 import {createRng,clamp as cl,lerp as lp,angleDelta as ad} from "./core/math.js";
@@ -21,14 +22,14 @@ const M=(c,e,i)=>new T.MeshLambertMaterial({color:c,flatShading:true,emissive:e|
 const box=(p,w,h,d,m,x,y,z)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x||0,y||0,z||0);o.castShadow=true;p.add(o);return o};
 const cyl=(p,r1,r2,h,m,x,y,z,seg)=>{const o=new T.Mesh(new T.CylinderGeometry(r1,r2,h,seg||8),m);o.position.set(x||0,y||0,z||0);o.castShadow=true;p.add(o);return o};
 // lights & sky
-const hemi=new T.HemisphereLight(0xbfd8ff,0x4a5a3a,.6),sun=new T.DirectionalLight(0xffe0b0,1);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);sun.shadow.bias=-.0006;Object.assign(sun.shadow.camera,{left:-45,right:45,top:45,bottom:-45,far:300});S.add(hemi,sun,sun.target);
+const hemi=new T.HemisphereLight(0xbfd8ff,0x4a5a3a,.6),sun=new T.DirectionalLight(0xffe0b0,1);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);sun.shadow.bias=-.0006;Object.assign(sun.shadow.camera,{left:-45,right:45,top:45,bottom:-45,far:300});const ambient=new T.AmbientLight(0xb5c7e2,.25),moonlight=new T.DirectionalLight(0xb5d4ff,.5);S.add(hemi,sun,sun.target,ambient,moonlight,moonlight.target);
 const skyU={top:{value:new T.Color()},bot:{value:new T.Color()}};
 const dome=new T.Mesh(new T.SphereGeometry(900,24,12),new T.ShaderMaterial({uniforms:skyU,side:T.BackSide,depthWrite:false,fog:false,vertexShader:'varying float y;void main(){y=normalize(position).y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 top,bot;varying float y;void main(){gl_FragColor=vec4(mix(bot,top,pow(max(y,0.),.55)),1.);}'}));S.add(dome);
 const sunM=new T.Mesh(new T.SphereGeometry(30,12,8),new T.MeshBasicMaterial({color:0xffe2a0,fog:false})),moonM=new T.Mesh(new T.SphereGeometry(20,12,8),new T.MeshBasicMaterial({color:0xdfe8ff,fog:false}));S.add(sunM,moonM);const gc=document.createElement('canvas');gc.width=gc.height=128;{const x=gc.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,230,170,1)');g.addColorStop(.25,'rgba(255,190,110,.35)');g.addColorStop(1,'rgba(255,160,80,0)');x.fillStyle=g;x.fillRect(0,0,128,128)}
 const glow=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(gc),blending:T.AdditiveBlending,depthWrite:false,fog:false,transparent:true}));glow.scale.set(700,700,1);S.add(glow);
 const sp=new Float32Array(1200);for(let i=0;i<400;i++){const a=rnd()*6.28,e=Math.acos(rnd());sp.set([Math.sin(e)*Math.cos(a)*850,Math.cos(e)*850,Math.sin(e)*Math.sin(a)*850],i*3)}
 const sg=new T.BufferGeometry();sg.setAttribute('position',new T.BufferAttribute(sp,3));const stars=new T.Points(sg,new T.PointsMaterial({size:2.5,sizeAttenuation:false,transparent:true,fog:false,depthWrite:false}));S.add(stars);
-const cD=new T.Color(0x2a7fd6),cDh=new T.Color(0xbfe3f0),cN=new T.Color(0x040816),cNh=new T.Color(0x10203a),cO=new T.Color(0xff8a4c),tmp=new T.Color();
+const cD=new T.Color(0x2a7fd6),cDh=new T.Color(0xbfe3f0),cN=new T.Color(0x172b4b),cNh=new T.Color(0x476381),cO=new T.Color(0xff8a4c),tmp=new T.Color();
 // terrain
 const tg=new T.PlaneGeometry(900,900,180,180);tg.rotateX(-Math.PI/2);const pa=tg.attributes.position,col=new Float32Array(pa.count*3),cc=new T.Color();
 for(let i=0;i<pa.count;i++){const x=pa.getX(i),z=pa.getZ(i),h=hf(x,z),d=Math.hypot(x,z),n=Math.sin(x*.21)*Math.cos(z*.17),sl=Math.abs(hf(x+4,z)-h)+Math.abs(hf(x,z+4)-h);pa.setY(i,h);
@@ -38,7 +39,7 @@ tg.setAttribute('color',new T.BufferAttribute(col,3));tg.computeVertexNormals();
 const ter=new T.Mesh(tg,new T.MeshLambertMaterial({vertexColors:true,map:nt}));ter.receiveShadow=true;S.add(ter);
 const wc=document.createElement('canvas');wc.width=wc.height=128;const wx=wc.getContext('2d');wx.fillStyle='#808080';wx.fillRect(0,0,128,128);for(let i=0;i<300;i++){wx.fillStyle=rnd()<.5?'rgba(255,255,255,.22)':'rgba(0,0,0,.22)';wx.beginPath();wx.arc(rnd()*128,rnd()*128,3+rnd()*9,0,6.3);wx.fill()}
 const wt=new T.CanvasTexture(wc),RP=420;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
-const water=new T.Mesh(new T.PlaneGeometry(3000,3000,100,100),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:.82,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6}));water.rotation.x=-Math.PI/2;S.add(water);
+const water=new T.Mesh(new T.PlaneGeometry(3000,3000,100,100),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:false,opacity:1,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6}));water.rotation.x=-Math.PI/2;S.add(water);
 const waterTime={value:0};
 water.material.onBeforeCompile=shader=>{
  shader.uniforms.worldTime=waterTime;
@@ -164,8 +165,8 @@ function act(){if(!started||atlasOpen)return;if(mode=='foot'){let b=null,bd=9;fo
 let ang=.35,mc=$('map').getContext('2d');
 const clock=new T.Clock();let fov=65;
 function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(),.05),dt=atlasOpen||document.hidden?0:rawDt,tm_=clock.elapsedTime;
- if(started)ang+=dt*.02;const sy=Math.sin(ang),dir=v3(Math.cos(ang),sy,.3).normalize(),k=cl(sy*3+.5,0,1),du=Math.max(0,1-Math.abs(sy)*4);
- skyU.top.value.copy(cN).lerp(cD,k);skyU.bot.value.copy(cNh).lerp(cDh,k).lerp(cO,du*.85);S.fog.color.copy(skyU.bot.value);hemi.intensity=.22+.45*k;sun.intensity=Math.max(0,sy)*1.15;sun.color.setHSL(.09,.7,.6+.3*k);water.material.color.setHSL(.53,.7,.15+.22*k);
+ if(started)ang=advanceSunAngle(ang,dt);const light=lightingAt(ang),sy=light.altitude,dir=v3(Math.cos(ang),sy,.3).normalize(),k=light.daylight,du=light.twilight;
+ skyU.top.value.copy(cN).lerp(cD,k);skyU.bot.value.copy(cNh).lerp(cDh,k).lerp(cO,du*.85);S.fog.color.copy(skyU.bot.value);hemi.intensity=light.hemisphere;hemi.groundColor.setHex(0x70899d).lerp(tmp.setHex(0x899483),k);ambient.intensity=light.ambient;sun.intensity=light.sun;moonlight.intensity=light.moon;sun.color.setHSL(.09,.7,.6+.3*k);water.material.color.setHSL(.53,.62,light.waterLightness);
  bm.forEach(m=>m.emissiveIntensity=(1-k)*1.1);lampM.emissiveIntensity=(1-k)*2;stars.material.opacity=1-k;bc.material.opacity=(1-k)*.3;beam.rotation.y=tm_*.8;
  const jX=(!started||atlasOpen)?0:cl(jx+(keys.KeyD?1:0)-(keys.KeyA?1:0),-1,1),jY=(!started||atlasOpen)?0:cl(jy+(keys.KeyW?1:0)-(keys.KeyS?1:0),-1,1),bo=!atlasOpen&&started&&(boostF||keys.ShiftLeft),ju=!atlasOpen&&started&&(jumpF||keys.Space);
  cloudM.emissiveIntensity=.08+.4*k;clouds.forEach(c=>{c.position.x+=dt*3;while(c.position.x-P.x>500)c.position.x-=1000;while(c.position.x-P.x<-500)c.position.x+=1000;while(c.position.z-P.z>500)c.position.z-=1000;while(c.position.z-P.z<-500)c.position.z+=1000});
@@ -196,7 +197,7 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
  C.fov=lp(C.fov,mode=='foot'?65:fov,.1);C.updateProjectionMatrix();
  const dist=mode=='foot'?7:cur.dist,ch=mode=='foot'?2:cur.ch,tg_=v3(P.x,P.y+ch,P.z),cd=Math.cos(pitch)*dist,want=v3(P.x-Math.sin(yaw)*cd,P.y+ch+Math.sin(pitch)*dist,P.z-Math.cos(yaw)*cd);
  want.y=Math.max(want.y,Math.max(0,hf(want.x,want.z))+1.2);C.position.lerp(want,1-Math.exp(-dt*(started?9:40)));C.lookAt(tg_);
- sun.position.copy(tg_).addScaledVector(dir,120);sun.target.position.copy(tg_);dome.position.copy(C.position);sunM.position.copy(C.position).addScaledVector(dir,800);moonM.position.copy(C.position).addScaledVector(dir,-800);sunM.visible=sy>-.1;glow.position.copy(sunM.position);glow.material.opacity=cl(sy*4+.5,0,1)*.9;moonM.visible=sy<.1;stars.position.copy(C.position);water.position.set(C.position.x,0,C.position.z);wt.offset.set(C.position.x*RP/3000+tm_*.012,-C.position.z*RP/3000+tm_*.009);
+ sun.position.copy(tg_).addScaledVector(dir,120);sun.target.position.copy(tg_);moonlight.position.copy(tg_).addScaledVector(dir,-120);moonlight.target.position.copy(tg_);dome.position.copy(C.position);sunM.position.copy(C.position).addScaledVector(dir,800);moonM.position.copy(C.position).addScaledVector(dir,-800);sunM.visible=sy>-.1;glow.position.copy(sunM.position);glow.material.opacity=cl(sy*4+.5,0,1)*.9;moonM.visible=sy<.1;stars.position.copy(C.position);water.position.set(C.position.x,0,C.position.z);wt.offset.set(C.position.x*RP/3000+tm_*.012,-C.position.z*RP/3000+tm_*.009);
  BC.forEach((b,i)=>{b.m.opacity=(b.on?.75:.45)+Math.sin(tm_*3+i)*.12;if(!b.on){const r=mode=='foot'?5:mode=='veh'&&cur.type=='plane'?22:10;if(Math.hypot(P.x-b.x,P.z-b.z)<r&&(mode!='veh'||cur.type!='plane'||P.y<hf(b.x,b.z)+70)){b.on=1;b.m.color.setHex(0xffc24a);lit++;persistProgress();$('cnt').textContent=lit+'/6';objectiveFeedback([45,45,90]);toast(lit==6?'Skyreach is lit. The isles are yours to roam.':'Beacon lit. '+(6-lit)+' to go.',3500)}}});
  const nav=selectedWaypoint?{item:selectedWaypoint,distance:distance2D(selectedWaypoint,P)}:nearestPending(BC,P)||nearestPending(XR,P),navArrow=$('navArrow'),navText=$('navText'),heading=mode=='foot'?hero.rotation.y:(cur?.h??yaw);if(nav){const isBeacon=BC.includes(nav.item);navArrow.style.transform='rotate('+relativeBearing(P,nav.item,heading)+'rad)';navText.textContent=(selectedWaypoint?selectedWaypoint.name+' · ':isBeacon?'Beacon ':'Skyshard ')+(nav.distance>=1000?(nav.distance/1000).toFixed(1)+'km':Math.round(nav.distance)+'m')}else{navArrow.style.transform='rotate(0rad)';navText.textContent='Compass clear ✓'}
  atlas.drawRadar(mc,P,heading,selectedWaypoint,[...BC.map(b=>({...b,color:"#ffc24a"})),...RG.map(q=>({...q,color:"#ffd23a"})),...XR.filter(q=>distance2D(q,P)<95)]);atlas.update(P,selectedWaypoint);
@@ -208,9 +209,10 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
 if(import.meta.env.PROD&&'serviceWorker' in navigator){addEventListener('load',async()=>{const hadController=!!navigator.serviceWorker.controller;let reloading=false;if(hadController)navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()},{once:true});try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});reg.update().catch(()=>{})}catch{}})}
 if(import.meta.env.DEV){
  globalThis.__skyreach={
-  snapshot:()=>({position:P.toArray(),mode,atlasOpen,waypoint:selectedWaypoint?.name,places:LM.map(l=>({name:l.name,on:l.on})),models:{boat:boat.userData.modelState,plane:pl.userData.modelState},drawCalls:R.info.render.calls,triangles:R.info.render.triangles}),
+  snapshot:()=>({position:P.toArray(),mode,atlasOpen,waypoint:selectedWaypoint?.name,places:LM.map(l=>({name:l.name,on:l.on})),models:{boat:boat.userData.modelState,plane:pl.userData.modelState},angle:ang,lighting:lightingAt(ang),drawCalls:R.info.render.calls,triangles:R.info.render.triangles}),
   inspect:(x,z,vehicle='foot',y=null)=>{releaseInput();started=1;$('start').style.display='none';if(vehicle==='foot'){setMode('foot',null);P.set(x,y??Math.max(gr(x,z),-.7),z);hero.visible=true}else{const v=V.find(v=>v.type===vehicle);v.g.position.set(x,y??Math.max(0,hf(x,z))+1,z);v.sp=0;v.h=0;P.copy(v.g.position);hero.visible=false;setMode('veh',v)}yaw=Math.PI;pitch=.45;C.position.set(P.x,P.y+7,P.z+14);C.lookAt(P.x,P.y+2,P.z);hero.position.copy(P);R.render(S,C)},
   hour:a=>ang=a,
+  frame:(x,y,z,tx,ty,tz)=>{atlasOpen=true;C.position.set(x,y,z);C.lookAt(tx,ty,tz);R.render(S,C)},
   render:()=>R.render(S,C)
  };
 }

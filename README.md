@@ -14,7 +14,9 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 
 Tap **Explore** (or press **M**) to chart a destination or locate your speedboat. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
-Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Fireflies appear near land after dark. All additions are locally generated in the existing stylized art direction.
+Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
+
+The day/night cycle is intentionally weighted toward exploration: daylight lasts 9 minutes and night lasts 3 minutes. Night keeps cool moonlight plus ambient/hemisphere fill so terrain, vehicles, and the player remain readable instead of dropping to near-black. Fireflies still appear near land after dark. All additions are locally generated in the existing stylized art direction.
 
 ## Current gameplay
 
@@ -71,7 +73,7 @@ Asset provenance is recorded beside each GLB.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v8`.
+`public/sw.js` currently uses cache version `skyreach-v9`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
@@ -96,6 +98,7 @@ src/
   style.css
   atlas.css
   core/
+    daylight.js
     math.js
     quality.js
     storage.js

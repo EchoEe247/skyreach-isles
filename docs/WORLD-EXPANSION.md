@@ -10,7 +10,7 @@ New destinations: Tideglass Cove (720, 350), Ember Ruins (470, -670), Veilwater 
 
 ## Verification
 
-- 24 Node tests pass: actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
+- 30 Node tests pass: actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, radial seafloor continuity, rendered-terrain height interpolation, daylight/night timing and lighting continuity, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
 - Production Vite build succeeds. The existing large-bundle warning remains.
 - Isolated Chromium on the Pixel/Termux host rendered the cove, observatory ruins and Veilwater cascade. These views were visually inspected.
 - Browser inspection confirmed boat and aircraft model states were ready.
@@ -19,6 +19,9 @@ New destinations: Tideglass Cove (720, 350), Ember Ruins (470, -670), Veilwater 
 - Chart opening, course selection, closing and movement pause/resume were exercised.
 - Browser keyboard input moved the player on Tideglass terrain; the selected Tideglass course reached HUD state.
 - No JavaScript errors were captured during that chart/movement sequence.
+- The updated cycle is deterministic at 9 minutes of daylight and 3 minutes of night. Midnight retains ambient, hemisphere, moonlight, and water-lightness floors for gameplay visibility.
+- Offshore terrain now fades radially below the waterline and gameplay ground queries interpolate the same mesh triangles that are rendered, removing the square seafloor/support-boundary artifacts seen from above.
+- Veilwater's cascade was rebuilt as a denser terrain-conforming ribbon with irregular alpha, circular soft mist particles, and a terrain-conforming shallow pool.
 
 ## Performance and boundaries
 

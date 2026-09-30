@@ -18,7 +18,7 @@ export function islandHeight(island, x, z) {
   const a=Math.atan2(v,u), r=Math.hypot(u,v);
   const edge=island.radius*(1+.07*Math.sin(a*3+island.x)+.045*Math.sin(a*5));
   const f=1-r/edge;
-  if(f<=0) return -8;
+  if(f<=0) return -3-77*smoothstep(0,.35,-f);
   let h=-3+island.height*smoothstep(0, .85, f);
   h+=(Math.sin(u*.085)*Math.cos(v*.065)*1.4)*smoothstep(0,.4,f);
   if(island.kind==='cove') {
@@ -32,11 +32,23 @@ export function islandHeight(island, x, z) {
   return h;
 }
 
+// Match the exact triangles used by the visible 76×76 offshore terrain mesh.
+export function islandSurfaceHeight(island,x,z){
+  const size=island.radius*2.35,step=size/76;
+  const gx=(x-island.x+size/2)/step,gz=(z-island.z+size/2)/step;
+  if(gx<0||gz<0||gx>=76||gz>=76)return islandHeight(island,x,z);
+  const ix=Math.floor(gx),iz=Math.floor(gz),fx=gx-ix,fz=gz-iz;
+  const x0=island.x-size/2+ix*step,z0=island.z-size/2+iz*step;
+  const a=islandHeight(island,x0,z0),b=islandHeight(island,x0,z0+step);
+  const c=islandHeight(island,x0+step,z0+step),d=islandHeight(island,x0+step,z0);
+  return fx+fz<=1?a+(d-a)*fx+(b-a)*fz:c+(b-c)*(1-fx)+(d-c)*(1-fz);
+}
+
 export function archipelagoHeight(x,z) {
   let h=-80;
   for(const island of ISLANDS) {
-    if(Math.abs(x-island.x)>island.radius*1.15||Math.abs(z-island.z)>island.radius*1.15)continue;
-    h=Math.max(h,islandHeight(island,x,z));
+    if(Math.abs(x-island.x)>island.radius*1.6||Math.abs(z-island.z)>island.radius*1.6)continue;
+    h=Math.max(h,islandSurfaceHeight(island,x,z));
   }
   return h;
 }

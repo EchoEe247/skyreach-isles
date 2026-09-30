@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ISLANDS,islandHeight} from '../src/core/archipelago.js';
+import {ISLANDS,islandHeight,islandSurfaceHeight,archipelagoHeight} from '../src/core/archipelago.js';
 import {terrainHeight,boatCanTravel} from '../src/core/world.js';
 
 test('offshore terrain is solid, finite, and reachable from open water',()=>{
@@ -45,4 +45,26 @@ test('sea arch allows the central passage but blocks its rock pillars',()=>{
   assert.equal(boatCanTravel(x,z),true);
   assert.equal(boatCanTravel(x,z-16),false);
   assert.equal(boatCanTravel(x,z+16),false);
+});
+
+test('offshore seafloor fades radially without square support-boundary seams',()=>{
+  for(const i of ISLANDS){
+    for(const sign of [-1,1]){
+      const edge=i.x+sign*i.radius*1.6;
+      assert.ok(Math.abs(archipelagoHeight(edge-.001,i.z)-archipelagoHeight(edge+.001,i.z))<.01);
+    }
+    for(let a=0;a<Math.PI*2;a+=.2){
+      const x=i.x+Math.cos(a)*i.radius*1.55,z=i.z+Math.sin(a)*i.radius*1.55;
+      assert.equal(islandHeight(i,x,z),-80);
+    }
+  }
+});
+
+test('surface queries match terrain grid vertices and stay continuous across triangles',()=>{
+  const i=ISLANDS[2],step=i.radius*2.35/76,left=i.x-i.radius*2.35/2,top=i.z-i.radius*2.35/2;
+  for(let n=25;n<50;n++){
+    const x=left+n*step,z=top+38*step;
+    assert.ok(Math.abs(islandSurfaceHeight(i,x,z)-islandHeight(i,x,z))<1e-8);
+    assert.ok(Math.abs(islandSurfaceHeight(i,x-.0001,z)-islandSurfaceHeight(i,x+.0001,z))<.01);
+  }
 });
