@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, explore three offshore islands, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, launch NASA's SLS from Earth into playable space, explore three offshore islands, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -32,6 +32,7 @@ See [Living Isles](docs/LIVING-ISLES.md) for the simulation contract and verific
 - Detailed user-supplied sports car for the player and color-varied town traffic
 - Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
 - Detailed airliner using the existing flight controls and physics
+- Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere and beyond the 100 km Kármán line
 - Six beacon objectives and eight airborne rings
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
 - Eight named landmarks with discovery feedback and minimap history
@@ -71,7 +72,15 @@ The boat uses `public/assets/boats/speedboat.glb` at its source scale. The sourc
 
 The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
 
-Asset provenance is recorded beside each GLB.
+The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `public/assets/space/nasa-sls-block1.stl`. The original NASA geometry is kept intact at runtime; Skyreach normalizes orientation/scale and applies the recognizable orange-core/white-booster presentation in Three.js. A procedural SLS-shaped fallback remains available only if the STL fails to load. `public/assets/space/nasa-blue-marble-2048.png` provides the NASA Earth texture used for the high-altitude view. Provenance metadata is stored beside both NASA assets.
+
+### Earth-to-space flight
+
+`src/core/spaceflight.js` owns the deterministic rocket-flight model. Atmosphere density decays continuously with altitude, gravity follows the inverse-square Earth-radius relationship, aerodynamic drag falls away with atmospheric density, and thrust/steering continue without switching scenes. The game maps physical altitude into a compressed render coordinate so a mobile WebGL scene can represent tens to hundreds of kilometers without destroying near-surface precision.
+
+The HUD reports altitude and atmospheric region, including the Kármán-line transition at 100 km. Crossing that line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation.
+
+Asset provenance is recorded beside each detailed vehicle/space asset.
 
 ## World and audio systems
 
@@ -112,6 +121,7 @@ src/
     quality.js
     storage.js
     world.js
+    spaceflight.js
     archipelago.js
   systems/
     audio.js
@@ -130,6 +140,11 @@ public/
     vehicles/
       sports_car.glb
       sports_car.provenance.json
+    space/
+      nasa-sls-block1.stl
+      nasa-blue-marble-2048.png
+      provenance.json
+      earth-provenance.json
   manifest.webmanifest
   sw.js
 tests/
@@ -142,6 +157,7 @@ tests/
   storage.test.mjs
   vehicle-asset.test.mjs
   world.test.mjs
+  spaceflight.test.mjs
 legacy/
   skyreach-original.html
 docs/

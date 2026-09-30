@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "bytes": 1511379,
+      "creator": "NASA/Goddard Space Flight Center Scientific Visualization Studio",
+      "destination": "/data/data/com.termux/files/home/MainWorkspace/skyreach-isles/public/assets/space/nasa-blue-marble-2048.png",
+      "expanded_bytes": null,
+      "extracted_to": null,
+      "license": "NASA media/reproduction guidelines",
+      "retrieved_at": "2026-09-30T21:11:44.094982Z",
+      "sha256": "ae6214b078ed0864c96f74bcb10ae3021f6eb116f8059797efe0fa9ea8b89d35",
+      "source_url": "https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png",
+      "title": "Blue Marble - A Seamless Image Mosaic of the Earth",
+      "unpacked": false
+    }
+  ],
+  "version": 1
+}

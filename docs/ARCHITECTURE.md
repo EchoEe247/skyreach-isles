@@ -15,7 +15,8 @@ Current extracted modules:
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
-- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.\n- `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.\n- `src/core/living-world.js`: deterministic weather, lightning, world-event cadence, and NPC schedule targets.
+- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.\n- `src/core/spaceflight.js`: deterministic SLS atmosphere, gravity, drag, altitude mapping, Kármán-line state, and rocket integration.
+- `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.\n- `src/core/living-world.js`: deterministic weather, lightning, world-event cadence, and NPC schedule targets.
 - `src/systems/exploration.js`: navigation, 2D proximity/bearing helpers, and lightweight haptic feedback.
 - `src/systems/audio.js`: adaptive WebAudio environment, movement, wildlife, and vehicle sound layers.
 - `src/style.css`: presentation separated from game logic.
@@ -39,8 +40,18 @@ The maintained game uses detailed GLB visuals while keeping the original procedu
 - `public/assets/vehicles/sports_car.glb`: player car and four traffic variants; only the named `paint` material is recolored.
 - `public/assets/boats/speedboat.glb`: source scale, rotated -90° around Y so its +X bow matches Skyreach's +Z forward convention.
 - `public/assets/aircraft/airliner.glb`: uniform 0.30 scale; its +Z nose already matches the flight rig.
+- `public/assets/space/nasa-sls-block1.stl`: official NASA SLS Block 1 geometry, normalized at load time and colored in-engine for the orange core/white boosters.
+- `public/assets/space/nasa-blue-marble-2048.png`: NASA Blue Marble texture for the high-altitude Earth representation.
 
 Driving, sailing, and flight physics remain owned by the existing gameplay simulation rather than by the visual models.
+
+## Continuous Earth-to-space flight
+
+The SLS is part of the same vehicle registry and main simulation loop as the car, boat, and airplane. There is no scene transition at altitude boundaries. Full-thrust ascent starts from the launch pad, then `src/core/spaceflight.js` updates physical altitude, vertical/horizontal speed, heading, pitch, atmosphere density, gravity, and drag deterministically.
+
+For numerical stability, physical rocket altitude is mapped to render height with a logarithmic function and can be inverted by tests. This preserves useful meter-scale ground coordinates while still representing the 100 km Kármán line and higher altitudes in the same Three.js scene. Visual atmosphere blending begins gradually above the lower atmosphere; fog/cloud contribution falls away, stars become fully visible, and the NASA Earth globe fades into view continuously.
+
+The mobile HUD exposes speed, physical altitude, and the current atmospheric region. The live browser smoke test has loaded the exact NASA STL as `rocket: ready` and rendered the controllable SLS at 110 km in the `SPACE` state.
 
 ## World continuity
 
@@ -117,6 +128,7 @@ The current Node test suite covers:
 - backward-compatible persistence for eight discoveries
 - offshore shore approaches, cove entry, waterfall terrain drop and sea-arch passage/pillars
 - bounded waterfall audio gains\n- weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
+- deterministic rocket ascent, atmosphere-density decay, altitude-dependent Earth gravity, invertible render-altitude mapping, and Kármán-line space blending
 
 ## Next extraction boundaries
 

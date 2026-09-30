@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "bytes": 13721684,
+      "creator": "NASA / Space Launch System Program Office",
+      "destination": "/data/data/com.termux/files/home/MainWorkspace/skyreach-isles/public/assets/space/nasa-sls-block1.stl",
+      "expanded_bytes": null,
+      "extracted_to": null,
+      "license": "NASA 3D Resources / NASA media usage guidelines",
+      "retrieved_at": "2026-09-30T21:10:33.238897Z",
+      "sha256": "d3af75412a54f1d15d644cce56e895fe6813452b49dc0558b4b2ddfb484844ac",
+      "source_url": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/printable/space-launch-system-(sls)-block-1/Space%20Launch%20System%20(SLS)%20Block%201.stl",
+      "title": "Space Launch System (SLS) Block 1",
+      "unpacked": false
+    }
+  ],
+  "version": 1
+}
