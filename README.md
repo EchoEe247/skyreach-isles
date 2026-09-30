@@ -9,7 +9,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 ## Current gameplay
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
-- Detailed user-supplied sports car for the player and color-varied town traffic, plus sailboat and airplane
+- Detailed user-supplied sports car for the player and color-varied town traffic, a detailed airliner, plus the sailboat
 - Six beacon objectives and eight airborne rings
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, hidden Skyshards, and landmark discoveries
@@ -40,7 +40,7 @@ npm run build
 npm run preview -- --host 0.0.0.0
 ```
 
-## Vehicle asset\n\nThe player car and four town traffic cars use \`public/assets/vehicles/sports_car.glb\`. Only the named \`paint\` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback. Asset provenance is recorded beside the GLB.\n\n## Repository layout
+## Vehicle assets\n\nThe player car and four town traffic cars use \`public/assets/vehicles/sports_car.glb\`. Only the named \`paint\` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback. Asset provenance is recorded beside the GLB.\n\nThe airplane uses \`public/assets/aircraft/airliner.glb\` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.\n\n## Repository layout
 
 ```text
 index.html

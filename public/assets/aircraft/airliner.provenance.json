@@ -1,0 +1,21 @@
+{
+  "asset": "airliner.glb",
+  "source": "User-supplied asset uploaded in the Skyreach Isles development conversation",
+  "sha256": "dc72d0554ff26674f037c9a2b5ff16b656e94e9909f72d3d81f83fc7277dd74b",
+  "size_bytes": 4039168,
+  "source_dimensions_m": {
+    "width": 34.9000015,
+    "height": 11.9500003,
+    "length": 37.4500008
+  },
+  "integration": {
+    "uniform_scale": 0.3,
+    "approx_game_dimensions_m": {
+      "width": 10.47,
+      "height": 3.585,
+      "length": 11.235
+    },
+    "forward_axis": "+Z",
+    "physics": "Existing Skyreach airplane controls and movement model are unchanged."
+  }
+}

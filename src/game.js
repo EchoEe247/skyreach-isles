@@ -80,13 +80,16 @@ const bV=reg(boat,{name:'boat',type:'boat',ch:3,dist:14,max:30});let ba=.8,br=15
 const dkc=Math.cos(ba),dks=Math.sin(ba),dock=box(S,3.4,.3,30,M(0x8a6a43),dkc*(br-16),.5,dks*(br-16));dock.rotation.y=bV.h;
 for(let i=0;i<8;i++)for(const s of[-1,1]){const u=br-30+i*4,pp=cyl(S,.2,.2,3,M(0x5a4530),dkc*u-dks*s*1.6,-.6,dks*u+dkc*s*1.6,6)}
 const dk=(x,z)=>{const u=x*dkc+z*dks,w=-x*dks+z*dkc;return Math.abs(w)<1.7&&u>br-31&&u<br-1},gr=(x,z)=>dk(x,z)?Math.max(hf(x,z),.6):hf(x,z);
-const pl=new T.Group();const fu=cyl(pl,.6,.35,6,M(0xf6f1e4),0,0,0,10);fu.rotation.x=Math.PI/2;box(pl,11,.15,1.6,M(0xd9342b),0,.2,.3);box(pl,.15,1.4,1.2,M(0xd9342b),0,.8,-2.8);box(pl,3.5,.12,.8,M(0xd9342b),0,.2,-2.8);const cp=new T.Mesh(new T.SphereGeometry(.55,8,6),M(0x1a2233,0x335577,.4));cp.position.set(0,.5,.6);pl.add(cp);
-const prop=new T.Group();prop.position.z=3.1;box(prop,3,.2,.1,M(0x222222),0,0,0);box(prop,.2,3,.1,M(0x222222),0,0,0);pl.add(prop);
+function fallbackPlane(){const g=new T.Group(),fu=cyl(g,.6,.35,6,M(0xf6f1e4),0,0,0,10);fu.rotation.x=Math.PI/2;box(g,11,.15,1.6,M(0xd9342b),0,.2,.3);box(g,.15,1.4,1.2,M(0xd9342b),0,.8,-2.8);box(g,3.5,.12,.8,M(0xd9342b),0,.2,-2.8);const cp=new T.Mesh(new T.SphereGeometry(.55,8,6),M(0x1a2233,0x335577,.4));cp.position.set(0,.5,.6);g.add(cp);const prop=new T.Group();prop.position.z=3.1;box(prop,3,.2,.1,M(0x222222),0,0,0);box(prop,.2,3,.1,M(0x222222),0,0,0);g.add(prop);return {g,prop}}
+function replacePlaneVisual(holder,source){if(holder.userData.visual)holder.remove(holder.userData.visual);const visual=source.clone(true);visual.scale.setScalar(.3);visual.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});holder.add(visual);holder.userData.visual=visual}
+const pl=new T.Group(),planeFallback=fallbackPlane(),prop=planeFallback.prop;pl.add(planeFallback.g);pl.userData.visual=planeFallback.g;
 const pV=reg(pl,{name:'plane',type:'plane',ch:2.5,dist:18,max:90,pt:0,rl:0});pl.position.set(0,7.3,-26);pV.h=Math.PI;pl.rotation.y=Math.PI;
 const TR=CAR_COLORS.slice(1).map((c,i)=>{const q=new T.Group(),visual=fallbackCar(c);q.add(visual);q.userData.visual=visual;q.rotation.order='YXZ';q.sg=i%2?1:-1;q.ax=i<2?0:1;q.u=q.sg*(20+i*8);q.dir=1;S.add(q);return q});
 const hl=new T.SpotLight(0xfff0c8,0,90,.5,.5);hl.position.set(0,1,2.2);hl.target.position.set(0,.5,22);car.add(hl,hl.target);
 const carModelUrl=new URL('assets/vehicles/sports_car.glb',document.baseURI).href;
 new GLTFLoader().load(carModelUrl,gltf=>{replaceCarVisual(car,gltf.scene,CAR_COLORS[0]);TR.forEach((q,i)=>replaceCarVisual(q,gltf.scene,CAR_COLORS[i+1],true));car.userData.model='sports_car.glb';TR.forEach(q=>q.userData.model='sports_car.glb')},undefined,e=>{console.warn('sports car model failed; using fallback',e);if(started)toast('Detailed car model could not load. Using fallback.',3500)});
+const airlinerModelUrl=new URL('assets/aircraft/airliner.glb',document.baseURI).href;
+new GLTFLoader().load(airlinerModelUrl,gltf=>{replacePlaneVisual(pl,gltf.scene);pl.userData.model='airliner.glb'},undefined,e=>{console.warn('airliner model failed; using fallback',e);if(started)toast('Detailed airplane model could not load. Using fallback.',3500)});
 // lighthouse
 const lh=new T.Group();let la=3.6,lr=150;while(hf(Math.cos(la)*lr,Math.sin(la)*lr)>.5)lr+=2;lh.position.set(Math.cos(la)*(lr-4),hf(Math.cos(la)*(lr-4),Math.sin(la)*(lr-4)),Math.sin(la)*(lr-4));
 for(let i=0;i<4;i++)cyl(lh,3-i*.4,3.4-i*.4,8,M(i%2?0xd9342b:0xf6f1e4),0,i*8+4,0,10);const lamp=new T.Mesh(new T.SphereGeometry(2,10,8),new T.MeshBasicMaterial({color:0xfff0b0}));lamp.position.y=34;lh.add(lamp);

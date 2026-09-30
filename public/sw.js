@@ -1,4 +1,4 @@
-const CACHE='skyreach-v3';
+const CACHE='skyreach-v4';
 const SHELL=['./','./index.html','./manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
