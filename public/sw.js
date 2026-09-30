@@ -1,4 +1,4 @@
-const CACHE='skyreach-v4';
+const CACHE='skyreach-v5';
 const SHELL=['./','./index.html','./manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
@@ -11,11 +11,23 @@ self.addEventListener('activate',event=>{
   self.clients.claim();
 });
 
+const networkFirst=request=>fetch(request).then(response=>{
+  if(response.ok){
+    const copy=response.clone();
+    caches.open(CACHE).then(cache=>cache.put(request,copy));
+  }
+  return response;
+}).catch(()=>caches.match(request));
+
 self.addEventListener('fetch',event=>{
   const request=event.request;
   if(request.method!=='GET')return;
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
+  if(request.mode==='navigate'||url.pathname.endsWith('.glb')){
+    event.respondWith(networkFirst(request));
+    return;
+  }
   event.respondWith(
     caches.match(request).then(hit=>hit||fetch(request).then(response=>{
       if(response.ok){
