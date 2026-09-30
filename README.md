@@ -9,7 +9,9 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 ## Current gameplay
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
-- Detailed user-supplied sports car for the player and color-varied town traffic, a detailed airliner, plus the sailboat
+- Detailed user-supplied sports car for the player and color-varied town traffic
+- Detailed speedboat using the existing sailing controls and physics
+- Detailed airliner using the existing flight controls and physics
 - Six beacon objectives and eight airborne rings
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, hidden Skyshards, and landmark discoveries
@@ -40,7 +42,17 @@ npm run build
 npm run preview -- --host 0.0.0.0
 ```
 
-## Vehicle assets\n\nThe player car and four town traffic cars use \`public/assets/vehicles/sports_car.glb\`. Only the named \`paint\` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback. Asset provenance is recorded beside the GLB.\n\nThe airplane uses \`public/assets/aircraft/airliner.glb\` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.\n\n## Repository layout
+## Vehicle assets
+
+The player car and four town traffic cars use `public/assets/vehicles/sports_car.glb`. Only the named `paint` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback.
+
+The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. The procedural boat is retained only as a load-failure fallback.
+
+The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
+
+Asset provenance is recorded beside each GLB.
+
+## Repository layout
 
 ```text
 index.html
@@ -51,9 +63,16 @@ src/
     math.js
     quality.js
     storage.js
+  systems/
+    exploration.js
 public/
+  assets/
+    aircraft/
+    boats/
+    vehicles/
   manifest.webmanifest
   sw.js
+tests/
 legacy/
   skyreach-original.html
 docs/

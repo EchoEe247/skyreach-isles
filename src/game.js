@@ -75,7 +75,9 @@ function sportsCarClone(source,color,traffic=false){const model=source.clone(tru
 function replaceCarVisual(holder,source,color,traffic=false){if(holder.userData.visual)holder.remove(holder.userData.visual);const visual=sportsCarClone(source,color,traffic);holder.add(visual);holder.userData.visual=visual}
 const car=new T.Group(),carVisual=fallbackCar(CAR_COLORS[0]);car.add(carVisual);car.userData.visual=carVisual;
 const cV=reg(car,{name:'car',type:'car',ch:2.5,dist:10,max:40});car.position.set(9,hf(9,14),14);
-const boat=new T.Group();box(boat,2.6,1,6,M(0xf3f0e6),0,.3,0);const bw=new T.Mesh(new T.ConeGeometry(1.8,3,4),M(0xf3f0e6));bw.rotation.set(Math.PI/2,0,Math.PI/4);bw.scale.set(.75,1,.5);bw.position.set(0,.3,4.4);boat.add(bw);box(boat,2.6,.3,6,M(0x1f6f8b),0,.9,0).scale.set(1.02,1,1.02);box(boat,1.8,1.4,2,M(0xffffff),0,1.7,-.8);box(boat,1.9,.5,2.1,M(0x1a2233),0,2,-.8);
+function fallbackBoat(){const g=new T.Group();box(g,2.6,1,6,M(0xf3f0e6),0,.3,0);const bw=new T.Mesh(new T.ConeGeometry(1.8,3,4),M(0xf3f0e6));bw.rotation.set(Math.PI/2,0,Math.PI/4);bw.scale.set(.75,1,.5);bw.position.set(0,.3,4.4);g.add(bw);box(g,2.6,.3,6,M(0x1f6f8b),0,.9,0).scale.set(1.02,1,1.02);box(g,1.8,1.4,2,M(0xffffff),0,1.7,-.8);box(g,1.9,.5,2.1,M(0x1a2233),0,2,-.8);return g}
+function replaceBoatVisual(holder,source){if(holder.userData.visual)holder.remove(holder.userData.visual);const visual=source.clone(true);visual.rotation.y=-Math.PI/2;visual.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});holder.add(visual);holder.userData.visual=visual}
+const boat=new T.Group(),boatFallback=fallbackBoat();boatFallback.visible=false;boat.add(boatFallback);boat.userData.visual=boatFallback;boat.userData.modelState='loading';
 const bV=reg(boat,{name:'boat',type:'boat',ch:3,dist:14,max:30});let ba=.8,br=150;while(hf(Math.cos(ba)*br,Math.sin(ba)*br)>-1.5)br+=2;const bx=Math.cos(ba)*br,bz=Math.sin(ba)*br;boat.position.set(bx,0,bz);bV.h=Math.atan2(Math.cos(ba),Math.sin(ba));
 const dkc=Math.cos(ba),dks=Math.sin(ba),dock=box(S,3.4,.3,30,M(0x8a6a43),dkc*(br-16),.5,dks*(br-16));dock.rotation.y=bV.h;
 for(let i=0;i<8;i++)for(const s of[-1,1]){const u=br-30+i*4,pp=cyl(S,.2,.2,3,M(0x5a4530),dkc*u-dks*s*1.6,-.6,dks*u+dkc*s*1.6,6)}
@@ -88,6 +90,8 @@ const TR=CAR_COLORS.slice(1).map((c,i)=>{const q=new T.Group(),visual=fallbackCa
 const hl=new T.SpotLight(0xfff0c8,0,90,.5,.5);hl.position.set(0,1,2.2);hl.target.position.set(0,.5,22);car.add(hl,hl.target);
 const carModelUrl=new URL('assets/vehicles/sports_car.glb',document.baseURI).href;
 new GLTFLoader().load(carModelUrl,gltf=>{replaceCarVisual(car,gltf.scene,CAR_COLORS[0]);TR.forEach((q,i)=>replaceCarVisual(q,gltf.scene,CAR_COLORS[i+1],true));car.userData.model='sports_car.glb';TR.forEach(q=>q.userData.model='sports_car.glb')},undefined,e=>{console.warn('sports car model failed; using fallback',e);if(started)toast('Detailed car model could not load. Using fallback.',3500)});
+const speedboatModelUrl=new URL('assets/boats/speedboat.glb',document.baseURI).href;
+new GLTFLoader().load(speedboatModelUrl,gltf=>{replaceBoatVisual(boat,gltf.scene);boat.userData.model='speedboat.glb';boat.userData.modelState='ready'},undefined,e=>{console.warn('speedboat model failed; using fallback',e);boatFallback.visible=true;boat.userData.modelState='fallback';if(started)toast('Detailed boat model could not load. Using fallback.',3500)});
 const airlinerModelUrl=new URL('assets/aircraft/airliner.glb',document.baseURI).href;
 new GLTFLoader().load(airlinerModelUrl,gltf=>{replacePlaneVisual(pl,gltf.scene);pl.userData.model='airliner.glb';pl.userData.modelState='ready'},undefined,e=>{console.warn('airliner model failed; using fallback',e);planeFallback.g.visible=true;pl.userData.modelState='fallback';if(started)toast('Detailed airplane model could not load. Using fallback.',3500)});
 // lighthouse

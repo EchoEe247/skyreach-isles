@@ -1,0 +1,18 @@
+{
+  "asset": "speedboat.glb",
+  "source": "User-supplied asset uploaded in the Skyreach Isles development conversation",
+  "sha256": "bfb0ab5c09b0901def0befbc75fa39b32dd26a5c2385daaa337086bd7bab805c",
+  "size_bytes": 1179368,
+  "source_dimensions_m": {
+    "length_x": 9.0010910034,
+    "height_y": 3.2298833132,
+    "width_z": 2.6299936771
+  },
+  "integration": {
+    "uniform_scale": 1.0,
+    "source_bow_axis": "+X",
+    "game_forward_axis": "+Z",
+    "rotation_y_radians": -1.5707963267948966,
+    "physics": "Existing Skyreach boat boarding, steering, water movement, speed, dock placement, and camera behavior are unchanged."
+  }
+}
