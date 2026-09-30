@@ -59,7 +59,7 @@ The home island and three offshore islands are finite terrain features in an unb
 
 `terrainHeight()` caps the far mathematical seafloor at -80 so very large ocean coordinates remain numerically stable. `boatCanTravel()` checks all real terrain plus sea-arch pillars, without a coordinate boundary. The old radius >= 360 shortcut is removed because offshore islands occupy some of those coordinates.
 
-The 3000×3000 water plane follows the camera every frame, so its visible surface effectively moves with the player. The sky dome, sun/moon visuals, stars, and directional-light target also follow the player/camera frame. Clouds wrap around the player's current coordinates, preventing long ocean voyages from leaving the atmospheric field behind.
+The 40000×40000 water plane follows the camera every frame. During rocket ascent, local terrain and water crossfade out between roughly 18–70 km physical altitude while the curved Earth representation takes over, preventing a finite square ocean edge from appearing beneath the SLS. The sky dome, sun/moon visuals, stars, and directional-light target also follow the player/camera frame. Clouds wrap around the player's current coordinates, preventing long ocean voyages from leaving the atmospheric field behind.
 
 ## Audio
 
@@ -68,7 +68,8 @@ Audio begins only after the player's Start gesture so mobile/browser autoplay re
 `src/systems/audio.js` generates the soundscape locally with WebAudio rather than streamed audio assets. The mix includes:
 
 - surface-aware footsteps for grass, sand, stone/road, wood, and shallow water
-- environmental and weather-driven wind\n- rain noise driven by the living-world weather profile
+- environmental and weather-driven wind
+- rain noise driven by the living-world weather profile
 - shoreline surf
 - open-ocean wash
 - land/foliage ambience
