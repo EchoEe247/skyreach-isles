@@ -15,7 +15,7 @@ Current extracted modules:
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
-- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.
+- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.\n- `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.\n- `src/core/living-world.js`: deterministic weather, lightning, world-event cadence, and NPC schedule targets.
 - `src/systems/exploration.js`: navigation, 2D proximity/bearing helpers, and lightweight haptic feedback.
 - `src/systems/audio.js`: adaptive WebAudio environment, movement, wildlife, and vehicle sound layers.
 - `src/style.css`: presentation separated from game logic.
@@ -23,7 +23,7 @@ Current extracted modules:
 New world modules:
 
 - src/core/archipelago.js: stable offshore island definitions and analytic heights.
-- src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.
+- src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.\n- src/systems/living-world.js: rain particles, event manifestations/resolution state, and ambient ferry traffic.
 - src/systems/atlas.js and src/atlas.css: chart, field notes, course selection and scrolling radar.
 
 ## State and persistence
@@ -57,7 +57,7 @@ Audio begins only after the player's Start gesture so mobile/browser autoplay re
 `src/systems/audio.js` generates the soundscape locally with WebAudio rather than streamed audio assets. The mix includes:
 
 - surface-aware footsteps for grass, sand, stone/road, wood, and shallow water
-- environmental wind
+- environmental and weather-driven wind\n- rain noise driven by the living-world weather profile
 - shoreline surf
 - open-ocean wash
 - land/foliage ambience
@@ -69,7 +69,7 @@ Audio begins only after the player's Start gesture so mobile/browser autoplay re
 - sparse nighttime insect chirps
 - distance-faded waterfall noise within 90 units of Veilwater, capped at 0.20 gain
 
-Mix levels react continuously to vehicle mode, speed, altitude, coast proximity, town proximity, terrain surface, and day/night state. A master compressor and bounded layer gains keep the synthesized mix under control.
+Mix levels react continuously to vehicle mode, speed, altitude, coast proximity, town proximity, terrain surface, day/night state, rain, and weather wind. A master compressor and bounded layer gains keep the synthesized mix under control.
 
 ## Exploration systems
 
@@ -77,8 +77,7 @@ The current progression layer includes six beacons, eight airborne rings, ten Sk
 
 `src/systems/exploration.js` supplies nearest-pending objective selection, distance/bearing helpers, and haptic feedback. The HUD compass prioritizes an explicitly selected destination, then unfinished beacons, then unfinished Skyshards. The radar follows the player with a 660-unit span. Eight discovery slots preserve the original five slots unchanged.
 
-## Performance
-
+## Living-world simulation\n\nThe living-world clock advances only while gameplay is active. Weather follows a 600-second continuous cycle with clear, cloudy, rain, storm, and fog phases blended over transition windows. Rendering responds by changing cloud density/speed, rain particles, linear-fog range, water bump strength, sky/sun/moon contribution, and bounded lightning flashes. Storm darkness is deliberately capped so the game's night-visibility contract remains intact.\n\nThe existing 24 NPC population is redistributed rather than increased: 18 residents remain on the home island and six live on the offshore islands. Four schedule periods (morning/day/evening/night) move each resident between deterministic community anchors with short local wandering around each anchor. This adds behavior without increasing character draw-call count.\n\nTwo low-poly ambient ferries traverse sampled open-water routes between the home island and offshore destinations. They are ambience only and do not affect player boat collision.\n\nWorld events are intermittent rather than a second checklist. Washed-up cargo, lighthouse outage, and stranded-boat events appear in bounded windows, manifest in the world, announce once, and resolve when the player reaches their event radius. Resolving the outage restores the lighthouse immediately. Event state is intentionally session-local and repeats on a later cycle.\n\n## Performance\n
 Automatic quality chooses a conservative preset from browser-reported device memory/CPU information when available. The player can cycle Auto, Low, Medium, and High without leaving the game. Pixel ratio and shadow rendering are the main runtime quality controls.
 
 Detailed GLB meshes currently disable their own dynamic shadows where appropriate to avoid turning visual upgrades into an unnecessary mobile GPU cost.
@@ -91,7 +90,7 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v8`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v10`.
 
 Service-worker behavior:
 
@@ -112,12 +111,12 @@ The current Node test suite covers:
 - aircraft GLB integrity, orientation, and real `GLTFLoader` parsing
 - speedboat GLB integrity, bow orientation, dimensions, and real `GLTFLoader` parsing
 - sports-car GLB integrity and paint-material contract
-- adaptive audio mix behavior and bounded gains
+- adaptive audio mix behavior, weather ambience, and bounded gains
 - open-ocean boat travel, shoreline blocking, and far-ocean terrain stability
 - exploration nearest-objective/bearing/distance helpers
 - backward-compatible persistence for eight discoveries
 - offshore shore approaches, cove entry, waterfall terrain drop and sea-arch passage/pillars
-- bounded waterfall audio gains
+- bounded waterfall audio gains\n- weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
 
 ## Next extraction boundaries
 

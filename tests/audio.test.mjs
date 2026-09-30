@@ -33,3 +33,11 @@ test('waterfall ambience fades with proximity and is bounded',()=>{
   assert.ok(computeAudioMix({waterfall:.5}).waterfall>0);
   assert.equal(computeAudioMix({waterfall:999}).waterfall,.2);
 });
+
+test('rain and storm raise weather ambience without exceeding mix bounds',()=>{
+  const clear=computeAudioMix({weatherWind:0,rain:0,storm:0});
+  const wet=computeAudioMix({weatherWind:.8,rain:.9,storm:1});
+  assert.equal(clear.rain,0);
+  assert.ok(wet.rain>.15&&wet.wind>clear.wind);
+  assert.ok(wet.rain<=1&&wet.wind<=1);
+});

@@ -10,7 +10,7 @@ New destinations: Tideglass Cove (720, 350), Ember Ruins (470, -670), Veilwater 
 
 ## Verification
 
-- 30 Node tests pass: actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, radial seafloor continuity, rendered-terrain height interpolation, daylight/night timing and lighting continuity, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
+- 36 current Node tests pass. Coverage includes actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, radial seafloor continuity, rendered-terrain height interpolation, daylight/night timing and lighting continuity, living-world weather/events/NPC schedules, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
 - Production Vite build succeeds. The existing large-bundle warning remains.
 - Isolated Chromium on the Pixel/Termux host rendered the cove, observatory ruins and Veilwater cascade. These views were visually inspected.
 - Browser inspection confirmed boat and aircraft model states were ready.

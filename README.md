@@ -18,6 +18,14 @@ Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and 
 
 The day/night cycle is intentionally weighted toward exploration: daylight lasts 9 minutes and night lasts 3 minutes. Night keeps cool moonlight plus ambient/hemisphere fill so terrain, vehicles, and the player remain readable instead of dropping to near-black. Fireflies still appear near land after dark. All additions are locally generated in the existing stylized art direction.
 
+## Living Isles
+
+The world now runs independently of the player instead of remaining mostly static. NPCs follow four day-part schedules, including residents assigned to each offshore island; two ambient ferries travel verified open-water routes; weather transitions through clear, cloudy, rain, storm, and fog states; and intermittent world events can be found and resolved without becoming a permanent quest checklist. Current events include washed-up cargo, a temporary lighthouse outage, and a stranded boat signal.
+
+Weather is coupled to rendering and audio: rain particles, cloud cover/speed, fog distance, ocean roughness, storm dimming/lightning, weather wind, and rain noise all change together. The existing night-visibility floor remains in effect during storms.
+
+See [Living Isles](docs/LIVING-ISLES.md) for the simulation contract and verification notes.
+
 ## Current gameplay
 
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
@@ -28,11 +36,11 @@ The day/night cycle is intentionally weighted toward exploration: daylight lasts
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
 - Eight named landmarks with discovery feedback and minimap history
 - Nearest-objective compass with live distance guidance
-- Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
+- Procedural island terrain, town, vegetation, lighthouse, traffic, scheduled town/island NPCs, ambient ferries, resolvable world events, particles, dynamic weather, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, Skyshards, landmark discoveries, and quality settings
 - Stronger objective feedback with screen pulses and supported-device haptics
 - Runtime quality selector with an automatic mobile-friendly default
-- Adaptive offline WebAudio soundscape: surface-aware footsteps, wind, surf, ocean wash, land/town ambience, car engine and road noise, boat engine and wake, airliner engine and jet noise, daytime birds, and nighttime insects
+- Adaptive offline WebAudio soundscape: surface-aware footsteps, weather wind and rain, surf, ocean wash, land/town ambience, car engine and road noise, boat engine and wake, airliner engine and jet noise, daytime birds, and nighttime insects
 - Installable/offline-capable PWA behavior after the first successful load
 
 ## Run locally
@@ -69,11 +77,11 @@ Asset provenance is recorded beside each GLB.
 
 `src/core/world.js` owns terrain-height evaluation plus the explicit boat-navigation contract. The island shoreline remains collidable, while open ocean is intentionally unbounded. Far-ocean terrain depth is capped for stable long-distance queries.
 
-`src/systems/audio.js` owns the adaptive WebAudio mix. Audio starts only after the player's Start gesture to satisfy browser autoplay rules. Mix levels react to movement speed, vehicle type, altitude, coast proximity, town proximity, terrain surface, and time of day.
+`src/core/living-world.js` defines deterministic weather phases, event cadence, lightning windows, and NPC schedule targets. `src/systems/living-world.js` owns rain rendering, event manifestations, and two ambient ferry routes.\n\n`src/systems/audio.js` owns the adaptive WebAudio mix. Audio starts only after the player's Start gesture to satisfy browser autoplay rules. Mix levels react to movement speed, vehicle type, altitude, coast proximity, town proximity, terrain surface, time of day, rain, and weather wind.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v9`.
+`public/sw.js` currently uses cache version `skyreach-v10`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
@@ -99,6 +107,7 @@ src/
   atlas.css
   core/
     daylight.js
+    living-world.js
     math.js
     quality.js
     storage.js
@@ -108,6 +117,7 @@ src/
     audio.js
     exploration.js
     island-scenery.js
+    living-world.js
     atlas.js
 public/
   assets/
@@ -126,6 +136,7 @@ tests/
   aircraft-asset.test.mjs
   archipelago.test.mjs
   audio.test.mjs
+  living-world.test.mjs
   boat-asset.test.mjs
   exploration.test.mjs
   storage.test.mjs
@@ -135,6 +146,7 @@ legacy/
   skyreach-original.html
 docs/
   ARCHITECTURE.md
+  LIVING-ISLES.md
 ```
 
 ## Development rule

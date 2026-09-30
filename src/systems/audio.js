@@ -2,10 +2,11 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 
 export function computeAudioMix(state={}){
   const mode=state.mode||'foot',speed=Math.abs(state.speed||0),alt=Math.max(0,state.altitude||0);
-  const ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day;
+  const ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day,rain=cl(state.rain||0),weatherWind=cl(state.weatherWind||0),storm=cl(state.storm||0);
   return {
     waterfall:cl((state.waterfall||0)*.20,0,.20),
-    wind:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0),0,.42),
+    wind:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0)+weatherWind*.11+storm*.05,0,.52),
+    rain:cl(rain*.16+storm*.04,0,.22),
     ocean:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
     surf:cl(coast*.12,0,.13),
     land:cl((1-ocean)*(1-town)*.035,0,.04),
@@ -61,6 +62,7 @@ export function createWorldAudio(){
 
       layers={
         wind:loopingNoise(ctx,noise,'bandpass',1050,.45),
+        rain:loopingNoise(ctx,noise,'highpass',1350,.35),
         waterfall:loopingNoise(ctx,noise,'lowpass',1800,.6),
         ocean:loopingNoise(ctx,noise,'lowpass',520,.5),
         surf:loopingNoise(ctx,noise,'bandpass',720,.6),
@@ -119,7 +121,7 @@ export function createWorldAudio(){
     if(!started||!ctx)return;
     if(ctx.state==='suspended')ctx.resume?.();
     const mix=computeAudioMix(state),speed=Math.abs(state.speed||0),mode=state.mode||'foot',now=ctx.currentTime;
-    target(layers.wind.gain.gain,mix.wind,.16);target(layers.wind.filter.frequency,700+speed*18+(state.altitude||0)*.8,.2);
+    target(layers.wind.gain.gain,mix.wind,.16);target(layers.wind.filter.frequency,700+speed*18+(state.altitude||0)*.8,.2);target(layers.rain.gain.gain,mix.rain,.18);
     target(layers.waterfall.gain.gain,mix.waterfall,.25);target(layers.ocean.gain.gain,mix.ocean,.2);target(layers.surf.gain.gain,mix.surf,.22);
     target(layers.land.gain.gain,mix.land,.3);target(layers.town.gain.gain,mix.town,.3);
     target(layers.road.gain.gain,mix.road,.08);target(layers.wake.gain.gain,mix.wake,.08);target(layers.jet.gain.gain,mix.jet,.1);
@@ -138,7 +140,7 @@ export function createWorldAudio(){
     }else stepClock=Math.min(stepClock,.3);
 
     wildClock-=state.dt||0;
-    if(wildClock<=0&&mode==='foot'&&(state.town||0)<.75){
+    if(wildClock<=0&&mode==='foot'&&(state.town||0)<.75&&(state.rain||0)<.35){
       const night=mix.night>.58;
       if((night&&mix.night>.58)||(!night&&mix.day>.32&&(state.ocean||0)<.72))chirp(night);
       wildClock=night?1.7+Math.random()*3.8:3.5+Math.random()*7.5;
