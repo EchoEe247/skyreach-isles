@@ -1,10 +1,20 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, explore three offshore islands, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
 The original playable single-file prototype is preserved unchanged at `legacy/skyreach-original.html`. The maintained version uses Vite and local npm dependencies so the project can grow without turning the original HTML into an increasingly fragile monolith.
+
+## Beyond the horizon
+
+- **Tideglass Cove:** a sheltered inlet, pale beaches, palms, a fishing jetty, and a dolphin pod offshore.
+- **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
+- **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
+
+Tap **Explore** (or press **M**) to chart a destination or locate your speedboat. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+
+Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Fireflies appear near land after dark. All additions are locally generated in the existing stylized art direction.
 
 ## Current gameplay
 
@@ -14,7 +24,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - Detailed airliner using the existing flight controls and physics
 - Six beacon objectives and eight airborne rings
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
-- Five named landmarks with discovery feedback and minimap history
+- Eight named landmarks with discovery feedback and minimap history
 - Nearest-objective compass with live distance guidance
 - Procedural island terrain, town, vegetation, lighthouse, traffic, NPCs, particles, weather/lighting ambience, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, Skyshards, landmark discoveries, and quality settings
@@ -47,7 +57,7 @@ npm run preview -- --host 0.0.0.0
 
 The player car and four town traffic cars use `public/assets/vehicles/sports_car.glb`. Only the named `paint` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback.
 
-The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shoreline collision is finite around the island; once the boat is in open ocean there is no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
+The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shorelines of the home island and three offshore islands are collidable, as are the sea-arch pillars. Open ocean has no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
 
 The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
 
@@ -61,7 +71,7 @@ Asset provenance is recorded beside each GLB.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v7`.
+`public/sw.js` currently uses cache version `skyreach-v8`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
@@ -84,14 +94,18 @@ vite.config.js
 src/
   game.js
   style.css
+  atlas.css
   core/
     math.js
     quality.js
     storage.js
     world.js
+    archipelago.js
   systems/
     audio.js
     exploration.js
+    island-scenery.js
+    atlas.js
 public/
   assets/
     aircraft/
@@ -107,6 +121,7 @@ public/
   sw.js
 tests/
   aircraft-asset.test.mjs
+  archipelago.test.mjs
   audio.test.mjs
   boat-asset.test.mjs
   exploration.test.mjs
@@ -122,3 +137,7 @@ docs/
 ## Development rule
 
 Preserve the feel and playability of the baseline while improving the internals incrementally. Do not rewrite working systems merely to chase architecture. New subsystems should move out of `game.js` when they have a clear interface and can be verified independently.
+
+## World expansion verification
+
+See [verification and boundaries](docs/WORLD-EXPANSION.md) for checks and remaining limitations.

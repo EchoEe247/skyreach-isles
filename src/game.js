@@ -1,6 +1,10 @@
 import * as T from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import "./style.css";
+import "./atlas.css";
+import {ISLANDS} from "./core/archipelago.js";
+import {createIslandScenery} from "./systems/island-scenery.js";
+import {createAtlas} from "./systems/atlas.js";
 import {createRng,clamp as cl,lerp as lp,angleDelta as ad} from "./core/math.js";
 import {loadProgress,saveProgress,loadSettings,saveSettings} from "./core/storage.js";
 import {applyRendererQuality,nextQuality,qualityLabel} from "./core/quality.js";
@@ -11,7 +15,7 @@ const $=id=>document.getElementById(id),v3=(x,y,z)=>new T.Vector3(x,y,z);
 const rnd=createRng(7);
 const hf=terrainHeight;
 const settings=loadSettings();let quality=settings.quality;const worldAudio=createWorldAudio();const R=new T.WebGLRenderer({antialias:true});applyRendererQuality(R,quality);R.shadowMap.type=T.PCFSoftShadowMap;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.15;document.body.prepend(R.domElement);
-const S=new T.Scene(),C=new T.PerspectiveCamera(65,innerWidth/innerHeight,.5,1300);S.fog=new T.Fog(0xbfe3f0,90,650);
+const S=new T.Scene(),C=new T.PerspectiveCamera(65,innerWidth/innerHeight,.5,2100);S.fog=new T.Fog(0xbfe3f0,150,1400);
 addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()});
 const M=(c,e,i)=>new T.MeshLambertMaterial({color:c,flatShading:true,emissive:e||0,emissiveIntensity:i||.5});
 const box=(p,w,h,d,m,x,y,z)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x||0,y||0,z||0);o.castShadow=true;p.add(o);return o};
@@ -34,7 +38,16 @@ tg.setAttribute('color',new T.BufferAttribute(col,3));tg.computeVertexNormals();
 const ter=new T.Mesh(tg,new T.MeshLambertMaterial({vertexColors:true,map:nt}));ter.receiveShadow=true;S.add(ter);
 const wc=document.createElement('canvas');wc.width=wc.height=128;const wx=wc.getContext('2d');wx.fillStyle='#808080';wx.fillRect(0,0,128,128);for(let i=0;i<300;i++){wx.fillStyle=rnd()<.5?'rgba(255,255,255,.22)':'rgba(0,0,0,.22)';wx.beginPath();wx.arc(rnd()*128,rnd()*128,3+rnd()*9,0,6.3);wx.fill()}
 const wt=new T.CanvasTexture(wc),RP=420;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
-const water=new T.Mesh(new T.PlaneGeometry(3000,3000),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:.82,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6}));water.rotation.x=-Math.PI/2;S.add(water);
+const water=new T.Mesh(new T.PlaneGeometry(3000,3000,100,100),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:.82,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6}));water.rotation.x=-Math.PI/2;S.add(water);
+const waterTime={value:0};
+water.material.onBeforeCompile=shader=>{
+ shader.uniforms.worldTime=waterTime;
+ shader.vertexShader='uniform float worldTime;\n'+shader.vertexShader;
+ shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+ vec2 sea=(modelMatrix*vec4(position,1.)).xz;
+ transformed.z+=sin(sea.x*.075+sea.y*.038+worldTime*1.2)*.17+sin(sea.y*.12-sea.x*.02-worldTime*1.7)*.09;`);
+};
+
 // town
 const ctex=(fn)=>{const c=document.createElement('canvas');c.width=c.height=64;fn(c.getContext('2d'));const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t};
 const wm=ctex(x=>{x.fillStyle='#fff';x.fillRect(0,0,64,64);x.fillStyle='#3a4a66';for(let i=0;i<4;i++)for(let j=0;j<4;j++)x.fillRect(i*16+4,j*16+4,8,9)});
@@ -57,7 +70,7 @@ for(let i=0;i<3000&&pc+bc_<N;i++){const x=(rnd()-.5)*700,z=(rnd()-.5)*700,h=hf(x
  if(h<9&&rnd()<.6){put(bl,bc_++,x,h+4.2*sc,z,sc,sc*.85,sc,cc.setHex(0x4f9a3a).offsetHSL((rnd()-.5)*.1,0,(rnd()-.5)*.1));put(km,kc++,x,h+1.5*sc,z,sc,sc,sc)}
  else{const c=cc.setHex(0x2f7a3c).offsetHSL((rnd()-.5)*.08,0,(rnd()-.5)*.1);for(let k=0;k<3;k++)put(pn[k],pc,x,h+sc*(2.6+k*1.9),z,sc,sc,sc,c);pc++;put(km,kc++,x,h+1.5*sc,z,sc,sc,sc)}}
 for(let i=0;i<1500&&rc_<260;i++){const x=(rnd()-.5)*700,z=(rnd()-.5)*700,h=hf(x,z);if(h<-.2||Math.hypot(x,z)<62)continue;put(rk,rc_++,x,h+.2,z,.6+rnd()*1.6,.5+rnd(),.6+rnd()*1.6,cc.setHex(0x8a857a).offsetHSL(0,0,(rnd()-.5)*.15))}
-pn.forEach(m=>m.count=pc);bl.count=bc_;km.count=kc;rk.count=rc_;rk.castShadow=true;[...pn,bl,km,rk].forEach(m=>{m.frustumCulled=false;S.add(m)});
+pn.forEach(m=>m.count=pc);bl.count=bc_;km.count=kc;rk.count=rc_;rk.castShadow=true;[...pn,bl,km,rk].forEach(m=>{m.computeBoundingSphere();m.frustumCulled=true;S.add(m)});
 const cloudM=new T.MeshLambertMaterial({color:0xffffff,emissive:0xcfd8e8,emissiveIntensity:.45,transparent:true,opacity:.85}),clouds=[];for(let i=0;i<22;i++){const g=new T.Group();for(let j=0;j<4;j++){const m=new T.Mesh(new T.IcosahedronGeometry(10+rnd()*8,1),cloudM);m.position.set(j*14-20,rnd()*4,rnd()*8);m.scale.y=.55;g.add(m)}g.position.set((rnd()-.5)*900,110+rnd()*50,(rnd()-.5)*900);S.add(g);clouds.push(g)}
 // characters
 function human(skin,shirt,pants,hair,scarf){const g=new T.Group(),b=new T.Group();g.add(b);box(b,.7,.9,.4,M(shirt),0,1.45,0);const hd=new T.Mesh(new T.IcosahedronGeometry(.32,1),M(skin));hd.position.y=2.15;hd.castShadow=true;b.add(hd);box(b,.66,.22,.62,M(hair),0,2.36,-.02);box(b,.08,.06,.04,M(0x111111),-.11,2.19,.29);box(b,.08,.06,.04,M(0x111111),.11,2.19,.29);box(b,.07,.09,.08,M(skin),0,2.13,.32);box(b,.15,.15,.15,M(skin),0,1.95,0);box(b,.74,.1,.44,M(0x222222),0,1.02,0);
@@ -82,8 +95,8 @@ const boat=new T.Group(),boatFallback=fallbackBoat();boatFallback.visible=false;
 const bV=reg(boat,{name:'boat',type:'boat',ch:3,dist:14,max:30});let ba=.8,br=150;while(hf(Math.cos(ba)*br,Math.sin(ba)*br)>-1.5)br+=2;const bx=Math.cos(ba)*br,bz=Math.sin(ba)*br;boat.position.set(bx,0,bz);bV.h=Math.atan2(Math.cos(ba),Math.sin(ba));
 const dkc=Math.cos(ba),dks=Math.sin(ba),dock=box(S,3.4,.3,30,M(0x8a6a43),dkc*(br-16),.5,dks*(br-16));dock.rotation.y=bV.h;
 for(let i=0;i<8;i++)for(const s of[-1,1]){const u=br-30+i*4,pp=cyl(S,.2,.2,3,M(0x5a4530),dkc*u-dks*s*1.6,-.6,dks*u+dkc*s*1.6,6)}
-const dk=(x,z)=>{const u=x*dkc+z*dks,w=-x*dks+z*dkc;return Math.abs(w)<1.7&&u>br-31&&u<br-1},gr=(x,z)=>dk(x,z)?Math.max(hf(x,z),.6):hf(x,z);
-const surfaceAt=(x,z)=>{const h=hf(x,z),d=Math.hypot(x,z);if(dk(x,z))return 'wood';if(h<-.2)return 'water';if(h<1)return 'sand';if(d<16||(d<65&&(Math.abs(x)<4||Math.abs(z)<4)))return 'stone';return 'grass'};
+const dk=(x,z)=>{const u=x*dkc+z*dks,w=-x*dks+z*dkc;return Math.abs(w)<1.7&&u>br-31&&u<br-1},gr=(x,z)=>dk(x,z)?Math.max(hf(x,z),.6):islandScenery.surfaceHeight(x,z);
+const surfaceAt=(x,z)=>{const h=hf(x,z),d=Math.hypot(x,z);if(dk(x,z)||Math.abs(x-islandScenery.jetty.x)<14&&Math.abs(z-islandScenery.jetty.z)<2.2)return 'wood';if(h<-.2)return 'water';if(h<1)return 'sand';if(d<16||(d<65&&(Math.abs(x)<4||Math.abs(z)<4)))return 'stone';return 'grass'};
 function fallbackPlane(){const g=new T.Group(),fu=cyl(g,.6,.35,6,M(0xf6f1e4),0,0,0,10);fu.rotation.x=Math.PI/2;box(g,11,.15,1.6,M(0xd9342b),0,.2,.3);box(g,.15,1.4,1.2,M(0xd9342b),0,.8,-2.8);box(g,3.5,.12,.8,M(0xd9342b),0,.2,-2.8);const cp=new T.Mesh(new T.SphereGeometry(.55,8,6),M(0x1a2233,0x335577,.4));cp.position.set(0,.5,.6);g.add(cp);const prop=new T.Group();prop.position.z=3.1;box(prop,3,.2,.1,M(0x222222),0,0,0);box(prop,.2,3,.1,M(0x222222),0,0,0);g.add(prop);return {g,prop}}
 function replacePlaneVisual(holder,source){if(holder.userData.visual)holder.remove(holder.userData.visual);const visual=source.clone(true);visual.scale.setScalar(.3);visual.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});holder.add(visual);holder.userData.visual=visual}
 const pl=new T.Group(),planeFallback=fallbackPlane(),prop=planeFallback.prop;planeFallback.g.visible=false;pl.add(planeFallback.g);pl.userData.visual=planeFallback.g;pl.userData.modelState='loading';
@@ -114,10 +127,12 @@ const LM=[
  {name:'Skyreach Airstrip',x:pl.position.x,z:pl.position.z,r:22,on:0},
  {name:'West Harbor',x:dkc*(br-16),z:dks*(br-16),r:22,on:0},
  {name:'Ember Lighthouse',x:lh.position.x,z:lh.position.z,r:22,on:0},
- {name:'Cloudbreak Peak',x:peakB.x,z:peakB.z,r:18,on:0}
+ {name:'Cloudbreak Peak',x:peakB.x,z:peakB.z,r:18,on:0},
+ ...ISLANDS.map(i=>({...i,r:i.radius*.8,on:0}))
 ];
+const islandScenery=createIslandScenery(S,BL);
 let dc=0;LM.forEach((l,i)=>{if(savedProgress.discoveries[i]){l.on=1;dc++}});
-$('cnt').textContent=lit+'/6';$('rg').textContent='Sky rings '+rc+'/8';$('shards').textContent='Skyshards '+sc+'/10';$('discoveries').textContent='Places '+dc+'/5';
+$('cnt').textContent=lit+'/6';$('rg').textContent='Sky rings '+rc+'/8';$('shards').textContent='Skyshards '+sc+'/10';$('discoveries').textContent='Places '+dc+'/8';
 const persistProgress=()=>saveProgress({beacons:BC.map(b=>!!b.on),rings:RG.map(q=>!!q.on),shards:XR.map(q=>!!q.on),discoveries:LM.map(l=>!!l.on)});
 const tailwind=()=>sc===10?1.12:1;
 const GL=[];for(let i=0;i<14;i++){const g=new T.Group(),p1=new T.Group(),p2=new T.Group();box(p1,1.6,.06,.5,M(0xffffff),.8,0,0);box(p2,1.6,.06,.5,M(0xffffff),-.8,0,0);g.add(p1,p2);g.p=[p1,p2];g.c=[[lh.position.x,lh.position.z],[bx,bz],[0,0]][i%3];g.r=15+rnd()*35;g.a=rnd()*6.28;g.y=28+rnd()*30;S.add(g);GL.push(g)}
@@ -126,35 +141,40 @@ const ptx=new T.CanvasTexture(pcv),PT=[];for(let i=0;i<60;i++){const q=new T.Spr
 const puff=(x,y,z,c,sz,vy)=>{const q=PT[pi++%60];q.position.set(x,y,z);q.material.color.setHex(c);q.sz=sz;q.life=1;q.vy=vy;q.visible=true};
 // input
 const keys={};let jx=0,jy=0,jid=null,jumpF=0,boostF=0,yaw=Math.PI,pitch=.35,off=0,started=0,mode='foot',cur=null,dragId=null,lx=0,ly=0;
-addEventListener('keydown',e=>{keys[e.code]=1;if(e.code=='KeyE')act()});addEventListener('keyup',e=>keys[e.code]=0);
+let atlasOpen=false,selectedWaypoint=null;
+function releaseInput(){Object.keys(keys).forEach(k=>delete keys[k]);jx=jy=jumpF=boostF=0;jid=dragId=null;$('knob').style.transform=''}
+const atlas=createAtlas({places:LM,vehicles:V,onSelect:p=>{selectedWaypoint=p;if(p)toast('Course set: '+p.name,2800)},onOpen:open=>{atlasOpen=open;releaseInput()}});
+addEventListener('blur',releaseInput);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInput()});
+addEventListener('keydown',e=>{if(atlasOpen||!started)return;keys[e.code]=1;if(e.code=='KeyE'&&!e.repeat)act()});addEventListener('keyup',e=>keys[e.code]=0);
 const joy=$('joy'),knob=$('knob');function mv(e){const r=joy.getBoundingClientRect();let dx=(e.clientX-r.left-r.width/2)/(r.width/2),dy=(e.clientY-r.top-r.height/2)/(r.height/2);const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}jx=dx;jy=-dy;knob.style.transform=`translate(${dx*40}px,${dy*40}px)`}
 joy.onpointerdown=e=>{jid=e.pointerId;joy.setPointerCapture(jid);mv(e)};joy.onpointermove=e=>{if(e.pointerId==jid)mv(e)};joy.onpointerup=joy.onpointercancel=()=>{jid=null;jx=jy=0;knob.style.transform=''};
 const hold=(id,f)=>{const el=$(id);el.onpointerdown=e=>{f(1);el.setPointerCapture(e.pointerId)};el.onpointerup=el.onpointercancel=()=>f(0)};hold('jump',v=>jumpF=v);hold('boost',v=>boostF=v);$('act').onpointerdown=act;
 const qualityBtn=$('quality');const renderQuality=()=>qualityBtn.textContent='Quality '+qualityLabel(quality);renderQuality();qualityBtn.onpointerdown=e=>{e.stopPropagation();quality=nextQuality(quality);settings.quality=quality;saveSettings(settings);applyRendererQuality(R,quality);renderQuality();toast('Quality '+qualityLabel(quality),1800)};
 const cv=R.domElement;cv.onpointerdown=e=>{dragId=e.pointerId;lx=e.clientX;ly=e.clientY};cv.onpointermove=e=>{if(e.pointerId!=dragId)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;if(mode=='foot')yaw-=dx*.006;else off-=dx*.006;pitch=cl(pitch+dy*.004,.05,1.2)};cv.onpointerup=cv.onpointercancel=()=>dragId=null;
-$('start').onpointerdown=()=>{$('start').style.display='none';started=1;worldAudio.start();toast('Follow the compass to sleeping beacons. Explore for glowing Skyshards and named landmarks.',5500)};
+$('start').onpointerdown=()=>{$('start').style.display='none';started=1;worldAudio.start();toast('Tap Explore to chart the offshore islands. Find your boat, sail to a new shore, and step ashore.',6000)};
 let tt;function toast(m,ms){const t=$('toast');t.textContent=m;t.classList.add('s');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('s'),ms||2500)}
 function objectiveFeedback(pattern=35){const ui=$('ui');ui.classList.remove('objective-pulse');void ui.offsetWidth;ui.classList.add('objective-pulse');haptic(pattern)}
 function col2(p,r){for(const b of BL){const dx=p.x-b.x,dz=p.z-b.z,d=Math.hypot(dx,dz),m=b.r+r;if(d<m&&d>.01){p.x=b.x+dx/d*m;p.z=b.z+dz/d*m}}}
 function setMode(m,c){mode=m;cur=c;$('act').textContent=m=='foot'?'Board':'Exit';$('jump').style.display=m=='foot'?'flex':'none';$('boost').textContent=c?.type=='plane'?'Throttle':'Boost';$('mode').textContent=c?'Driving the '+c.name:'On foot';$('spd').textContent=''}
-function act(){if(!started)return;if(mode=='foot'){let b=null,bd=9;for(const v of V){const d=v.g.position.distanceTo(P);if(d<bd){bd=d;b=v}}if(b){hero.visible=false;setMode('veh',b);haptic(20);toast(b.type=='plane'?'Hold Throttle, then push the stick up to lift off':b.type=='boat'?'Sail out to the sea beacons':'Drive. Hold Boost for speed',3500)}else toast('Walk up to a vehicle to board')}
+function act(){if(!started||atlasOpen)return;if(mode=='foot'){let b=null,bd=9;for(const v of V){const d=v.g.position.distanceTo(P);if(d<bd){bd=d;b=v}}if(b){hero.visible=false;setMode('veh',b);haptic(20);toast(b.type=='plane'?'Hold Throttle, then push the stick up to lift off':b.type=='boat'?'Sail out to the sea beacons':'Drive. Hold Boost for speed',3500)}else toast('Walk up to a vehicle to board')}
  else{const g=cur.g.position;if(cur.type=='plane'&&(g.y-hf(g.x,g.z)>3||cur.sp>6)){toast('Land and slow down first');return}
  for(let a=0;a<6.3;a+=1.05){const x=g.x+Math.sin(cur.h+a)*4,z=g.z+Math.cos(cur.h+a)*4,h=gr(x,z);if(h>.3||cur.type=='boat'){P.set(x,Math.max(h,-.7),z);hero.visible=true;cur.sp=0;setMode('foot',null);return}}toast('No solid ground nearby. Head to shore.')}}
 // update
-let ang=.35,mc=$('map').getContext('2d'),mi=document.createElement('canvas');mi.width=mi.height=120;{const x=mi.getContext('2d'),im=x.createImageData(120,120);for(let i=0;i<14400;i++){const h=hf(((i%120)/120-.5)*900,((i/120|0)/120-.5)*900),c=h<0?[20,70+h*3,110+h*3]:h<1?[230,214,160]:h<17?[95,155,74]:h<26?[139,132,120]:[244,247,250];im.data.set([c[0],cl(c[1],0,255),cl(c[2],0,255),255],i*4)}x.putImageData(im,0,0)}
+let ang=.35,mc=$('map').getContext('2d');
 const clock=new T.Clock();let fov=65;
-function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05),tm_=clock.elapsedTime;
+function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(),.05),dt=atlasOpen||document.hidden?0:rawDt,tm_=clock.elapsedTime;
  if(started)ang+=dt*.02;const sy=Math.sin(ang),dir=v3(Math.cos(ang),sy,.3).normalize(),k=cl(sy*3+.5,0,1),du=Math.max(0,1-Math.abs(sy)*4);
  skyU.top.value.copy(cN).lerp(cD,k);skyU.bot.value.copy(cNh).lerp(cDh,k).lerp(cO,du*.85);S.fog.color.copy(skyU.bot.value);hemi.intensity=.22+.45*k;sun.intensity=Math.max(0,sy)*1.15;sun.color.setHSL(.09,.7,.6+.3*k);water.material.color.setHSL(.53,.7,.15+.22*k);
  bm.forEach(m=>m.emissiveIntensity=(1-k)*1.1);lampM.emissiveIntensity=(1-k)*2;stars.material.opacity=1-k;bc.material.opacity=(1-k)*.3;beam.rotation.y=tm_*.8;
- const jX=cl(jx+(keys.KeyD?1:0)-(keys.KeyA?1:0),-1,1),jY=cl(jy+(keys.KeyW?1:0)-(keys.KeyS?1:0),-1,1),bo=boostF||keys.ShiftLeft,ju=jumpF||keys.Space;
+ const jX=(!started||atlasOpen)?0:cl(jx+(keys.KeyD?1:0)-(keys.KeyA?1:0),-1,1),jY=(!started||atlasOpen)?0:cl(jy+(keys.KeyW?1:0)-(keys.KeyS?1:0),-1,1),bo=!atlasOpen&&started&&(boostF||keys.ShiftLeft),ju=!atlasOpen&&started&&(jumpF||keys.Space);
  cloudM.emissiveIntensity=.08+.4*k;clouds.forEach(c=>{c.position.x+=dt*3;while(c.position.x-P.x>500)c.position.x-=1000;while(c.position.x-P.x<-500)c.position.x+=1000;while(c.position.z-P.z>500)c.position.z-=1000;while(c.position.z-P.z<-500)c.position.z+=1000});
  V.forEach(v=>{v.mk.visible=mode=='foot';v.mk.position.y=9+Math.sin(tm_*3)*.6});hl.intensity=(mode=='veh'&&cur===cV&&k<.6)?2.4*(1-k):0;PT.forEach(s=>{if(s.life>0){s.life-=dt*1.1;s.position.y+=s.vy*dt;s.scale.setScalar(s.sz*(2-s.life));s.material.opacity=Math.max(0,s.life)*.55;if(s.life<=0)s.visible=false}});
  TR.forEach(q=>{q.u+=q.dir*9*dt;const a=Math.abs(q.u);if(a>52||a<17){q.dir*=-1;q.u=q.sg*cl(a,17,52)}const v=q.dir;q.rotation.y=q.ax?v*Math.PI/2:v>0?0:Math.PI;q.position.set(q.ax?q.u:-1.5*v,6.06,q.ax?1.5*v:q.u)});
  GL.forEach(g=>{g.a+=dt*.35;g.position.set(g.c[0]+Math.cos(g.a)*g.r,g.y+Math.sin(g.a*2)*2,g.c[1]+Math.sin(g.a)*g.r);g.rotation.y=-g.a;const f=Math.sin(tm_*7+g.r)*.5;g.p[0].rotation.z=f;g.p[1].rotation.z=-f});
  RG.forEach((q,i)=>{if(!q.on)q.m.opacity=.6+Math.sin(tm_*3+i)*.25;if(!q.on&&mode=='veh'&&cur.type=='plane'&&P.distanceTo(q.g.position)<10){q.on=1;q.m.color.setHex(0x7dff9a);rc++;persistProgress();$('rg').textContent='Sky rings '+rc+'/8';objectiveFeedback([25,35,25]);toast(rc==8?'All rings flown. Sky master.':'Ring '+rc+' of 8',2500)}});
  XR.forEach((q,i)=>{if(q.on)return;q.g.rotation.y+=dt*1.7;q.g.children[1].rotation.z+=dt*.8;q.g.position.y=q.g.baseY+Math.sin(tm_*2.2+i)*.45;const reach=mode=='veh'&&cur?.type=='plane'?7:4.2;if(distance2D(q,P)<reach){q.on=1;q.g.visible=false;sc++;persistProgress();$('shards').textContent='Skyshards '+sc+'/10';objectiveFeedback([35,35,70]);toast(sc===10?'All Skyshards found. Tailwind unlocked: faster sprint and vehicles.':'Skyshard '+sc+' of 10',3200)}});
- LM.forEach((l,i)=>{if(!started||l.on)return;if(distance2D(l,P)<l.r&&Math.abs(P.y-hf(l.x,l.z))<35){l.on=1;dc++;persistProgress();$('discoveries').textContent='Places '+dc+'/5';objectiveFeedback(45);toast('Discovered: '+l.name+(dc===5?' — atlas complete.':''),3000)}});
+ LM.forEach((l,i)=>{if(!started||l.on)return;if(distance2D(l,P)<l.r&&Math.abs(P.y-hf(l.x,l.z))<35){l.on=1;dc++;persistProgress();$('discoveries').textContent='Places '+dc+'/8';objectiveFeedback(45);toast('Discovered: '+l.name+(dc===8?' — atlas complete.':''),3000)}});
  // NPCs
  let near=null,nd=5;NP.forEach(n=>{const d=n.tg.clone().sub(n.position);d.y=0;if(n.w>0)n.w-=dt;else if(d.length()<1){n.w=1+rnd()*4;const a=rnd()*6.28,r=8+rnd()*44;n.tg.set(Math.cos(a)*r,6,Math.sin(a)*r)}else{d.normalize();n.position.addScaledVector(d,n.sp*dt);n.rotation.y+=ad(Math.atan2(d.x,d.z)-n.rotation.y)*Math.min(1,dt*6);n.ph+=dt*n.sp*5;col2(n.position,.5)}
   anim(n,n.w>0?0:n.ph,n.w>0?0:.7);n.position.y=hf(n.position.x,n.position.z);const pd=n.position.distanceTo(P);if(mode=='foot'&&pd<nd){nd=pd;near=n}});
@@ -178,12 +198,20 @@ function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.
  want.y=Math.max(want.y,Math.max(0,hf(want.x,want.z))+1.2);C.position.lerp(want,1-Math.exp(-dt*(started?9:40)));C.lookAt(tg_);
  sun.position.copy(tg_).addScaledVector(dir,120);sun.target.position.copy(tg_);dome.position.copy(C.position);sunM.position.copy(C.position).addScaledVector(dir,800);moonM.position.copy(C.position).addScaledVector(dir,-800);sunM.visible=sy>-.1;glow.position.copy(sunM.position);glow.material.opacity=cl(sy*4+.5,0,1)*.9;moonM.visible=sy<.1;stars.position.copy(C.position);water.position.set(C.position.x,0,C.position.z);wt.offset.set(C.position.x*RP/3000+tm_*.012,-C.position.z*RP/3000+tm_*.009);
  BC.forEach((b,i)=>{b.m.opacity=(b.on?.75:.45)+Math.sin(tm_*3+i)*.12;if(!b.on){const r=mode=='foot'?5:mode=='veh'&&cur.type=='plane'?22:10;if(Math.hypot(P.x-b.x,P.z-b.z)<r&&(mode!='veh'||cur.type!='plane'||P.y<hf(b.x,b.z)+70)){b.on=1;b.m.color.setHex(0xffc24a);lit++;persistProgress();$('cnt').textContent=lit+'/6';objectiveFeedback([45,45,90]);toast(lit==6?'Skyreach is lit. The isles are yours to roam.':'Beacon lit. '+(6-lit)+' to go.',3500)}}});
- const nav=nearestPending(BC,P)||nearestPending(XR,P),navArrow=$('navArrow'),navText=$('navText'),heading=mode=='foot'?hero.rotation.y:(cur?.h??yaw);if(nav){const isBeacon=BC.includes(nav.item);navArrow.style.transform='rotate('+relativeBearing(P,nav.item,heading)+'rad)';navText.textContent=(isBeacon?'Beacon ':'Skyshard ')+Math.round(nav.distance)+'m'}else{navArrow.style.transform='rotate(0rad)';navText.textContent='Compass clear ✓'}
- // minimap
- mc.clearRect(0,0,120,120);mc.drawImage(mi,0,0);const mp=(x,z)=>[(x/900+.5)*120,(z/900+.5)*120];BC.forEach(b=>{const[x,y]=mp(b.x,b.z);mc.fillStyle=b.on?'#fff':'#ffc24a';mc.beginPath();mc.arc(x,y,b.on?2:3.5,0,6.3);mc.fill()});
- V.forEach(v=>{const[x,y]=mp(v.g.position.x,v.g.position.z);mc.fillStyle=v.type=='car'?'#ff5a3a':v.type=='boat'?'#38e0ff':'#ffd23a';mc.fillRect(x-3,y-3,6,6)});RG.forEach(q=>{if(!q.on){const[x,y]=mp(q.x,q.z);mc.strokeStyle='#ffd23a';mc.strokeRect(x-2,y-2,4,4)}});LM.forEach(l=>{if(l.on){const[x,y]=mp(l.x,l.z);mc.fillStyle='#fff3d6';mc.fillRect(x-1.5,y-1.5,3,3)}});XR.forEach(q=>{if(!q.on&&distance2D(q,P)<95){const[x,y]=mp(q.x,q.z);mc.fillStyle='#8ff7ff';mc.save();mc.translate(x,y);mc.rotate(Math.PI/4);mc.fillRect(-2,-2,4,4);mc.restore()}});{const[x,y]=mp(P.x,P.z);mc.save();mc.translate(x,y);mc.rotate(Math.PI-(mode=='foot'?hero.rotation.y:cur.h));mc.fillStyle='#ff5a2f';mc.beginPath();mc.moveTo(0,-6);mc.lineTo(4,4);mc.lineTo(-4,4);mc.fill();mc.restore()}
+ const nav=selectedWaypoint?{item:selectedWaypoint,distance:distance2D(selectedWaypoint,P)}:nearestPending(BC,P)||nearestPending(XR,P),navArrow=$('navArrow'),navText=$('navText'),heading=mode=='foot'?hero.rotation.y:(cur?.h??yaw);if(nav){const isBeacon=BC.includes(nav.item);navArrow.style.transform='rotate('+relativeBearing(P,nav.item,heading)+'rad)';navText.textContent=(selectedWaypoint?selectedWaypoint.name+' · ':isBeacon?'Beacon ':'Skyshard ')+(nav.distance>=1000?(nav.distance/1000).toFixed(1)+'km':Math.round(nav.distance)+'m')}else{navArrow.style.transform='rotate(0rad)';navText.textContent='Compass clear ✓'}
+ atlas.drawRadar(mc,P,heading,selectedWaypoint,[...BC.map(b=>({...b,color:"#ffc24a"})),...RG.map(q=>({...q,color:"#ffd23a"})),...XR.filter(q=>distance2D(q,P)<95)]);atlas.update(P,selectedWaypoint);
+ waterTime.value=tm_;
+ islandScenery.update({time:tm_,dt,daylight:k,position:P,boat:mode==='veh'&&cur?.type==='boat',speed:cur?.sp||0,heading:cur?.h||0,quality});
  const ah=hf(P.x,P.z),ar=Math.hypot(P.x,P.z),audioMode=mode=='veh'?(cur?.type||'foot'):'foot',audioSpeed=mode=='veh'?Math.abs(cur?.sp||0):Math.hypot(jX,jY)*(bo?11:6.5),audioOcean=cl((1.2-ah)/5,0,1),audioCoast=cl(1-Math.abs(ah)/4.5,0,1),audioTown=cl(1-ar/90,0,1),audioAlt=audioMode=='plane'?Math.max(0,P.y-ah):0;
- worldAudio.update({dt,mode:audioMode,speed:audioSpeed,walking:mode=='foot'&&Math.hypot(jX,jY)>.08,sprinting:!!bo,grounded:mode=='foot'&&Math.abs(P.y-Math.max(gr(P.x,P.z),-.7))<.15,surface:surfaceAt(P.x,P.z),ocean:audioOcean,coast:audioCoast,town:audioTown,daylight:k,altitude:audioAlt});
+ worldAudio.update({dt,waterfall:cl(1-Math.hypot(P.x-(ISLANDS[2].x-5),P.z-ISLANDS[2].z)/90,0,1),mode:audioMode,speed:audioSpeed,walking:mode=='foot'&&Math.hypot(jX,jY)>.08,sprinting:!!bo,grounded:mode=='foot'&&Math.abs(P.y-Math.max(gr(P.x,P.z),-.7))<.15,surface:surfaceAt(P.x,P.z),ocean:audioOcean,coast:audioCoast,town:audioTown,daylight:k,altitude:audioAlt});
  R.render(S,C)}
 if(import.meta.env.PROD&&'serviceWorker' in navigator){addEventListener('load',async()=>{const hadController=!!navigator.serviceWorker.controller;let reloading=false;if(hadController)navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()},{once:true});try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});reg.update().catch(()=>{})}catch{}})}
+if(import.meta.env.DEV){
+ globalThis.__skyreach={
+  snapshot:()=>({position:P.toArray(),mode,atlasOpen,waypoint:selectedWaypoint?.name,places:LM.map(l=>({name:l.name,on:l.on})),models:{boat:boat.userData.modelState,plane:pl.userData.modelState},drawCalls:R.info.render.calls,triangles:R.info.render.triangles}),
+  inspect:(x,z,vehicle='foot',y=null)=>{releaseInput();started=1;$('start').style.display='none';if(vehicle==='foot'){setMode('foot',null);P.set(x,y??Math.max(gr(x,z),-.7),z);hero.visible=true}else{const v=V.find(v=>v.type===vehicle);v.g.position.set(x,y??Math.max(0,hf(x,z))+1,z);v.sp=0;v.h=0;P.copy(v.g.position);hero.visible=false;setMode('veh',v)}yaw=Math.PI;pitch=.45;C.position.set(P.x,P.y+7,P.z+14);C.lookAt(P.x,P.y+2,P.z);hero.position.copy(P);R.render(S,C)},
+  hour:a=>ang=a,
+  render:()=>R.render(S,C)
+ };
+}
 setMode('foot',null);loop();

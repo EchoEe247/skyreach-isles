@@ -1,0 +1,31 @@
+# Beyond the horizon — September 30, 2026
+
+Angel's priority was believable world detail and exploration. Timed challenges were not implemented.
+
+## Play
+
+Open Explore, choose an offshore island, and follow the compass. Find my speedboat tracks its current location. Land at a beach, exit, and explore on foot. Existing objectives, vehicles, audio and saved progress remain supported.
+
+New destinations: Tideglass Cove (720, 350), Ember Ruins (470, -670), Veilwater Island (-650, 420). Coordinates are world x/z.
+
+## Verification
+
+- 24 Node tests pass: actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
+- Production Vite build succeeds. The existing large-bundle warning remains.
+- Isolated Chromium on the Pixel/Termux host rendered the cove, observatory ruins and Veilwater cascade. These views were visually inspected.
+- Browser inspection confirmed boat and aircraft model states were ready.
+- Browser simulation registered all three offshore discoveries.
+- At a 412 × 850 viewport the chart had no horizontal overflow.
+- Chart opening, course selection, closing and movement pause/resume were exercised.
+- Browser keyboard input moved the player on Tideglass terrain; the selected Tideglass course reached HUD state.
+- No JavaScript errors were captured during that chart/movement sequence.
+
+## Performance and boundaries
+
+This remains a stylized procedural game. The update adds environmental detail and explorable places, not photorealistic rendering. Dolphin movement is ambient animation. Water is visual animation; this is not a fluid, tide or current simulation.
+
+Palms, rocks and stepping stones are instanced. Wakes use a fixed 64-instance pool. Forest bounds allow culling. Each new island mesh has 76 × 76 subdivisions; water has 100 × 100.
+
+Verification used software-rendered Chromium in a separate Xvfb display, with no Android Display 0 actions. It verifies rendering and interactions, not native Android GPU performance. Native Chrome frame pacing and the subjective audio mix still need player feedback.
+
+No downloaded assets were added. Terrain, scenery and shaders were authored in the repository. Existing user-provided vehicle assets and their provenance are unchanged.

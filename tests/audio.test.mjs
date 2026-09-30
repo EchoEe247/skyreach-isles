@@ -27,3 +27,9 @@ test('audio gains stay bounded under extreme speed and altitude',()=>{
     assert.ok(value>=0&&value<=1,key);
   }
 });
+
+test('waterfall ambience fades with proximity and is bounded',()=>{
+  assert.equal(computeAudioMix({waterfall:0}).waterfall,0);
+  assert.ok(computeAudioMix({waterfall:.5}).waterfall>0);
+  assert.equal(computeAudioMix({waterfall:999}).waterfall,.2);
+});

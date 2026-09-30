@@ -4,6 +4,7 @@ export function computeAudioMix(state={}){
   const mode=state.mode||'foot',speed=Math.abs(state.speed||0),alt=Math.max(0,state.altitude||0);
   const ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day;
   return {
+    waterfall:cl((state.waterfall||0)*.20,0,.20),
     wind:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0),0,.42),
     ocean:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
     surf:cl(coast*.12,0,.13),
@@ -60,6 +61,7 @@ export function createWorldAudio(){
 
       layers={
         wind:loopingNoise(ctx,noise,'bandpass',1050,.45),
+        waterfall:loopingNoise(ctx,noise,'lowpass',1800,.6),
         ocean:loopingNoise(ctx,noise,'lowpass',520,.5),
         surf:loopingNoise(ctx,noise,'bandpass',720,.6),
         land:loopingNoise(ctx,noise,'highpass',1250,.3),
@@ -118,7 +120,7 @@ export function createWorldAudio(){
     if(ctx.state==='suspended')ctx.resume?.();
     const mix=computeAudioMix(state),speed=Math.abs(state.speed||0),mode=state.mode||'foot',now=ctx.currentTime;
     target(layers.wind.gain.gain,mix.wind,.16);target(layers.wind.filter.frequency,700+speed*18+(state.altitude||0)*.8,.2);
-    target(layers.ocean.gain.gain,mix.ocean,.2);target(layers.surf.gain.gain,mix.surf,.22);
+    target(layers.waterfall.gain.gain,mix.waterfall,.25);target(layers.ocean.gain.gain,mix.ocean,.2);target(layers.surf.gain.gain,mix.surf,.22);
     target(layers.land.gain.gain,mix.land,.3);target(layers.town.gain.gain,mix.town,.3);
     target(layers.road.gain.gain,mix.road,.08);target(layers.wake.gain.gain,mix.wake,.08);target(layers.jet.gain.gain,mix.jet,.1);
     target(layers.wake.filter.frequency,430+speed*32,.1);target(layers.jet.filter.frequency,650+speed*10,.1);

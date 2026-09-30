@@ -13,7 +13,7 @@ export function loadProgress(){
     beacons:bools(value.beacons,6),
     rings:bools(value.rings,8),
     shards:bools(value.shards,10),
-    discoveries:bools(value.discoveries,5)
+    discoveries:bools(value.discoveries,8)
   };
 }
 
