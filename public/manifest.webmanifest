@@ -1,0 +1,10 @@
+{
+  "name": "Skyreach Isles",
+  "short_name": "Skyreach",
+  "description": "Explore a living island by foot, car, boat and plane.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#14183a",
+  "theme_color": "#14183a",
+  "orientation": "landscape"
+}

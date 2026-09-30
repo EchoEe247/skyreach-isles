@@ -1,0 +1,21 @@
+:root{--cream:#fff3d6;--amber:#ffb347;--sea:#38b6c4;--ink:#14183a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;height:100%;overflow:hidden;background:#14183a;color:var(--cream);font:600 14px system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.g{background:rgba(20,24,58,.5);backdrop-filter:blur(6px);border:1px solid rgba(255,243,214,.25);border-radius:14px}
+#obj{position:absolute;left:10px;top:10px;padding:8px 12px}#obj b{color:var(--amber);font-size:18px}
+#map{position:absolute;right:10px;top:10px;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,243,214,.5)}
+#spd{position:absolute;right:14px;top:128px;font-size:20px;color:var(--amber);text-shadow:0 1px 4px #000}
+#toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);padding:10px 16px;opacity:0;transition:opacity .4s;text-align:center;max-width:80%}
+#toast.s{opacity:1}
+#joy{position:absolute;left:18px;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:130px;height:130px;border-radius:50%;pointer-events:auto;touch-action:none}
+#knob{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:var(--amber);opacity:.85}
+.b{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--cream);touch-action:none;text-align:center}
+#act{right:22px;bottom:calc(150px + env(safe-area-inset-bottom,0px));width:76px;height:76px;background:rgba(56,182,196,.75)}
+#jump{right:112px;bottom:calc(52px + env(safe-area-inset-bottom,0px));width:68px;height:68px}
+#boost{right:22px;bottom:calc(40px + env(safe-area-inset-bottom,0px));width:76px;height:76px;background:rgba(255,179,71,.75);color:var(--ink)}
+#start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:radial-gradient(circle at 50% 70%,rgba(255,140,60,.55),rgba(20,24,58,.93) 70%);z-index:9}
+#start h1{font:italic 700 clamp(44px,12vw,96px)/1 "Iowan Old Style",Palatino,Georgia,serif;margin:0 0 14px;color:var(--cream)}
+#start p{max-width:420px;line-height:1.5;margin:4px 0;font-size:16px}#start .t{margin-top:26px;color:var(--amber);font-size:20px}
+
+#quality{position:absolute;right:14px;top:158px;pointer-events:auto;border:1px solid rgba(255,243,214,.25);padding:7px 10px;color:var(--cream);font:600 12px system-ui,sans-serif;touch-action:manipulation}
+#quality:active{transform:scale(.96)}
