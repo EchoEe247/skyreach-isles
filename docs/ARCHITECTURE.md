@@ -144,3 +144,11 @@ Continue extracting only when the boundary is useful and testable:
 4. UI: HUD, minimap, settings
 
 Each extraction should preserve `legacy/skyreach-original.html` as the behavioral reference and be followed by tests, a production build, and an appropriate runtime smoke check.
+
+## Earth–Moon celestial layer
+
+`src/core/celestial.js` extends the atmospheric SLS model after the Kármán line into a deterministic three-dimensional celestial state. Physical position and velocity remain in meters; Earth and Moon accelerations are evaluated independently, while `renderRelativeVector()` and angular-body sizing map the large physical distances into a stable camera-relative Three.js representation.
+
+The Moon is physically centered about 384,400 km from Earth. `src/systems/moon.js` owns the near-surface lunar representation: cratered terrain, instanced rocks and the landing site are activated only on lunar approach. This is LOD/coordinate remapping inside the same running scene, not a level transition.
+
+Spacecraft share the celestial integrator. The NASA SLS preserves its original atmosphere/ascent behavior until 100 km, then hands its physical velocity into the celestial state. Alien Scout and Alien Strike Ship begin landed at the lunar site and can take off into the same Earth–Moon space. Target cruise changes thrust direction and magnitude continuously; simulation-time acceleration is safety-limited by target distance. The Strike Ship source contains many independent meshes, so its geometry is merged by material at load time for a substantially lower mobile draw-call cost.

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "file": "alien_spaceship.glb",
+      "source": "User-provided asset from this ChatGPT project session; local source /sdcard/Download/alien_spaceship-3.glb",
+      "license": "User-provided; repository does not assert a third-party license",
+      "sha256": "e102abd0cbd069a266317611673cc8f10d76bdc9df3551d874e643a8d0ff2492"
+    },
+    {
+      "file": "alien_ship.glb",
+      "source": "User-provided asset from this ChatGPT project session; local source /sdcard/Download/alien_ship.glb",
+      "license": "User-provided; repository does not assert a third-party license",
+      "sha256": "07b5d2d8733ec902c97cfb08868ee66a3cdcdb11cc139b8c8261c4fcf48cd543"
+    }
+  ],
+  "usage": "Both ships are player-boardable lunar spacecraft. alien_ship.glb is merged by material at runtime to reduce draw calls."
+}

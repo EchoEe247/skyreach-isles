@@ -176,3 +176,11 @@ Preserve the feel and playability of the baseline while improving the internals 
 ## World expansion verification
 
 See [verification and boundaries](docs/WORLD-EXPANSION.md) for checks and remaining limitations.
+
+### Continuous Earth–Moon flight
+
+Skyreach now extends the existing no-cutscene SLS flight into a physical Earth–Moon system. `src/core/celestial.js` tracks the spacecraft in 3D meter-scale coordinates with Earth and Moon gravity using the real approximate 384,400 km Earth–Moon separation and 1,737.4 km lunar radius. Rendering is camera-relative and compressed separately, so the simulation can cover interplanetary distances without sacrificing the original meter-scale Earth gameplay.
+
+Crossing the 100 km Kármán line hands the existing SLS velocity continuously into the celestial model; there is no scene load or teleport. The flight HUD adds **TARGET**, **CRUISE**, and **TIME** controls. CRUISE is a physical acceleration/braking assist toward Earth or the Moon rather than a warp/teleport, while TIME advances the same deterministic simulation and automatically falls back toward real time near a world.
+
+The Moon has a continuously approached local terrain patch with craters, rocks and a landing site. After landing, the player can exit the SLS and explore on foot under reduced lunar gravity. Two user-provided ships are parked near the landing area: `alien_spaceship.glb` as the Alien Scout and `alien_ship.glb` as the Alien Strike Ship. Both are boardable and use the same celestial flight model; the highly fragmented Strike Ship is merged by material at runtime to reduce mobile draw calls.
