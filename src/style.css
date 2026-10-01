@@ -55,3 +55,12 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
   #ui.rocket-mode #quality{top:176px}
   #ui.rocket-mode #atlas-toggle{top:216px}
 }
+
+#spaceTargetMarker{display:none;position:absolute;left:50%;top:50%;width:58px;height:58px;transform:translate(-50%,-50%);z-index:5;pointer-events:none;text-align:center;color:#8ff6ff;text-shadow:0 1px 4px #000,0 0 9px rgba(80,220,255,.8)}
+#spaceTargetMarker.show{display:block}
+#spaceTargetRing{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;line-height:1;color:#8ff6ff;animation:targetPulse 1.2s ease-in-out infinite}
+#spaceTargetLabel{position:absolute;left:50%;top:48px;transform:translateX(-50%);font-size:10px;letter-spacing:.12em;white-space:nowrap;color:#d7fbff;background:rgba(10,18,40,.68);border:1px solid rgba(143,246,255,.38);border-radius:7px;padding:2px 5px}
+#spaceTargetPointer{display:none;position:absolute;left:20px;top:-10px;font-size:18px;color:var(--amber);transform-origin:50% 38px}
+#spaceTargetMarker.edge #spaceTargetRing{opacity:.45}
+#spaceTargetMarker.edge #spaceTargetPointer{display:block}
+@keyframes targetPulse{0%,100%{transform:scale(.9);opacity:.72}50%{transform:scale(1.08);opacity:1}}

@@ -90,11 +90,11 @@ Asset provenance is recorded beside each detailed vehicle/space asset, including
 
 Skyreach now extends the existing no-cut SLS ascent into a physical Earth-Moon simulation. At the Karman-line handoff the rocket keeps its velocity and attitude, while `src/core/celestial.js` begins full 3D position/velocity integration in meters. Earth and Moon gravity are applied continuously, the Moon uses its real approximate 384,400 km separation and 1,737.4 km radius, and camera-relative logarithmic rendering keeps those distances stable on mobile without teleporting the craft.
 
-The spacecraft HUD adds **TARGET**, **CRUISE**, and **TIME** controls. Cruise is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
+The spacecraft HUD adds **TARGET**, **AUTO NAV**, and **TIME** controls. A cyan target locator appears from high ascent onward: when the Moon/Earth target is off-screen it pins to the screen edge with a pointer; when visible it sits over the target. The navigation strip also reports live yaw and pitch error. AUTO NAV is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
 
 Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB. The SLS STL and NASA Earth texture are deferred until the rocket is used, and the alien GLBs are deferred until Moon travel/boarding makes them relevant, reducing initial network and main-thread work.
 
-Earth return is bidirectional for the SLS: TARGET EARTH + CRUISE guides back to the original launch-site corridor, then hands the rocket continuously back to the atmospheric model near 10 km altitude for manual braking/descent and normal ground exit. Moon walking is bounded to the rendered local terrain patch so the player cannot walk onto invisible collision ground.
+Earth return is bidirectional for the SLS: TARGET EARTH + AUTO NAV guides back to the original launch-site corridor, then hands the rocket continuously back to the atmospheric model near 10 km altitude for manual braking/descent and normal ground exit. Moon walking is bounded to the rendered local terrain patch so the player cannot walk onto invisible collision ground.
 
 ## World and audio systems
 
@@ -108,19 +108,19 @@ Earth return is bidirectional for the SLS: TARGET EARTH + CRUISE guides back to 
 
 Current master verification after the Claude-audit repair pass:
 
-- **60/60 Node tests pass**.
+- **61/61 Node tests pass**.
 - npm run build passes. The game-owned JS is split to ~97 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.
 - Local development serving returns HTTP 200.
-- Deterministic transfer coverage verifies that Moon cruise physically intercepts the lunar landing corridor without teleporting.
+- Deterministic transfer coverage verifies that Moon AUTO NAV physically intercepts the lunar landing corridor without teleporting.
 - The current transfer profile reaches the final guided corridor at roughly 899 m lunar altitude and about 8.1 m/s before manual landing control.
 - Headless Termux Chromium cannot provide trustworthy Three.js visual acceptance because EGL/WebGL initialization fails in that environment. This is a QA-environment limitation, not evidence of a rendered pass.
 - Native/mobile visual feel and frame pacing should be judged in the actual playable browser session.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v13`.
+`public/sw.js` currently uses cache version `skyreach-v14`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

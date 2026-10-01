@@ -73,6 +73,16 @@ export function targetDistance(state,target='moon'){
   const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state):moonLandingTarget();
   return len(sub(t,p));
 }
+export function targetGuidance(state,target='moon'){
+  const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state):moonLandingTarget(),delta=sub(t,p),attitude=attitudeForDirection(p,delta);
+  return {
+    distance:len(delta),
+    heading:attitude.heading,
+    pitch:attitude.pitch,
+    relativeHeading:angleDelta(attitude.heading-(state.heading||0)),
+    relativePitch:angleDelta(attitude.pitch-(state.pitch||0))
+  };
+}
 export function atmosphericStateFromCelestial(state){
   const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],up=radialUp(p,[0,0,0]);
   const verticalSpeed=dot(vel,up),tangent=sub(vel,mul(up,verticalSpeed)),horizontalSpeed=len(tangent);

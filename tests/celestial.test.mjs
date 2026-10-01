@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,moonPhysicalFromLocal} from '../src/core/celestial.js';
+import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,targetGuidance,moonPhysicalFromLocal} from '../src/core/celestial.js';
 
 test('Moon uses real-scale Earth-Moon separation and radius',()=>{
   assert.ok(Math.abs(Math.hypot(...MOON_CENTER)-MOON_DISTANCE_M)<1);
@@ -75,4 +75,12 @@ test('Moon cruise returns to the original Earth launch corridor',()=>{
   assert.equal(reached,true);
   assert.ok(Math.hypot(s.position[0]+65,s.position[2]+40)<300);
   assert.ok(s.earthAltitude<15000);
+});
+
+test('Moon guidance points near launch heading and reports the real elevation change',()=>{
+  const s=initCelestialFromRocket({altitude:100000,worldX:-65,worldZ:-40,verticalSpeed:1200,horizontalSpeed:400,velocityHeading:Math.PI,heading:Math.PI,pitch:0});
+  const g=targetGuidance(s,'moon');
+  assert.ok(g.distance>370_000_000&&g.distance<390_000_000);
+  assert.ok(Math.abs(g.relativeHeading)<.02,'Moon should begin close to the launch heading');
+  assert.ok(g.relativePitch>.5&&g.relativePitch<.72,'Moon should be roughly 35 degrees off the launch vertical');
 });

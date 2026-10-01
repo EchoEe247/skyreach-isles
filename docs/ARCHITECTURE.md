@@ -61,7 +61,7 @@ The SLS is part of the same vehicle registry and main simulation loop as the car
 
 For numerical stability, physical rocket altitude is mapped to render height with a logarithmic function and can be inverted by tests. This preserves useful meter-scale ground coordinates while still representing the 100 km Kármán line and higher altitudes in the same Three.js scene. Visual atmosphere blending begins gradually above the lower atmosphere; fog/cloud contribution falls away, stars become fully visible, and the NASA Earth globe fades into view continuously.
 
-The spacecraft HUD exposes speed and body-relative altitude plus a 20–100% throttle preset and SAS toggle. After celestial handoff it also exposes TARGET, CRUISE, and TIME controls for Earth/Moon navigation. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. Earlier browser smoke checks covered ~105 m, 16.6 km, 44.2 km, and ~297 km during the atmospheric-only phase; current automated coverage additionally exercises the Earth-Moon celestial handoff and transfer corridor.
+The spacecraft HUD exposes speed and body-relative altitude plus a 20–100% throttle preset and SAS toggle. After celestial handoff it also exposes TARGET, AUTO NAV, and TIME controls for Earth/Moon navigation. A camera-projected target locator is activated during high ascent/interbody flight and clamps to the viewport edge when the target is off-screen; the navigation readout exposes yaw and pitch error from the vehicle attitude to the selected body. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. Earlier browser smoke checks covered ~105 m, 16.6 km, 44.2 km, and ~297 km during the atmospheric-only phase; current automated coverage additionally exercises the Earth-Moon celestial handoff and transfer corridor.
 
 ## Earth-Moon interbody simulation
 
@@ -71,7 +71,7 @@ The Moon is physically placed about 384,400 km from Earth with a 1,737.4 km radi
 
 `src/systems/moon.js` provides the local lunar landing/exploration patch: deterministic cratered terrain, rocks, landing pad, and low-gravity walking. The distant Moon globe fades out as the local patch becomes relevant. The two lunar alien craft share the same celestial physics as the SLS. The larger 119-mesh craft is merged by material at runtime before display to reduce draw submissions on Pixel-class hardware.
 
-Cruise assist computes a physical thrust/braking command toward the selected Earth or Moon target. It does not teleport or rewrite position. Player-selected 1x-400x simulation acceleration is automatically clamped near either world so approach and landing remain controllable.
+AUTO NAV computes a physical steering/thrust/braking command toward the selected Earth or Moon target. It does not teleport or rewrite position. Player-selected 1x-400x simulation acceleration is automatically clamped near either world so approach and landing remain controllable.
 
 For SLS Earth return, the celestial state retains the original launch-site x/z coordinates. TARGET EARTH guides into that corridor; once horizontal alignment is within 300 m, altitude is below 15 km, and speed is below 100 m/s, the vehicle hands back into `spaceflight.js` with radial/tangential velocity preserved. Reentry, descent, touchdown and exit then use the normal atmospheric/ground path rather than a reset or teleport.
 
@@ -135,7 +135,7 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v13`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v14`.
 
 Service-worker behavior:
 
@@ -168,7 +168,7 @@ The current Node test suite covers:
 
 ## Current verification status
 
-As of the current Earth-Moon audit-repair build, the repository test suite is **60/60 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
+As of the current Earth-Moon audit-repair build, the repository test suite is **61/61 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
 
 Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, lunar-site projection, render-distance compression, safe warp limits, physical Moon-cruise interception, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
 
