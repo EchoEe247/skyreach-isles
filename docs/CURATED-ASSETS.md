@@ -34,12 +34,16 @@ Static models share geometry/materials through instancing and add no dynamic sha
 ## Deferred
 The motorcycle remains deferred: no suitable modern sporty model with quickly verifiable public-web redistribution rights was obtained. NPC visual replacement is also deferred. Neither is represented as completed.
 
-## Verification
-- Final Node suite: **47/47 passing**, including the original 44 baseline tests and new provenance/dependency, selection, and navigation-clearance checks.
+## Verification for this September 30 asset pass
+- At completion of this asset pass, the Node suite was **47/47 passing**, including the then-44 baseline tests and new provenance/dependency, selection, and navigation-clearance checks.
 - Production build: passed; existing non-fatal chunk-size warning remains.
 - Runtime state checks: all five enrichment regions loaded with no asset failures; 162 static placements and six animals registered. Animals advanced retained animation clips, and distant animals stopped updating. Boat, plane and rocket model states were ready.
 - Mobile viewport: 412 × 850, document width 412, HUD contained in viewport.
-- Visual sign-off is **pending**: the isolated Termux Chromium software-GPU process repeatedly lost its WebGL context; DOM screenshots were blank behind the HUD. A second rendering backend stalled during pixel readback. These captures are not visual acceptance evidence. No native Android GPU performance claim is made.
+- Visual sign-off for this isolated asset-pass capture was **not established**: the isolated Termux Chromium software-GPU process repeatedly lost its WebGL context; DOM screenshots were blank behind the HUD. A second rendering backend stalled during pixel readback. These captures are not visual acceptance evidence. No native Android GPU performance claim is made.
 - Existing navigation, weather/daylight/audio and deterministic rocket tests passed. Full manual vehicle and spaceflight playtesting was not repeated during this pass.
 
-Native Android GPU frame pacing, visual composition and subjective audio quality still require a successful rendered play session.
+These bullets are historical evidence for the curated-asset pass, not the current repository-wide verification count.
+
+## Current repository status
+
+The maintained build now also includes continuous Earth-Moon flight, lunar terrain, and two boardable user-provided alien spacecraft. The current repository suite is **57/57 passing**, the production build succeeds, and the current cache version is skyreach-v12. Headless Termux Chromium still cannot be treated as current visual acceptance evidence because EGL/WebGL initialization is unavailable there; use the actual playable browser session for native/mobile visual and frame-pacing judgment.

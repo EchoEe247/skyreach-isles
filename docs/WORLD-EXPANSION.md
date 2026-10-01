@@ -8,9 +8,9 @@ Open Explore, choose an offshore island, and follow the compass. Find my speedbo
 
 New destinations: Tideglass Cove (720, 350), Ember Ruins (470, -670), Veilwater Island (-650, 420). Coordinates are world x/z.
 
-## Verification
+## Verification at the time of the world-expansion release
 
-- 36 current Node tests pass. Coverage includes actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, radial seafloor continuity, rendered-terrain height interpolation, daylight/night timing and lighting continuity, living-world weather/events/NPC schedules, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
+- The suite at that point contained 36 passing Node tests. Coverage includes actual GLTF parsing, existing boat navigation, offshore shore approaches, cove entry, sea-arch collision, radial seafloor continuity, rendered-terrain height interpolation, daylight/night timing and lighting continuity, living-world weather/events/NPC schedules, waterfall terrain drop/audio bounds, and eight-slot discovery persistence.
 - Production Vite build succeeds. The existing large-bundle warning remains.
 - Isolated Chromium on the Pixel/Termux host rendered the cove, observatory ruins and Veilwater cascade. These views were visually inspected.
 - Browser inspection confirmed boat and aircraft model states were ready.
@@ -30,6 +30,8 @@ This remains a stylized procedural game. The update adds environmental detail an
 Palms, rocks and stepping stones are instanced. Wakes use a fixed 64-instance pool. Forest bounds allow culling. Each new island mesh has 76 × 76 subdivisions; water has 100 × 100.
 
 Verification used software-rendered Chromium in a separate Xvfb display, with no Android Display 0 actions. It verifies rendering and interactions, not native Android GPU performance. Native Chrome frame pacing and the subjective audio mix still need player feedback.
+
+The bullets above are historical evidence for the world-expansion release, not the current repository-wide test count. The maintained build now has **57/57 passing tests** and additionally includes continuous Earth-Moon flight, lunar terrain, and two boardable alien spacecraft. Current verification and spaceflight architecture are documented in README.md and docs/ARCHITECTURE.md.
 
 The original expansion used repository-authored terrain, scenery and shaders. The subsequent [curated CC0 asset pass](CURATED-ASSETS.md) adds selected imported scenery and animals. Existing user-provided vehicle assets and their provenance are unchanged.
 ## Curated enrichment

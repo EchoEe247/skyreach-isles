@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, launch NASA's SLS from Earth into playable space, explore three offshore islands, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, launch NASA's SLS continuously from Earth to the Moon, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -34,7 +34,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Detailed user-supplied sports car for the player and color-varied town traffic
 - Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
 - Detailed airliner using the existing flight controls and physics
-- Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere and beyond the 100 km Kármán line
+- Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere, across the 100 km Karman line, through interbody space, and down to the Moon
 - Six beacon objectives and eight airborne rings
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
 - Eight named landmarks with discovery feedback and minimap history
@@ -43,6 +43,8 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Progress persistence for beacons, sky rings, Skyshards, landmark discoveries, and quality settings
 - Stronger objective feedback with screen pulses and supported-device haptics
 - Runtime quality selector with an automatic mobile-friendly default
+- Real-scale Earth-Moon celestial navigation with target selection, physical cruise guidance, and proximity-limited 1x/10x/50x/100x/400x simulation-time acceleration
+- Explorable low-gravity lunar terrain with a landing site, crater field, rocks, and two boardable alien spacecraft: Alien Scout and Alien Strike Ship
 - Adaptive offline WebAudio soundscape: surface-aware footsteps, weather wind and rain, surf, ocean wash, land/town ambience, car engine and road noise, boat engine and wake, airliner engine and jet noise, daytime birds, and nighttime insects
 - Installable/offline-capable PWA behavior after the first successful load
 
@@ -76,13 +78,13 @@ The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its
 
 The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `public/assets/space/nasa-sls-block1.stl`. Skyreach normalizes orientation/scale, removes only the STL's large printable display plinth so it does not fly with the vehicle, and applies the recognizable orange-core/white-booster presentation in Three.js. A procedural SLS-shaped fallback remains available only if the STL fails to load. `public/assets/space/nasa-blue-marble-2048.png` provides the NASA Earth texture used for the high-altitude view. Provenance metadata is stored beside both NASA assets.
 
-### Earth-to-space flight
+### Atmospheric ascent and Karman-line handoff
 
 `src/core/spaceflight.js` owns the deterministic rocket-flight model. Atmosphere density decays continuously with altitude, gravity follows the inverse-square Earth-radius relationship, aerodynamic drag falls away with atmospheric density, and thrust/steering continue without switching scenes. The game maps physical altitude into a compressed render coordinate so a mobile WebGL scene can represent tens to hundreds of kilometers without destroying near-surface precision.
 
 The mobile flight HUD separates speed, altitude, and atmospheric region so objective guidance no longer overlaps telemetry. Rocket throttle is adjustable from 20–100% before/while holding THRUST, and SAS can be toggled: SAS damps rotation and adds a gentle gravity-turn assist, while SAS OFF preserves pitch/yaw inertia for manual flight. Horizontal velocity keeps its own travel heading in space instead of snapping instantly to the rocket nose. Crossing the 100 km Kármán line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation.
 
-Asset provenance is recorded beside each detailed vehicle/space asset.
+Asset provenance is recorded beside each detailed vehicle/space asset, including the two user-provided lunar alien craft.
 
 ## Continuous Earth-to-Moon flight
 
@@ -99,6 +101,19 @@ Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb
 `src/core/living-world.js` defines deterministic weather phases, event cadence, lightning windows, and NPC schedule targets. `src/systems/living-world.js` owns rain rendering, event manifestations, and two ambient ferry routes.
 
 `src/systems/audio.js` owns the adaptive WebAudio mix. Audio starts only after the player's Start gesture to satisfy browser autoplay rules. Mix levels react to movement speed, vehicle type, altitude, coast proximity, town proximity, terrain surface, time of day, rain, and weather wind.
+
+## Current verification
+
+Current master verification after the Earth-Moon and alien-spacecraft work:
+
+- **57/57 Node tests pass**.
+- npm run build passes; Vite still reports the known non-fatal large-chunk warning.
+- git diff --check passes.
+- Local development serving returns HTTP 200.
+- Deterministic transfer coverage verifies that Moon cruise physically intercepts the lunar landing corridor without teleporting.
+- The current transfer profile reaches the final guided corridor at roughly 899 m lunar altitude and about 8.1 m/s before manual landing control.
+- Headless Termux Chromium cannot provide trustworthy Three.js visual acceptance because EGL/WebGL initialization fails in that environment. This is a QA-environment limitation, not evidence of a rendered pass.
+- Native/mobile visual feel and frame pacing should be judged in the actual playable browser session.
 
 ## PWA and update behavior
 
@@ -128,6 +143,7 @@ src/
   atlas.css
   core/
     daylight.js
+    environment-layout.js
     living-world.js
     math.js
     quality.js
@@ -142,6 +158,7 @@ src/
     island-scenery.js
     living-world.js
     moon.js
+    environment-assets.js
     atlas.js
 public/
   assets/
@@ -154,6 +171,17 @@ public/
     vehicles/
       sports_car.glb
       sports_car.provenance.json
+    animals/
+      Deer.glb
+      Fox.glb
+      ShibaInu.glb
+    environment/
+      manifest.json
+      QUATERNIUS-LICENSE.txt
+      nature/
+      ruins/
+      textures/
+      urban/
     space/
       nasa-sls-block1.stl
       nasa-blue-marble-2048.png
@@ -167,20 +195,27 @@ public/
   sw.js
 tests/
   aircraft-asset.test.mjs
+  alien-assets.test.mjs
   archipelago.test.mjs
   audio.test.mjs
-  living-world.test.mjs
   boat-asset.test.mjs
+  celestial.test.mjs
+  daylight.test.mjs
+  environment-assets.test.mjs
   exploration.test.mjs
+  living-world.test.mjs
+  spaceflight.test.mjs
   storage.test.mjs
   vehicle-asset.test.mjs
   world.test.mjs
-  spaceflight.test.mjs
 legacy/
   skyreach-original.html
 docs/
   ARCHITECTURE.md
+  ASSET-INTEGRATION-PLAN.md
+  CURATED-ASSETS.md
   LIVING-ISLES.md
+  WORLD-EXPANSION.md
 ```
 
 ## Development rule
@@ -190,11 +225,3 @@ Preserve the feel and playability of the baseline while improving the internals 
 ## World expansion verification
 
 See [verification and boundaries](docs/WORLD-EXPANSION.md) for checks and remaining limitations.
-
-### Continuous Earth–Moon flight
-
-Skyreach now extends the existing no-cutscene SLS flight into a physical Earth–Moon system. `src/core/celestial.js` tracks the spacecraft in 3D meter-scale coordinates with Earth and Moon gravity using the real approximate 384,400 km Earth–Moon separation and 1,737.4 km lunar radius. Rendering is camera-relative and compressed separately, so the simulation can cover interplanetary distances without sacrificing the original meter-scale Earth gameplay.
-
-Crossing the 100 km Kármán line hands the existing SLS velocity continuously into the celestial model; there is no scene load or teleport. The flight HUD adds **TARGET**, **CRUISE**, and **TIME** controls. CRUISE is a physical acceleration/braking assist toward Earth or the Moon rather than a warp/teleport, while TIME advances the same deterministic simulation and automatically falls back toward real time near a world.
-
-The Moon has a continuously approached local terrain patch with craters, rocks and a landing site. After landing, the player can exit the SLS and explore on foot under reduced lunar gravity. Two user-provided ships are parked near the landing area: `alien_spaceship.glb` as the Alien Scout and `alien_ship.glb` as the Alien Strike Ship. Both are boardable and use the same celestial flight model; the highly fragmented Strike Ship is merged by material at runtime to reduce mobile draw calls.

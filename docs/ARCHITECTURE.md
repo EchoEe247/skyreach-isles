@@ -18,16 +18,21 @@ Current extracted modules:
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
-- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.\n- `src/core/spaceflight.js`: deterministic SLS atmosphere, gravity, drag, altitude mapping, Kármán-line state, and rocket integration.
-- `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.\n- `src/core/living-world.js`: deterministic weather, lightning, world-event cadence, and NPC schedule targets.
+- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.
+- `src/core/spaceflight.js`: deterministic SLS atmosphere, gravity, drag, altitude mapping, Kármán-line state, and rocket integration.
+- `src/core/celestial.js`: deterministic Earth-Moon 3D position/velocity integration, two-body gravity, spacecraft target guidance, render-coordinate compression, lunar approach mapping, and safe time acceleration.
+- `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.
+- `src/core/living-world.js`: deterministic weather, lightning, world-event cadence, and NPC schedule targets.
 - `src/systems/exploration.js`: navigation, 2D proximity/bearing helpers, and lightweight haptic feedback.
 - `src/systems/audio.js`: adaptive WebAudio environment, movement, wildlife, and vehicle sound layers.
+- `src/systems/moon.js`: deterministic lunar terrain patch, craters, rocks, landing pad, and local surface queries.
 - `src/style.css`: presentation separated from game logic.
 
 New world modules:
 
 - src/core/archipelago.js: stable offshore island definitions and analytic heights.
-- src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.\n- src/systems/living-world.js: rain particles, event manifestations/resolution state, and ambient ferry traffic.
+- src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.
+- src/systems/living-world.js: rain particles, event manifestations/resolution state, and ambient ferry traffic.
 - src/systems/atlas.js and src/atlas.css: chart, field notes, course selection and scrolling radar.
 
 ## State and persistence
@@ -45,16 +50,18 @@ The maintained game uses detailed GLB visuals while keeping the original procedu
 - `public/assets/aircraft/airliner.glb`: uniform 0.30 scale; its +Z nose already matches the flight rig.
 - `public/assets/space/nasa-sls-block1.stl`: official NASA SLS Block 1 geometry, normalized at load time; only the printable display-plinth triangles are discarded before rendering, then the rocket is colored in-engine for the orange core/white boosters.
 - `public/assets/space/nasa-blue-marble-2048.png`: NASA Blue Marble texture for the high-altitude Earth representation.
+- `public/assets/space/alien/alien_spaceship.glb`: user-provided Alien Scout visual; textured PBR asset with normals/UVs, loaded directly as the compact lunar craft.
+- `public/assets/space/alien/alien_ship.glb`: user-provided Alien Strike Ship visual; missing normals are generated at runtime and its many source meshes are merged by material before display to reduce mobile draw submissions.
 
 Driving, sailing, and flight physics remain owned by the existing gameplay simulation rather than by the visual models.
 
-## Continuous Earth-to-space flight
+## Atmospheric ascent and celestial handoff
 
 The SLS is part of the same vehicle registry and main simulation loop as the car, boat, and airplane. There is no scene transition at altitude boundaries. `src/core/spaceflight.js` updates physical altitude, vertical/horizontal speed, body heading, inertial horizontal-velocity heading, pitch/yaw rates, atmosphere density, gravity, drag, throttle response, SAS damping, and the gravity-turn assist deterministically.
 
 For numerical stability, physical rocket altitude is mapped to render height with a logarithmic function and can be inverted by tests. This preserves useful meter-scale ground coordinates while still representing the 100 km Kármán line and higher altitudes in the same Three.js scene. Visual atmosphere blending begins gradually above the lower atmosphere; fog/cloud contribution falls away, stars become fully visible, and the NASA Earth globe fades into view continuously.
 
-The mobile HUD exposes separate speed, physical altitude, and atmospheric-region cells plus a 20–100% throttle preset and SAS toggle. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. The live browser smoke checks cover ~105 m, 16.6 km, 44.2 km, and ~297 km.
+The spacecraft HUD exposes speed and body-relative altitude plus a 20–100% throttle preset and SAS toggle. After celestial handoff it also exposes TARGET, CRUISE, and TIME controls for Earth/Moon navigation. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. Earlier browser smoke checks covered ~105 m, 16.6 km, 44.2 km, and ~297 km during the atmospheric-only phase; current automated coverage additionally exercises the Earth-Moon celestial handoff and transfer corridor.
 
 ## Earth-Moon interbody simulation
 
@@ -102,7 +109,18 @@ The current progression layer includes six beacons, eight airborne rings, ten Sk
 
 `src/systems/exploration.js` supplies nearest-pending objective selection, distance/bearing helpers, and haptic feedback. The HUD compass prioritizes an explicitly selected destination, then unfinished beacons, then unfinished Skyshards. The radar follows the player with a 660-unit span. Eight discovery slots preserve the original five slots unchanged.
 
-## Living-world simulation\n\nThe living-world clock advances only while gameplay is active. Weather follows a 600-second continuous cycle with clear, cloudy, rain, storm, and fog phases blended over transition windows. Rendering responds by changing cloud density/speed, rain particles, linear-fog range, water bump strength, sky/sun/moon contribution, and bounded lightning flashes. Storm darkness is deliberately capped so the game's night-visibility contract remains intact.\n\nThe existing 24 NPC population is redistributed rather than increased: 18 residents remain on the home island and six live on the offshore islands. Four schedule periods (morning/day/evening/night) move each resident between deterministic community anchors with short local wandering around each anchor. This adds behavior without increasing character draw-call count.\n\nTwo low-poly ambient ferries traverse sampled open-water routes between the home island and offshore destinations. They are ambience only and do not affect player boat collision.\n\nWorld events are intermittent rather than a second checklist. Washed-up cargo, lighthouse outage, and stranded-boat events appear in bounded windows, manifest in the world, announce once, and resolve when the player reaches their event radius. Resolving the outage restores the lighthouse immediately. Event state is intentionally session-local and repeats on a later cycle.\n\n## Performance\n
+## Living-world simulation
+
+The living-world clock advances only while gameplay is active. Weather follows a 600-second continuous cycle with clear, cloudy, rain, storm, and fog phases blended over transition windows. Rendering responds by changing cloud density/speed, rain particles, linear-fog range, water bump strength, sky/sun/moon contribution, and bounded lightning flashes. Storm darkness is deliberately capped so the game's night-visibility contract remains intact.
+
+The existing 24 NPC population is redistributed rather than increased: 18 residents remain on the home island and six live on the offshore islands. Four schedule periods (morning/day/evening/night) move each resident between deterministic community anchors with short local wandering around each anchor. This adds behavior without increasing character draw-call count.
+
+Two low-poly ambient ferries traverse sampled open-water routes between the home island and offshore destinations. They are ambience only and do not affect player boat collision.
+
+World events are intermittent rather than a second checklist. Washed-up cargo, lighthouse outage, and stranded-boat events appear in bounded windows, manifest in the world, announce once, and resolve when the player reaches their event radius. Resolving the outage restores the lighthouse immediately. Event state is intentionally session-local and repeats on a later cycle.
+
+## Performance
+
 Automatic quality chooses a conservative preset from browser-reported device memory/CPU information when available. The player can cycle Auto, Low, Medium, and High without leaving the game. Pixel ratio and shadow rendering are the main runtime quality controls.
 
 Detailed GLB meshes currently disable their own dynamic shadows where appropriate to avoid turning visual upgrades into an unnecessary mobile GPU cost.
@@ -141,8 +159,17 @@ The current Node test suite covers:
 - exploration nearest-objective/bearing/distance helpers
 - backward-compatible persistence for eight discoveries
 - offshore shore approaches, cove entry, waterfall terrain drop and sea-arch passage/pillars
-- bounded waterfall audio gains\n- weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
+- bounded waterfall audio gains
+- weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
 - deterministic rocket ascent, atmosphere-density decay, altitude-dependent Earth gravity, invertible render-altitude mapping, and Kármán-line space blending
+
+## Current verification status
+
+As of the current Earth-Moon build, the repository test suite is **57/57 passing** and the production Vite build succeeds. git diff --check is clean. Local serving has returned HTTP 200 for the current build.
+
+Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, lunar-site projection, render-distance compression, safe warp limits, physical Moon-cruise interception, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
+
+The deterministic transfer test verifies a physical Moon intercept rather than a teleport. Headless Termux Chromium is not accepted as visual evidence for the current space build because its EGL/WebGL path fails to initialize; native/mobile visual QA remains a rendered-session concern.
 
 ## Next extraction boundaries
 
@@ -154,11 +181,3 @@ Continue extracting only when the boundary is useful and testable:
 4. UI: HUD, minimap, settings
 
 Each extraction should preserve `legacy/skyreach-original.html` as the behavioral reference and be followed by tests, a production build, and an appropriate runtime smoke check.
-
-## Earth–Moon celestial layer
-
-`src/core/celestial.js` extends the atmospheric SLS model after the Kármán line into a deterministic three-dimensional celestial state. Physical position and velocity remain in meters; Earth and Moon accelerations are evaluated independently, while `renderRelativeVector()` and angular-body sizing map the large physical distances into a stable camera-relative Three.js representation.
-
-The Moon is physically centered about 384,400 km from Earth. `src/systems/moon.js` owns the near-surface lunar representation: cratered terrain, instanced rocks and the landing site are activated only on lunar approach. This is LOD/coordinate remapping inside the same running scene, not a level transition.
-
-Spacecraft share the celestial integrator. The NASA SLS preserves its original atmosphere/ascent behavior until 100 km, then hands its physical velocity into the celestial state. Alien Scout and Alien Strike Ship begin landed at the lunar site and can take off into the same Earth–Moon space. Target cruise changes thrust direction and magnitude continuously; simulation-time acceleration is safety-limited by target distance. The Strike Ship source contains many independent meshes, so its geometry is merged by material at load time for a substantially lower mobile draw-call cost.

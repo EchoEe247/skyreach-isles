@@ -43,9 +43,9 @@ Events are intermittent and session-local:
 
 Events announce once when they begin. Reaching the event radius resolves the current occurrence; cargo is secured, lighthouse power is restored, or the stranded crew acknowledges the player. The event marker/manifestation disappears after resolution. Events later recur with the living-world cycle rather than becoming persistent collectibles.
 
-## Verification
+## Verification at the time of the Living Isles update
 
-- 36 Node regression tests pass.
+- The suite at that point contained 36 passing Node regression tests.
 - Living-world tests cover weather bounds/continuity, storm-only lightning, all four NPC schedule periods, community containment, and intermittent event cadence.
 - Audio tests cover bounded rain/storm ambience.
 - Production Vite build succeeds; the existing >500 kB bundle warning remains non-fatal.
@@ -53,6 +53,8 @@ Events announce once when they begin. Reaching the event radius resolves the cur
 - Browser state checks confirmed clear weather + cargo event, rain + lighthouse outage, rain + stranded-boat event, storm at midnight, two active ambient ferries, and NPC period changes.
 - Teleport QA to Tideglass cargo confirmed the event resolves when the player enters its event radius.
 - The alternate Ember ferry path was sampled along every segment and remained below the boat-travel shoreline threshold.
+
+These bullets document the Living Isles release checkpoint. The current repository has since grown to **57/57 passing tests** and adds Earth-Moon flight, lunar terrain, and two alien spacecraft without changing the living-world contracts above. Current repository-wide verification is summarized in README.md and docs/ARCHITECTURE.md.
 
 ## Deliberate boundaries
 

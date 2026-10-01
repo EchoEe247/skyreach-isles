@@ -6,7 +6,7 @@
 
 Enrich Skyreach Isles in one coordinated pass using selected free assets that fit the existing world. Asset packs are source libraries, not content dumps. Only pieces that improve a specific location, interaction, or visual gap are imported.
 
-The current playable baseline remains authoritative: existing sports car/traffic, speedboat, airliner, NASA SLS, offshore islands, weather, NPC schedules, audio, exploration objectives, and the 9-minute-day / 3-minute-night cycle stay intact unless a selected asset is explicitly replacing a weaker procedural visual.
+This document records the September 30 enrichment baseline. That baseline included the sports car/traffic, speedboat, airliner, NASA SLS, offshore islands, weather, NPC schedules, audio, exploration objectives, and the 9-minute-day / 3-minute-night cycle. The later maintained build additionally includes continuous Earth-Moon flight, lunar terrain, and two user-provided boardable alien spacecraft; those later systems are documented in README.md and docs/ARCHITECTURE.md.
 
 ## Public-web licensing rule
 
@@ -162,7 +162,7 @@ Targets:
 - keep source archives outside the production/public tree
 - measure the built asset footprint before and after integration
 
-The existing ~662 KB minified JS warning should not be worsened by embedding model data into JavaScript. Models remain external runtime assets.
+The production bundle still has a known non-fatal large-chunk warning. Runtime model data remains external rather than embedded into JavaScript; the later Moon/spacecraft work follows the same rule.
 
 ## Implementation order
 
