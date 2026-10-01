@@ -28,6 +28,10 @@ export function physicalAltitude(renderM){
 export function spaceBlend(altitudeM){
   return clamp((Math.max(0,altitudeM)-18000)/(KARMAN_LINE_M-18000),0,1);
 }
+export function celestialEarthVisualBlend(altitudeM){
+  const t=clamp((Math.max(0,Number(altitudeM)||0)-KARMAN_LINE_M)/300000,0,1);
+  return t*t*(3-2*t);
+}
 
 export function atmosphereLabel(altitudeM){
   const h=Math.max(0,altitudeM);
@@ -107,5 +111,6 @@ export function stepRocket(state,input,dt,profile={}){
     else{s.verticalSpeed=0;s.horizontalSpeed*=Math.exp(-simDt*4);if(impactSpeed<8)s.landedBody='earth'}
   }
   s.altitude=Math.max(0,s.altitude+s.verticalSpeed*simDt);
+  if(s.altitude>1||s.verticalSpeed>1)s.landedBody=null;
   return s;
 }

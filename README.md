@@ -82,7 +82,7 @@ The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `publ
 
 `src/core/spaceflight.js` owns the deterministic rocket-flight model. Atmosphere density decays continuously with altitude, gravity follows the inverse-square Earth-radius relationship, aerodynamic drag falls away with atmospheric density, and thrust/steering continue without switching scenes. The game maps physical altitude into a compressed render coordinate so a mobile WebGL scene can represent tens to hundreds of kilometers without destroying near-surface precision.
 
-The mobile flight HUD separates speed, altitude, and atmospheric region so objective guidance no longer overlaps telemetry. Rocket throttle is adjustable from 20–100% before/while holding THRUST, and SAS can be toggled: SAS damps rotation and adds a gentle gravity-turn assist, while SAS OFF preserves pitch/yaw inertia for manual flight. Horizontal velocity keeps its own travel heading in space instead of snapping instantly to the rocket nose. Crossing the 100 km Kármán line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation.
+The mobile flight HUD separates speed, altitude, and atmospheric region so objective guidance no longer overlaps telemetry. Rocket throttle is adjustable from 20–100% before/while holding THRUST, and SAS can be toggled: SAS damps rotation and adds a gentle gravity-turn assist, while SAS OFF preserves pitch/yaw inertia for manual flight. Horizontal velocity keeps its own travel heading in space instead of snapping instantly to the rocket nose. Crossing the 100 km Kármán line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation. The render anchor is also preserved across the handoff, preventing an X/Z snap toward world origin on the first celestial frame.
 
 Asset provenance is recorded beside each detailed vehicle/space asset, including the two user-provided lunar alien craft.
 
@@ -90,7 +90,7 @@ Asset provenance is recorded beside each detailed vehicle/space asset, including
 
 Skyreach now extends the existing no-cut SLS ascent into a physical Earth-Moon simulation. At the Karman-line handoff the rocket keeps its velocity and attitude, while `src/core/celestial.js` begins full 3D position/velocity integration in meters. Earth and Moon gravity are applied continuously, the Moon uses its real approximate 384,400 km separation and 1,737.4 km radius, and camera-relative logarithmic rendering keeps those distances stable on mobile without teleporting the craft.
 
-The spacecraft HUD adds **TARGET**, **AUTO NAV**, and **TIME** controls. A cyan target locator appears from high ascent onward: when the Moon/Earth target is off-screen it pins to the screen edge with a pointer; when visible it sits over the target. The navigation strip also reports live yaw and pitch error. AUTO NAV is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
+The spacecraft HUD adds **TARGET**, **AUTO NAV**, and **TIME** controls. The launch HUD uses a five-column telemetry row so speed, altitude, fuel, heat, and target state do not overlap the navigation strip. A cyan target locator appears from high ascent onward: when the Moon/Earth target is off-screen it pins to the screen edge with a pointer; when visible it sits over the target. The navigation strip also reports live yaw and pitch error. AUTO NAV is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
 
 Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB. The SLS STL and NASA Earth texture are deferred until the rocket is used, and the alien GLBs are deferred until Moon travel/boarding makes them relevant, reducing initial network and main-thread work.
 
@@ -112,7 +112,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 Current master verification after the full space-stack remediation:
 
-- **70/70 Node tests pass**.
+- **73/73 Node tests pass**.
 - npm run build passes. The game-owned JS is split to ~107 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.
@@ -124,7 +124,7 @@ Current master verification after the full space-stack remediation:
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v15`.
+`public/sw.js` currently uses cache version `skyreach-v16`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

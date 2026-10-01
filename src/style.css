@@ -34,7 +34,7 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 }
 /* Rocket flight HUD and controls */
 #rocketCtl{display:none}
-#ui.rocket-mode #spd{left:10px;right:10px;top:128px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px 9px;background:rgba(20,24,58,.72);backdrop-filter:blur(7px);border:1px solid rgba(255,243,214,.28);border-radius:13px;text-shadow:none;font-size:12px;line-height:1.1;z-index:3}
+#ui.rocket-mode #spd{left:10px;right:10px;top:128px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:7px 9px;background:rgba(20,24,58,.72);backdrop-filter:blur(7px);border:1px solid rgba(255,243,214,.28);border-radius:13px;text-shadow:none;font-size:12px;line-height:1.1;z-index:3}
 #ui.rocket-mode #spd .metric{min-width:0;display:flex;flex-direction:column;gap:2px;overflow:hidden}
 #ui.rocket-mode #spd .metric small{font-size:8px;letter-spacing:.13em;color:#d8d2c2;opacity:.85}
 #ui.rocket-mode #spd .metric b{font-size:13px;color:var(--amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

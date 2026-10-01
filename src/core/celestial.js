@@ -168,3 +168,4 @@ export function projectMoonLocal(position){const rel=sub(position,MOON_SITE);ret
 export function moonSiteDistance(position){const q=projectMoonLocal(position);return Math.hypot(q.x,q.z)}
 export function moonLocalBlend(position){const q=projectMoonLocal(position),alt=clamp((90000-q.altitude)/70000,0,1),lat=clamp((MOON_LOCAL_RADIUS_M-Math.hypot(q.x,q.z))/2500,0,1);return alt*lat}
 export function moonLocalRenderAltitude(altitudeM){const h=Math.max(0,altitudeM);return h<2500?h:2500+1800*Math.log1p((h-2500)/1800)}
+export function spacecraftRenderXZ(anchorX,anchorZ,localX,localZ,blend){const b=clamp(blend,0,1);return {x:anchorX+(localX-anchorX)*b,z:anchorZ+(localZ-anchorZ)*b}}

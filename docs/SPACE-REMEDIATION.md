@@ -57,8 +57,12 @@ This document records the full remediation pass following the focused SLS / Moon
 
 ## Verification
 
-- 70/70 Node tests pass after this remediation.
+- 73/73 Node tests pass after this remediation.
 - New regression coverage includes destructive/gentle lunar impacts, celestial SAS/manual divergence, manual high-warp limiting, atmospheric crash semantics, streamed lunar recentering, physical lunar gravity, vacuum spacecraft audio, and the optimized SLS asset envelope.
 - Production Vite build passes.
 - git diff --check passes.
 - The current local play URL is expected at http://127.0.0.1:8877.
+
+## Launch continuity correction
+
+A follow-up launch audit found two render-continuity faults hidden behind otherwise-correct flight physics: the celestial branch could reset spacecraft X/Z toward world origin when lunar-local blend was zero, and the Earth globe switched instantly from the full atmospheric representation to the compressed celestial representation at Kármán. The celestial render path now preserves the exact launch render anchor until lunar-local blending begins. The Earth globe now transitions smoothly from its atmospheric representation to its compressed celestial representation across 100–400 km instead of switching scale/position in one frame. Engine plumes remain visually continuous through atmospheric ascent until actual booster geometry separation exists, and liftoff clears stale ground-landing state. The rocket HUD telemetry row is five columns to avoid overlap after FUEL/HEAT were added.

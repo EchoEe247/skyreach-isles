@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,targetGuidance,moonPhysicalFromLocal,MOON_SITE_UP,LANDING_MAX_SPEED_MPS,CRASH_MIN_SPEED_MPS} from '../src/core/celestial.js';
+import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,targetGuidance,moonPhysicalFromLocal,MOON_SITE_UP,LANDING_MAX_SPEED_MPS,CRASH_MIN_SPEED_MPS,spacecraftRenderXZ} from '../src/core/celestial.js';
 
 test('Moon uses real-scale Earth-Moon separation and radius',()=>{
   assert.ok(Math.abs(Math.hypot(...MOON_CENTER)-MOON_DISTANCE_M)<1);
@@ -117,4 +117,13 @@ test('manual flight cannot receive full 400x warp control amplification',()=>{
   assert.equal(s.requestedWarp,400);
   assert.ok(s.warp<=10);
   assert.ok(Math.abs(s.heading)<1);
+});
+
+test('Karman render anchor stays continuous until lunar-local blending begins',()=>{
+  const anchor={x:-42.5,z:-31.25};
+  assert.deepEqual(spacecraftRenderXZ(anchor.x,anchor.z,1200,-900,0),anchor);
+  const half=spacecraftRenderXZ(anchor.x,anchor.z,1200,-900,.5);
+  assert.equal(half.x,(anchor.x+1200)/2);
+  assert.equal(half.z,(anchor.z-900)/2);
+  assert.deepEqual(spacecraftRenderXZ(anchor.x,anchor.z,1200,-900,1),{x:1200,z:-900});
 });

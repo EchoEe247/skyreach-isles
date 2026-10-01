@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {EARTH_RADIUS_M,KARMAN_LINE_M,atmosphereDensity,gravityAtAltitude,renderAltitude,physicalAltitude,spaceBlend,gravityTurnPitch,stepRocket} from '../src/core/spaceflight.js';
+import {EARTH_RADIUS_M,KARMAN_LINE_M,atmosphereDensity,gravityAtAltitude,renderAltitude,physicalAltitude,spaceBlend,celestialEarthVisualBlend,gravityTurnPitch,stepRocket} from '../src/core/spaceflight.js';
 
 test('atmosphere thins continuously with altitude',()=>{
   assert.equal(atmosphereDensity(0),1);
@@ -78,4 +78,18 @@ test('hard atmospheric impact is a crash, not a safe stop',()=>{
   const s=stepRocket({altitude:0,verticalSpeed:-80,horizontalSpeed:25,heading:0,velocityHeading:0,pitch:0},{throttle:0,steerX:0,steerY:0,sas:true},1/60);
   assert.equal(s.crashedBody,'earth');
   assert.ok(s.impactSpeed>18);
+});
+
+test('liftoff clears a stale ground landed state',()=>{
+  let s={altitude:0,verticalSpeed:0,horizontalSpeed:0,heading:0,velocityHeading:0,pitch:0,pitchRate:0,yawRate:0,landedBody:'earth'};
+  for(let i=0;i<10;i++)s=stepRocket(s,{throttle:1,steerX:0,steerY:0,sas:true},1/60,{acceleration:40});
+  assert.ok(s.altitude>1);
+  assert.equal(s.landedBody,null);
+});
+
+test('Earth visual transition is continuous after Karman handoff',()=>{
+  assert.equal(celestialEarthVisualBlend(KARMAN_LINE_M),0);
+  assert.ok(celestialEarthVisualBlend(100001)<1e-6);
+  assert.ok(celestialEarthVisualBlend(250000)>.45&&celestialEarthVisualBlend(250000)<.55);
+  assert.equal(celestialEarthVisualBlend(400000),1);
 });
