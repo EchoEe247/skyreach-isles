@@ -10,7 +10,10 @@ export const ISLANDS = [
     description:'Climb the old stone path to a broken observatory above the sea.'},
   {id:'veil', name:'Veilwater Island', x:-650, z:420, radius:125, height:32,
     color:0x628675, sand:0x969e97, kind:'falls',
-    description:'A spring spills from a basalt terrace. Offshore, a sea arch frames the horizon.'}
+    description:'A spring spills from a basalt terrace. Offshore, a sea arch frames the horizon.'},
+  {id:'multiverse-nexus', name:'Nexus Isle', x:-900, z:-650, radius:168, height:19,
+    color:0x496a72, sand:0xb9a884, kind:'nexus',
+    description:'A portal island with three playable character realms: platforming, speed-running, and arcade destruction.'}
 ];
 
 export function islandHeight(island, x, z) {
@@ -28,6 +31,11 @@ export function islandHeight(island, x, z) {
   if(island.kind==='falls') {
     // A narrow terrace makes a real lip for the waterfall at local x=-8.
     h-=13*smoothstep(-13,-5,u)*smoothstep(0,.45,f);
+  }
+  if(island.kind==='nexus') {
+    // Broad, game-friendly central shelf for the portal hub and three starter trials.
+    const plateau=smoothstep(.28,.72,f);
+    h=h*(1-plateau)+10.5*plateau;
   }
   return h;
 }

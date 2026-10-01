@@ -34,6 +34,7 @@ New world modules:
 - src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.
 - src/systems/living-world.js: rain particles, event manifestations/resolution state, and ambient ferry traffic.
 - src/systems/atlas.js and src/atlas.css: chart, field notes, course selection and scrolling radar.
+- src/systems/multiverse-isle.js: Nexus Isle portal hub, three transformable original homage characters, realm-specific movement, platform surfaces, ring collection, smash interactions, and return-to-Nightweaver flow.
 
 ## State and persistence
 
@@ -78,7 +79,7 @@ For SLS Earth return, the celestial state retains the original launch-site x/z c
 
 ## World continuity
 
-The home island and three offshore islands are finite terrain features in an unbounded ocean. All use the same height query for walking, vehicle grounding, chart generation and shoreline collision. Sea-arch pillars have explicit boat collision while the middle remains navigable.
+The home island and four offshore islands are finite terrain features in an unbounded ocean. Nexus Isle uses the same analytic terrain and shoreline contract, with a broad central plateau reserved for portal gameplay. All use the same height query for walking, vehicle grounding, chart generation and shoreline collision. Sea-arch pillars have explicit boat collision while the middle remains navigable.
 
 `terrainHeight()` caps the far mathematical seafloor at -80 so very large ocean coordinates remain numerically stable. `boatCanTravel()` checks all real terrain plus sea-arch pillars, without a coordinate boundary. The old radius >= 360 shortcut is removed because offshore islands occupy some of those coordinates.
 
@@ -108,9 +109,9 @@ Mix levels react continuously to vehicle mode, speed, altitude, coast proximity,
 
 ## Exploration systems
 
-The current progression layer includes six beacons, eight airborne rings, ten Skyshards, and eight named landmarks. Skyshards unlock the persistent Tailwind movement bonus when all ten are collected.
+The current progression layer includes six beacons, eight airborne rings, ten Skyshards, and nine named landmarks. Skyshards unlock the persistent Tailwind movement bonus when all ten are collected.
 
-`src/systems/exploration.js` supplies nearest-pending objective selection, distance/bearing helpers, and haptic feedback. The HUD compass prioritizes an explicitly selected destination, then unfinished beacons, then unfinished Skyshards. The radar follows the player with a 660-unit span. Eight discovery slots preserve the original five slots unchanged.
+`src/systems/exploration.js` supplies nearest-pending objective selection, distance/bearing helpers, and haptic feedback. The HUD compass prioritizes an explicitly selected destination, then unfinished beacons, then unfinished Skyshards. The radar follows the player with a 660-unit span. Nine discovery slots preserve the original five slots unchanged; the ninth records Nexus Isle without invalidating older saves.
 
 ## Living-world simulation
 

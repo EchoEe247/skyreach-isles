@@ -65,17 +65,19 @@ export function createIslandScenery(scene, obstacles) {
     geometry.setAttribute('color',new T.Float32BufferAttribute(colors,3));geometry.computeVertexNormals();
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({vertexColors:true}));mesh.receiveShadow=true;scene.add(mesh);
     coastline(island.x,island.z,island.radius,(x,z)=>ground(island,x,z));
-    for(let n=0;n<95;n++){
-      const a=random()*Math.PI*2,r=Math.sqrt(random())*island.radius;
-      const x=island.x+Math.cos(a)*r,z=island.z+Math.sin(a)*r,h=ground(island,x,z);
-      if(h<1||h>island.height-4)continue;
-      if(island.kind==='cove'&&h<13)palms.push({x,z,y:h,s:.8+random()*.6,a});
-      else rocks.push({x,z,y:h,s:.6+random()*1.8,a});
-    }
-    // A walkable approach from the south shore to the island's centre.
-    for(let n=0;n<40;n++){
-      const z=island.z+island.radius*.82*(1-n/39),x=island.x+Math.sin(n*.16)*5;
-      const h=ground(island,x,z);if(h>1.4)pathPoints.push({x,y:h+.055,z});
+    if(island.kind!=='nexus'){
+      for(let n=0;n<95;n++){
+        const a=random()*Math.PI*2,r=Math.sqrt(random())*island.radius;
+        const x=island.x+Math.cos(a)*r,z=island.z+Math.sin(a)*r,h=ground(island,x,z);
+        if(h<1||h>island.height-4)continue;
+        if(island.kind==='cove'&&h<13)palms.push({x,z,y:h,s:.8+random()*.6,a});
+        else rocks.push({x,z,y:h,s:.6+random()*1.8,a});
+      }
+      // A walkable approach from the south shore to the island's centre.
+      for(let n=0;n<40;n++){
+        const z=island.z+island.radius*.82*(1-n/39),x=island.x+Math.sin(n*.16)*5;
+        const h=ground(island,x,z);if(h>1.4)pathPoints.push({x,y:h+.055,z});
+      }
     }
   }
   coastline(0,0,380,terrainHeight);

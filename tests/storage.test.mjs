@@ -19,8 +19,8 @@ test('progress persists the expanded exploration state',()=>{
   saveProgress(expected);
   assert.deepEqual(loadProgress(),expected);
 });
-test('eight landmark discoveries survive save and reload',()=>{
-  const discoveries=Array.from({length:8},()=>true);
+test('nine landmark discoveries survive save and reload',()=>{
+  const discoveries=Array.from({length:9},()=>true);
   saveProgress({beacons:[true],rings:[],shards:[],discoveries});
   assert.deepEqual(loadProgress().discoveries,discoveries);
 });

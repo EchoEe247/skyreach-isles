@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town as Nightweaver, drive the car, visit and fly from the integrated LAX airport, sail across the open ocean, pilot a diving submarine, launch NASA's SLS continuously from Earth to the Moon, inspect the James Webb Space Telescope from a dedicated deep-space view, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town as Nightweaver, drive the car, visit and fly from the integrated LAX airport, sail across the open ocean, pilot a diving submarine, launch NASA's SLS continuously from Earth to the Moon, inspect the James Webb Space Telescope from a dedicated deep-space view, explore the lunar surface, fly two alien spacecraft, explore four offshore islands, including the new portal-driven Nexus Isle, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -11,8 +11,9 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Tideglass Cove:** a sheltered inlet, pale beaches, palms, a fishing jetty, and a dolphin pod offshore.
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
+- **Nexus Isle:** an expandable portal hub with three starter character realms: Jump Kingdom, Velocity Circuit, and Breaker Arcade.
 
-Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **LAX International Airport**, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **Multiverse Nexus**, **LAX International Airport**, or **NASA Launch Complex** for direct map/compass guidance. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 
@@ -40,7 +41,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere, across the 100 km Karman line, through interbody space, and down to the Moon
 - Six beacon objectives and eight airborne rings
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
-- Eight named landmarks with discovery feedback and minimap history
+- Nine named landmarks with discovery feedback and minimap history
 - Nearest-objective compass with live distance guidance
 - Procedural island terrain, town, vegetation, lighthouse, traffic, scheduled town/island NPCs, ambient ferries, resolvable world events, particles, dynamic weather, minimap, and day/night cycle
 - Progress persistence for beacons, sky rings, Skyshards, landmark discoveries, and quality settings
@@ -75,7 +76,7 @@ npm run preview -- --host 0.0.0.0
 
 The player car and four town traffic cars use `public/assets/vehicles/sports_car.glb`. Only the named `paint` material is recolored per vehicle, preserving the model's glass, lights, trim, wheels, brakes, and interior materials. The original procedural car remains as a load-failure fallback.
 
-The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shorelines of the home island and three offshore islands are collidable, as are the sea-arch pillars. Open ocean has no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
+The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shorelines of the home island and four offshore islands are collidable, as are the sea-arch pillars. Open ocean has no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
 
 The submarine uses the user-supplied `public/assets/vehicles/submarine.glb`, normalized at runtime to the game's vehicle scale. It starts offshore in water deep enough to move immediately while remaining reachable from the home island. The left stick handles forward/reverse and steering, **Boost** increases propulsion, **Dive** descends, and **Surface** rises. The depth limiter follows the local seafloor and blocks forward movement before the hull would intersect terrain. Explore includes a live **Find my submarine** course and chart marker. A lightweight procedural submarine remains only as a model-load fallback.
 
@@ -90,6 +91,18 @@ The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `publ
 The mobile flight HUD separates speed, altitude, and atmospheric region so objective guidance no longer overlaps telemetry. Rocket throttle is adjustable from 20–100% before/while holding THRUST, and SAS can be toggled: SAS damps rotation and adds a gentle gravity-turn assist, while SAS OFF preserves pitch/yaw inertia for manual flight. Horizontal velocity keeps its own travel heading in space instead of snapping instantly to the rocket nose. Crossing the 100 km Kármán line does not load another level or teleport the vehicle: the same SLS object, camera, controls, velocity state, sky, stars, and Earth representation continue in the same simulation. The render anchor is also preserved across the handoff, preventing an X/Z snap toward world origin on the first celestial frame.
 
 Asset provenance is recorded beside each detailed vehicle/space asset, including the two user-provided lunar alien craft.
+
+## Multiverse Nexus
+
+Nexus Isle is a fourth offshore island reserved for expandable character realms. The first three are original homage modes rather than redistributed franchise characters or ripped assets:
+
+- **Jump Kingdom / Redcap Rover:** a retro platforming hero with a raised-platform route and six collectible prism stars.
+- **Velocity Circuit / Volt Runner:** a fast blue energy runner with fourteen route rings, boost pads, and a substantially higher realm-specific sprint speed.
+- **Breaker Arcade / Brick Titan:** a heavy arcade bruiser with nine destructible neon cabinets that use the normal action button as **SMASH**.
+
+Each realm has its own animated portal in the central hub. Entering a portal changes the playable character in the same open world, teleports to that realm's start area on the island, changes movement/jump behavior where appropriate, and updates the existing HUD with realm progress. Each realm also has a return pad that restores Nightweaver at the central Nexus. The three realm definitions and their gameplay are isolated in src/systems/multiverse-isle.js so more portals can be added later without rebuilding the island.
+
+The starter realm art is generated in-engine from original geometry and materials for low mobile overhead. A permissive CC0 platformer pack was researched as an optional later enrichment path, but this first implementation does not depend on external character assets.
 
 ## LAX, Nightweaver, and JWST
 
@@ -125,7 +138,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-- The LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
+- The Multiverse-specific regression suite passes **7/7**, the LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
 - Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
 - AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
 - The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
@@ -141,7 +154,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v20`.
+`public/sw.js` currently uses cache version `skyreach-v21`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
