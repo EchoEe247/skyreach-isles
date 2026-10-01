@@ -1,6 +1,7 @@
 import {smoothstep as sm} from './math.js';
 
 import {archipelagoHeight,ISLANDS} from "./archipelago.js";
+import {spiTerrainHeight} from './south-padre.js';
 
 // The Muse LAX blockout is intentionally compressed to fit the main island while
 // preserving its four-runway layout. These constants are shared by terrain,
@@ -35,11 +36,13 @@ function airportInfluence(x,z){
 }
 
 export function terrainHeight(x,z){
+  const spi=spiTerrainHeight(x,z);if(spi!==null)return spi;
   const natural=Math.max(mainIslandHeight(x,z),archipelagoHeight(x,z)),airport=airportInfluence(x,z);
   return natural+(AIRPORT_SITE.elevation-natural)*airport;
 }
 
 export function boatCanTravel(x,z){
+  if(spiTerrainHeight(x,z)!==null)return false;
   // Collision follows actual land, including offshore islands; no world boundary.
   const falls=ISLANDS[2];
   if([-1,1].some(side=>Math.hypot(x-(falls.x-148),z-(falls.z+15+side*16))<7.5))return false;

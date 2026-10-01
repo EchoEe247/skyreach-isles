@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town as Nightweaver, drive the car, visit and fly from the integrated LAX airport, sail across the open ocean, pilot a diving submarine, launch NASA's SLS continuously from Earth to the Moon, inspect the James Webb Space Telescope from a dedicated deep-space view, explore the lunar surface, fly two alien spacecraft, explore four offshore islands, including the new portal-driven Nexus Isle, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town as Nightweaver, drive the cars, visit and fly from the integrated LAX airport, sail across the open ocean, pilot a diving submarine, launch NASA's SLS continuously from Earth to the Moon, inspect the James Webb Space Telescope from a dedicated deep-space view, explore the lunar surface, fly two alien spacecraft, explore five offshore regions, including the South Padre Island + Port Isabel region and Nexus Isle, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -12,8 +12,11 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
 - **Nexus Isle:** a large offshore island split into two dedicated playable districts: Velocity District and Breaker City.
+- **Port Isabel + South Padre Island:** a recognizable mainland town and lighthouse connect by a continuous, drivable Queen Isabella Memorial Causeway to Padre Boulevard, south-city blocks, and a quieter northern shore.
 
-Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **Multiverse Nexus**, **LAX International Airport**, or **NASA Launch Complex** for direct map/compass guidance. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **Multiverse Nexus**, **LAX International Airport**, **NASA Launch Complex**, **Port Isabel · Causeway Start**, or **South Padre Island** for direct map/compass guidance. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+
+South Padre is a deliberately horizontally compressed procedural game reconstruction, not a survey-accurate map: Port Isabel, the causeway corridor, and the long narrow island are brought within a practical mobile-game drive. The Queen Isabella Memorial Causeway route uses a raised deck peak of **23.8 m (78 ft)** from the real-world height reference. The player can continuously drive from Port Isabel road up the west ramp, across the raised causeway and down the east ramp to Padre Boulevard, without a scene cut. A second boardable sports car is parked in Port Isabel and uses the same sports-car model/fallback and vehicle controls as the original.
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 
@@ -134,10 +137,10 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-- The refocused two-district Multiverse is covered by dedicated regression tests, while the clean deployment remains gated by the full `npm test` and `npm run build` workflow.
+- The refocused two-district Multiverse is covered by dedicated regression tests. The SPI integration adds two targeted route/integration tests; the clean deployment remains gated by the full `npm test` and `npm run build` workflow.
 - Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
 - AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
-- The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
+- The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail. The SPI integration preserves and does not stage/commit it.
 - The committed tree retains the known-good SLS derivative, so repository CI remains the authority for the clean-tree full-suite result.
 - Vite still reports the known non-fatal >500 kB warning for the Three.js vendor chunk.
 - git diff --check passes.
