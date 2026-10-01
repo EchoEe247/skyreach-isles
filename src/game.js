@@ -338,7 +338,7 @@ $('nexus').onclick=()=>{
  if(!multiverse.isTransformed()&&Math.hypot(P.x-multiverseIsland.x,P.z-multiverseIsland.z)>45)nexusHome=P.clone();
  multiverse.travelToHub(P);settleRealmTravel();yaw=Math.PI;hero.rotation.y=yaw;toast('Choose a portal below or walk into its glowing ring.',3200);
 };
-for(const id of['jump','velocity','breaker'])$('realm-'+id).onclick=()=>{if(mode!=='foot'||onMoon)return;multiverse.chooseRealm(id,P);settleRealmTravel()};
+for(const id of['velocity','breaker'])$('realm-'+id).onclick=()=>{if(mode!=='foot'||onMoon)return;multiverse.chooseRealm(id,P);settleRealmTravel()};
 $('realm-restart').onclick=()=>{multiverse.restart(P);settleRealmTravel()};
 $('realm-exit').onclick=()=>{multiverse.travelToHub(P);settleRealmTravel()};
 $('nexus-home').onclick=()=>{if(!nexusHome)return;multiverse.travelToHub(P);P.copy(nexusHome);nexusHome=null;settleRealmTravel()};
@@ -346,14 +346,14 @@ function updateRealmHUD(){
  const id=multiverse.activeRealm(),hub=mode==='foot'&&!onMoon&&!id&&Math.hypot(P.x-multiverseIsland.x,P.z-multiverseIsland.z)<35;
  $('realm-hub').hidden=!hub;$('realm-hud').hidden=!id;$('ui').classList.toggle('realm-mode',!!id);
  $('nexus-home').hidden=!nexusHome;
- if(id){$('realm-title').textContent={jump:'JUMP KINGDOM · REDCAP ROVER',velocity:'VELOCITY CIRCUIT · VOLT RUNNER',breaker:'BREAKER CITY · BRICK TITAN'}[id];
- $('realm-help').textContent={jump:'Move + Jump · Hold Boost for long jumps · Stomp walkers · Hit gold blocks from below',velocity:'Follow gold rings · Boost to run · Action = Spin Dash · Red springs bounce · Jump over spikes',breaker:'Walk within reach + Smash · Destroy towers and guards · Chain hits for a higher combo'}[id];
+ if(id){$('realm-title').textContent={velocity:'VELOCITY DISTRICT · VOLT RUNNER',breaker:'BREAKER CITY · BRICK TITAN'}[id];
+ $('realm-help').textContent={velocity:'24 ordered gates · Boost to run · Action = Spin Dash · Springs launch · avoid spikes · chase a faster rank',breaker:'12 multi-hit towers + 6 guards · get in range and SMASH · chain punches for combo score'}[id];
  $('realm-progress').textContent=multiverse.statusText();$('realm-result').textContent=multiverse.completed()[id]?'WORLD CLEARED! Replay or return to the Nexus.':''}
 }
 const qualityBtn=$('quality');const renderQuality=()=>qualityBtn.textContent='Quality '+qualityLabel(quality);renderQuality();qualityBtn.onpointerdown=e=>{e.stopPropagation();quality=nextQuality(quality);settings.quality=quality;saveSettings(settings);applyRendererQuality(R,quality);renderQuality();toast('Quality '+qualityLabel(quality),1800)};
 const cv=R.domElement;cv.onpointerdown=e=>{dragId=e.pointerId;lx=e.clientX;ly=e.clientY};cv.onpointermove=e=>{if(e.pointerId!=dragId)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;if(telescopeView){telescopeYaw-=dx*.006;telescopePitch=cl(telescopePitch+dy*.004,-.85,.95)}else{if(mode=='foot')yaw-=dx*.006;else off-=dx*.006;pitch=cl(pitch+dy*.004,.05,1.2)}};cv.onpointerup=cv.onpointercancel=()=>dragId=null;
 cv.addEventListener('wheel',e=>{if(!telescopeView)return;e.preventDefault();telescopeDistance=cl(telescopeDistance+Math.sign(e.deltaY)*2,22,58)},{passive:false});
-const beginGame=()=>{if(started)return;$('start').style.display='none';started=1;worldAudio.start();toast('Explore now charts Nexus Isle, LAX, the SLS, and your vehicles. Multiverse Nexus has three playable portal realms.',6800)};
+const beginGame=()=>{if(started)return;$('start').style.display='none';started=1;worldAudio.start();toast('Explore now charts Nexus Isle, LAX, the SLS, and your vehicles. Nexus Isle has two large playable districts: Velocity District and Breaker City.',6800)};
 $('start').onpointerdown=beginGame;$('start').onkeydown=e=>{if(e.code==='Enter'||e.code==='Space'){e.preventDefault();beginGame()}};
 let tt;function toast(m,ms){const t=$('toast');t.textContent=m;t.classList.add('s');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('s'),ms||2500)}
 function objectiveFeedback(pattern=35){const ui=$('ui');ui.classList.remove('objective-pulse');void ui.offsetWidth;ui.classList.add('objective-pulse');haptic(pattern)}

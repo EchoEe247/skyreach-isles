@@ -13,7 +13,7 @@ export const ISLANDS = [
     description:'A spring spills from a basalt terrace. Offshore, a sea arch frames the horizon.'},
   {id:'multiverse-nexus', name:'Nexus Isle', x:-900, z:-650, radius:168, height:19,
     color:0x496a72, sand:0xb9a884, kind:'nexus',
-    description:'A portal island with three playable character realms: platforming, speed-running, and arcade destruction.'}
+    description:'A large portal island split into two distinct playable districts: Velocity District and Breaker City.'}
 ];
 
 export function islandHeight(island, x, z) {
@@ -33,7 +33,7 @@ export function islandHeight(island, x, z) {
     h-=13*smoothstep(-13,-5,u)*smoothstep(0,.45,f);
   }
   if(island.kind==='nexus') {
-    // Broad, game-friendly central shelf for the portal hub and three starter trials.
+    // Broad central shelf for the Nexus fork plus two separated playable districts.
     const plateau=smoothstep(.28,.72,f);
     h=h*(1-plateau)+10.5*plateau;
   }

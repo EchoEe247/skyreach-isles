@@ -11,7 +11,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Tideglass Cove:** a sheltered inlet, pale beaches, palms, a fishing jetty, and a dolphin pod offshore.
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
-- **Nexus Isle:** an expandable portal hub with three starter character realms: Jump Kingdom, Velocity Circuit, and Breaker Arcade.
+- **Nexus Isle:** a large offshore island split into two dedicated playable districts: Velocity District and Breaker City.
 
 Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **Multiverse Nexus**, **LAX International Airport**, or **NASA Launch Complex** for direct map/compass guidance. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
@@ -94,14 +94,12 @@ Asset provenance is recorded beside each detailed vehicle/space asset, including
 
 ## Multiverse Nexus
 
-Tap **MULTIVERSE** while on foot on Earth to visit Nexus Isle. Each labeled portal transforms you into a different playable hero. A hub selector, per-world controls, objective compass, restart, and return buttons make all three modes accessible on mobile.
+Nexus Isle now focuses entirely on **two physically separated, larger districts**. The former platforming replica has been removed from the project rather than hidden.
 
-- **Jump Kingdom / Redcap Rover:** Mario-inspired grass-and-brick platforming with pipes, a castle, six stars, coins, gold bonus blocks, stompable walkers, sweep hazards and checkpoints.
-- **Velocity Circuit / Volt Runner:** Sonic-inspired speed running with a continuous checker track, fourteen ordered gold ring gates, Spin Dash, boost pads, springs, spikes and a finish timer.
-- **Breaker City / Brick Titan:** Wreck-It Ralph-inspired demolition with nine city towers, four patrolling guards, oversized-fist smash animation, debris and combo scoring.
+- **Velocity District / Volt Runner:** occupies the west side of Nexus Isle as a 24-gate ordered time-trial course. It has a continuous checker track, five boost pads, four checkpoints, three springs, three spike hazards, Spin Dash, stronger realm-specific speed, live timing, best-time tracking, and S/A/B/C finish ranks.
+- **Breaker City / Brick Titan:** occupies the east side as a larger street-grid demolition arena with **12 multi-hit towers** and **6 patrolling security guards**. Towers take two or three punches, targets stay physically solid until destroyed, debris bursts on impact, guards can break combos, and rapid hits multiply the score.
 
-All three use original procedural characters and scenery. They are compact homage games, not full commercial-game replicas. See [Multiverse gameplay and verification](docs/MULTIVERSE.md).
-
+The central Nexus is now a simple fork/return plaza between those two destinations rather than a three-world cluster. The two in-world entrances are more than 120 world units apart, each district has its own scenery, signage and return pad, and **MULTIVERSE** still provides fast access while the island remains physically reachable by normal exploration.
 ## LAX, Nightweaver, and JWST
 
 The main island now contains a compressed but complete LAX airport footprint in its southeast quadrant. `src/core/world.js` owns the airport-site contract and blends the natural terrain into a flat 10-unit airport plateau with a softened perimeter. The supplied `lax_airport.glb` is 150×110 source units and is rendered at 1.25× scale, fitting inside that flattened zone. Airport buildings contribute lightweight collision circles, runway/apron lights are instanced, and procedural trees/rocks are excluded from the airport footprint.
@@ -136,7 +134,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-- The Multiverse-specific regression suite passes **16/16**. The deployed clean checkout passes **102/102** runtime tests and `npm run build` through GitHub Actions.
+- The refocused two-district Multiverse is covered by dedicated regression tests, while the clean deployment remains gated by the full `npm test` and `npm run build` workflow.
 - Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
 - AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
 - The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
@@ -153,7 +151,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v23`.
+`public/sw.js` currently uses cache version `skyreach-v25`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
