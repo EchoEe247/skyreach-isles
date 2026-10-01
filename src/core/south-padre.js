@@ -1,10 +1,12 @@
 // South Padre/Port Isabel gameplay contract aligned to the user-supplied GLB.
-// The first integration used 0.08 horizontal scale with 0.9005 vertical scale, which
-// made cars/player gigantic and buildings pencil-thin. Geometry is now 0.50 uniform;
-// only the bridge gets a vertical override so its roadway peak still reads at ~23.8 m.
-const GEO_SCALE=6.25;
-const ORIGIN=Object.freeze({x:1072,z:0});
-const expand=(x,z)=>Object.freeze({x:ORIGIN.x+(x-ORIGIN.x)*GEO_SCALE,z:ORIGIN.z+(z-ORIGIN.z)*GEO_SCALE});
+// Source GLB dimensions are meter-scale. 1.5 scene units represent one source meter relative to Nightweaver.
+export const HUMAN_SCALE=1.5;
+const GEO_SCALE=18.75;
+const BRIDGE_Y_SCALE=23.8/26.43;
+const LIGHTHOUSE_Y_SCALE=21.95/25.83;
+const BASE_ORIGIN=Object.freeze({x:1072,z:0});
+const ORIGIN=Object.freeze({x:2200,z:0});
+const expand=(x,z)=>Object.freeze({x:ORIGIN.x+(x-BASE_ORIGIN.x)*GEO_SCALE,z:ORIGIN.z+(z-BASE_ORIGIN.z)*GEO_SCALE});
 const routePoint=(x,z,y,name)=>Object.freeze({...expand(x,z),y,name});
 const baseShoreline=[
  [-65.9,1477.2,76.0],[-219.6,1444.0,51.0],[-373.3,1409.1,50.6],[-527.0,1390.6,47.4],
@@ -17,7 +19,7 @@ const baseShoreline=[
  [-4369.9,583.2,51.4]
 ];
 const destination=expand(1458,-107),lighthouse=expand(1105.9,-8),padreBlvd=expand(1409,-373),peak=expand(1247.5,-23.1),bayProbe=expand(1260,90);
-const carSpawn=Object.freeze({x:ORIGIN.x-24,z:ORIGIN.z+8,y:.8});
+const carSpawn=Object.freeze({x:2157.757568359375,z:16.341095581054674,y:1.8082950711250305});
 
 export const SOUTH_PADRE=Object.freeze({
  id:'south-padre-port-isabel',
@@ -25,13 +27,14 @@ export const SOUTH_PADRE=Object.freeze({
  model:Object.freeze({
    path:'assets/regions/south-padre-island.glb',
    sourceSha256:'3b76f4ff571914e727ba34763642e3dec165a1d3cb18c12540773e1b3947b251',
-   scale:Object.freeze({x:.5,y:.5,z:.5}),
-   // Keeps the Port Isabel drive start fixed while enlarging the supplied model to 50% world scale.
-   position:Object.freeze({x:3668.814453125,y:0,z:188.13}),
-   bridgeYScale:1.800984,
+   scale:Object.freeze({x:HUMAN_SCALE,y:HUMAN_SCALE,z:HUMAN_SCALE}),
+   // Preserve source geometry while offsetting full-scale Port Isabel east of the main island.
+   position:Object.freeze({x:9990.443359375,y:0,z:564.39}),
+   bridgeYScale:BRIDGE_Y_SCALE,
+   lighthouseYScale:LIGHTHOUSE_Y_SCALE,
    sourceTriangles:724219,
-   loadRadius:650,
-   visibilityRadius:900
+   loadRadius:3500,
+   visibilityRadius:18000
  }),
  destination:Object.freeze({
    id:'south-padre-island',name:'South Padre Island',shortName:'SPI',x:destination.x,z:destination.z,icon:'☀',
@@ -43,25 +46,32 @@ export const SOUTH_PADRE=Object.freeze({
    category:'TEXAS COAST · DRIVE START',
    description:'Your Port Isabel sports car is parked here. Board it and drive continuously onto the Queen Isabella Memorial Causeway and South Padre Island.'
  }),
- portIsabel:Object.freeze({center:Object.freeze({x:ORIGIN.x,z:ORIGIN.z}),halfX:325,halfZ:300,elevation:.8}),
+ portIsabel:Object.freeze({center:Object.freeze({x:ORIGIN.x,z:ORIGIN.z}),halfX:850,halfZ:780,elevation:1.75}),
  carSpawn,
  lighthouse:Object.freeze(lighthouse),padreBlvd:Object.freeze(padreBlvd),
- causeway:Object.freeze({peak:Object.freeze({...peak}),peakHeight:23.8,realPeakFeet:78}),
+ causeway:Object.freeze({peak:Object.freeze({...peak}),peakHeight:23.8*HUMAN_SCALE,realPeakMeters:23.8,realPeakFeet:78}),
  route:Object.freeze([
-   routePoint(1072,0,.8,'Port Isabel Road'),
-   routePoint(1119.5,3.1,5.9,'West approach'),
-   routePoint(1167.5,-5.1,5.9,'Causeway west'),
-   routePoint(1207.5,-13.8,14.8,'Causeway rise'),
-   routePoint(1247.5,-23.1,23.8,'Causeway peak'),
-   routePoint(1287.5,-32.5,19.5,'Causeway descent'),
-   routePoint(1327.5,-41.6,6.9,'Causeway east'),
-   routePoint(1367.5,-49.9,5.9,'East approach'),
-   routePoint(1407.5,-55.9,5.2,'South Padre landing'),
-   routePoint(1458,-107,2.8,'Padre Boulevard')
+   Object.freeze({x:carSpawn.x,z:carSpawn.z,y:carSpawn.y,name:'Port Isabel Road'}),
+   routePoint(1119.5,3.1,5.55*HUMAN_SCALE*BRIDGE_Y_SCALE,'West approach'),
+   routePoint(1167.5,-5.1,6.53*HUMAN_SCALE*BRIDGE_Y_SCALE,'Causeway west'),
+   routePoint(1207.5,-13.8,16.61*HUMAN_SCALE*BRIDGE_Y_SCALE,'Causeway rise'),
+   routePoint(1247.5,-23.1,26.43*HUMAN_SCALE*BRIDGE_Y_SCALE,'Causeway peak'),
+   routePoint(1287.5,-32.5,21.65*HUMAN_SCALE*BRIDGE_Y_SCALE,'Causeway descent'),
+   routePoint(1327.5,-41.6,7.62*HUMAN_SCALE*BRIDGE_Y_SCALE,'Causeway east'),
+   routePoint(1367.5,-49.9,6.53*HUMAN_SCALE*BRIDGE_Y_SCALE,'East approach'),
+   routePoint(1407.5,-55.9,2.03*HUMAN_SCALE*BRIDGE_Y_SCALE,'South Padre landing'),
+   routePoint(1458,-107,1.85*HUMAN_SCALE,'Padre Boulevard')
  ]),
  bayProbe:Object.freeze(bayProbe),
- shoreline:Object.freeze(baseShoreline.map(([z,c,h])=>Object.freeze([z*GEO_SCALE,ORIGIN.x+(c-ORIGIN.x)*GEO_SCALE,h*GEO_SCALE])))
+ shoreline:Object.freeze(baseShoreline.map(([z,c,h])=>Object.freeze([ORIGIN.z+(z-BASE_ORIGIN.z)*GEO_SCALE,ORIGIN.x+(c-BASE_ORIGIN.x)*GEO_SCALE,h*GEO_SCALE])))
 });
+
+export function spiProximity(position){
+ const shorelineDistances=SOUTH_PADRE.shoreline.map(([z,c])=>Math.hypot(position.x-c,position.z-z));
+ const distance=Math.min(Math.hypot(position.x-ORIGIN.x,position.z-ORIGIN.z),Math.hypot(position.x-destination.x,position.z-destination.z),...SOUTH_PADRE.route.map(p=>Math.hypot(position.x-p.x,position.z-p.z)),...shorelineDistances);
+ const outsideMainIsland=Math.hypot(position.x,position.z)>500;
+ return Object.freeze({distance,near:outsideMainIsland&&distance<SOUTH_PADRE.model.visibilityRadius,visibilityRadius:SOUTH_PADRE.model.visibilityRadius,clearFogFar:18000});
+}
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
@@ -71,9 +81,9 @@ function routeY(x,z){
  for(let i=0;i<pts.length-1;i++){
   const a=pts[i],b=pts[i+1],dx=b.x-a.x,dz=b.z-a.z,l2=dx*dx+dz*dz;
   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/l2,0,1),px=a.x+dx*t,pz=a.z+dz*t,d=Math.hypot(x-px,z-pz);
-  if(d<24){
-   const deck=a.y+(b.y-a.y)*smooth(0,1,t),ground=.8;
-   return d<11?deck:deck+(ground-deck)*smooth(11,24,d);
+  if(d<26){
+   const deck=a.y+(b.y-a.y)*smooth(0,1,t),ground=1.75;
+   return d<15.5?deck:deck+(ground-deck)*smooth(15.5,26,d);
   }
  }
  return null;
@@ -96,18 +106,18 @@ export function spiRouteHeight(x,z){return routeY(x,z)}
 export function isSpiRoute(x,z){return routeY(x,z)!==null}
 
 export function spiLandHeight(x,z){
- const p=SOUTH_PADRE.portIsabel;
- const dx=Math.abs(x-p.center.x),dz=Math.abs(z-p.center.z);
- if(dx<p.halfX&&dz<p.halfZ){
-  const edge=Math.min(p.halfX-dx,p.halfZ-dz);
-  return edge<10?-.9+(p.elevation+.9)*smooth(0,10,edge):p.elevation;
+ const p=SOUTH_PADRE.portIsabel,dx=(x-p.center.x)/p.halfX,dz=(z-p.center.z)/p.halfZ;
+ const angle=Math.atan2(dz,dx),radius=Math.hypot(dx,dz),edgeScale=.98+.025*Math.sin(angle*3+.6)+.015*Math.cos(angle*5-1.1);
+ if(radius<edgeScale){
+  const edge=(edgeScale-radius)*Math.min(p.halfX,p.halfZ);
+  return edge<14?-.9+(p.elevation+.9)*smooth(0,14,edge):p.elevation;
  }
  const shore=shorelineAt(z);
  if(!shore)return null;
  const edge=shore.half-Math.abs(x-shore.center);
  if(edge<=0)return null;
- const elevation=.72+.12*Math.sin(z*.0015);
- return edge<14?-.9+(elevation+.9)*smooth(0,14,edge):elevation;
+ const elevation=2.15+.28*Math.sin(z*.0008);
+ return edge<22?-.9+(elevation+.9)*smooth(0,22,edge):elevation;
 }
 
 export function spiTerrainHeight(x,z){

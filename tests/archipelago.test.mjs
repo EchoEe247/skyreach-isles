@@ -32,8 +32,8 @@ test('Tideglass inlet stays navigable from the open sea',()=>{
 });
 
 test('all regions leave truly long-distance sailing unbounded',()=>{
-  // The enlarged South Padre terrain reaches well past 17k world units; sample beyond every landmass.
-  for(let a=0;a<Math.PI*2;a+=.07)assert.equal(boatCanTravel(Math.cos(a)*30000,Math.sin(a)*30000),true);
+  // The full-scale South Padre terrain reaches past 80k world units; sample far beyond every landmass.
+  for(let a=0;a<Math.PI*2;a+=.07)assert.equal(boatCanTravel(Math.cos(a)*150000,Math.sin(a)*150000),true);
 });
 
 test('Veilwater terrace has a real height drop beneath the waterfall',()=>{

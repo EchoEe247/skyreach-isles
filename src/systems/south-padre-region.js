@@ -8,12 +8,13 @@ function addFallback(group){
  const fallback=new T.Group();fallback.name='SPI loading fallback';group.add(fallback);
  const roadMat=material(0x353b3e),sandMat=material(0xd7c692),townMat=material(0xd6aa86);
  // Port Isabel loading pad.
- const port=new T.Mesh(new T.BoxGeometry(R.portIsabel.halfX*2,.45,R.portIsabel.halfZ*2),townMat);
- port.position.set(R.portIsabel.center.x,R.portIsabel.elevation-.25,R.portIsabel.center.z);fallback.add(port);
+ const outline=new T.Shape();outline.moveTo(-1,-.72);outline.lineTo(.62,-.72);outline.lineTo(1,-.22);outline.lineTo(.74,.72);outline.lineTo(-.72,.86);outline.lineTo(-1,.28);outline.closePath();
+ const port=new T.Mesh(new T.ShapeGeometry(outline),townMat);port.scale.set(R.portIsabel.halfX,R.portIsabel.halfZ,1);port.rotation.x=-Math.PI/2;
+ port.position.set(R.portIsabel.center.x,R.portIsabel.elevation-.2,R.portIsabel.center.z);fallback.add(port);
  // Lightweight causeway deck exactly follows the shared collision centerline.
  for(let i=0;i<R.route.length-1;i++){
   const a=R.route[i],b=R.route[i+1],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz),dy=b.y-a.y;
-  const deck=new T.Mesh(new T.BoxGeometry(len+.8,.7,13),roadMat);
+  const deck=new T.Mesh(new T.BoxGeometry(len+.8,.9,31),roadMat);
   deck.position.set((a.x+b.x)/2,(a.y+b.y)/2-.2,(a.z+b.z)/2);
   deck.rotation.y=-Math.atan2(dz,dx);
   deck.rotation.z=Math.atan2(dy,len);
@@ -31,6 +32,18 @@ function addFallback(group){
  return fallback;
 }
 
+function addContext(group){
+ // Lightweight game-context dressing, not survey-accurate Port Isabel geometry.
+ const dummy=new T.Object3D(),sites=[[-610,-420],[-420,-520],[-170,-480],[120,-505],[390,-430],[610,-285],[-650,260],[-430,490],[-170,520],[130,505],[410,445],[650,250]];
+ const buildings=new T.InstancedMesh(new T.BoxGeometry(24,9,18),material(0xc9b28e),sites.length);
+ sites.forEach(([x,z],i)=>{dummy.position.set(R.portIsabel.center.x+x,6.2,R.portIsabel.center.z+z);dummy.rotation.set(0,i*.23,0);dummy.scale.set(1+(i%3)*.14,1+(i%4)*.08,1);dummy.updateMatrix();buildings.setMatrixAt(i,dummy.matrix)});
+ buildings.instanceMatrix.needsUpdate=true;group.add(buildings);
+ const palmSites=[[-720,-180],[-620,-500],[-380,-650],[-90,-620],[250,-640],[580,-470],[730,-120],[-720,140],[-590,520],[-310,650],[20,620],[330,620],[610,460],[735,130],[-420,40],[430,-20]];
+ const trunks=new T.InstancedMesh(new T.CylinderGeometry(.45,.65,8,6),material(0x7a5a3b),palmSites.length),crowns=new T.InstancedMesh(new T.IcosahedronGeometry(3.2,1),material(0x557b54),palmSites.length);
+ palmSites.forEach(([x,z],i)=>{dummy.position.set(R.portIsabel.center.x+x,5.7,R.portIsabel.center.z+z);dummy.rotation.set(0,i*.8,0);dummy.scale.set(.8,1.2,.8);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);dummy.position.y=11.2;dummy.scale.set(1.5,.65,1.5);dummy.updateMatrix();crowns.setMatrixAt(i,dummy.matrix)});
+ trunks.instanceMatrix.needsUpdate=true;crowns.instanceMatrix.needsUpdate=true;group.add(trunks,crowns);
+}
+
 function regionDistance(position){
  const px=position.x,pz=position.z;
  let best=Math.hypot(px-R.portIsabel.center.x,pz-R.portIsabel.center.z);
@@ -42,7 +55,7 @@ function regionDistance(position){
 
 export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
  const group=new T.Group();group.name='South Padre Island + Port Isabel';scene.add(group);
- const fallback=addFallback(group),modelHolder=new T.Group();modelHolder.name='Uploaded South Padre GLB';group.add(modelHolder);
+ const fallback=addFallback(group),modelHolder=new T.Group();addContext(group);modelHolder.name='Uploaded South Padre GLB';group.add(modelHolder);
  let state='deferred',requested=false,model=null,meshCount=0,triangleCount=0,vegetation=[],jetties=[];
  const loader=new GLTFLoader();
 
@@ -55,6 +68,8 @@ export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
    model.position.set(R.model.position.x,R.model.position.y,R.model.position.z);
    const bridge=model.getObjectByName('Bridge_QueenIsabella');
    if(bridge)bridge.scale.y=R.model.bridgeYScale;
+   const lighthouseParts=['Port_Isabel__concrete','Port_Isabel__lighthouse','Port_Isabel__glass','Port_Isabel__dark'];
+   lighthouseParts.forEach(name=>{const part=model.getObjectByName(name);if(part)part.scale.y=R.model.lighthouseYScale});
    model.updateMatrixWorld(true);
    model.traverse(o=>{
     if(!o.isMesh)return;

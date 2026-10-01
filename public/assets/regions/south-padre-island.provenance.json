@@ -15,22 +15,58 @@
     "approxTriangles": 724219
   },
   "integration": {
-    "horizontalScale": 0.5,
-    "verticalScale": 0.5,
+    "humanRelativeScale": 1.5,
+    "horizontalScale": 1.5,
+    "verticalScale": 1.5,
     "translation": [
-      3668.814453125,
+      9990.443359375,
       0,
-      188.13
+      564.39
     ],
+    "sourceAnchor": [
+      -5193.62890625,
+      -376.26
+    ],
+    "humanScaleRationale": "1.5 world units per source meter; 2.8-unit Nightweaver visual approximates a 1.85-1.9 m adult.",
+    "officialCausewayReference": {
+      "organization": "WJE",
+      "lengthMiles": 2.4,
+      "widthFeet": 68,
+      "deckHeightFeet": 78,
+      "realPeakMeters": 23.8,
+      "worldPeakHeight": 35.7,
+      "sourceAsphaltPcaLengthMeters": 3813.76,
+      "sourceAsphaltWidthMeters": [
+        17.5,
+        18.5
+      ],
+      "sourceConcreteWidthMeters": [
+        19.1,
+        20.15
+      ]
+    },
+    "lighthouseReference": {
+      "organization": "Texas Historical Commission",
+      "heightFeet": 72,
+      "realHeightMeters": 21.95,
+      "sourceHeightMeters": 25.83,
+      "yCorrection": 0.8497862942
+    },
     "waterMesh": "hidden; Skyreach animated ocean remains authoritative",
-    "performance": "lazy-loaded near South Padre; 0.50 uniform model scale enlarges Port Isabel/roads/buildings/island; bridge keeps a separate vertical correction; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
+    "performance": "lazy-loaded near SPI; 1.50 human-relative uniform scale; bridge Y correction 23.8/26.43; lighthouse-only Y correction 21.95/25.83; local visibility radius 18000; clear-weather SPI fog extends to 18000; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
     "autoLowMediumApproxVisibleTriangles": 291478,
     "culledSourceTriangles": {
       "water": 78803,
       "vegetation": 297598,
       "jetties": 56340
     },
-    "bridgeVerticalScale": 1.800984,
-    "portIsabelVehicle": "Dedicated boardable sports car parked at Port Isabel causeway start; Explore points to the car."
+    "bridgeVerticalScale": 0.9004918577,
+    "portIsabelVehicle": "Dedicated boardable sports car visual/fallback scaled 1.5; holder and marker remain unscaled; parked at Port Isabel road start facing the continuous causeway route; Explore points to the car.",
+    "contextDressing": "Instanced low-rise fillers and palms are illustrative game context, not survey-accurate geometry.",
+    "worldAnchor": [
+      2200,
+      0
+    ],
+    "anchorNote": "Full-scale Port Isabel is offset east to avoid overlap with the original Skyreach island; internal source geometry and causeway alignment are preserved."
   }
 }
