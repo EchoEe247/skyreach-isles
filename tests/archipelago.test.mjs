@@ -31,8 +31,9 @@ test('Tideglass inlet stays navigable from the open sea',()=>{
   assert.ok(terrainHeight(c.x,c.z)>3);
 });
 
-test('all islands leave long-distance sailing unbounded',()=>{
-  for(let a=0;a<Math.PI*2;a+=.07)assert.equal(boatCanTravel(Math.cos(a)*3000,Math.sin(a)*3000),true);
+test('all regions leave truly long-distance sailing unbounded',()=>{
+  // South Padre now extends to roughly 4.4k world units from origin; sample well beyond every landmass.
+  for(let a=0;a<Math.PI*2;a+=.07)assert.equal(boatCanTravel(Math.cos(a)*7000,Math.sin(a)*7000),true);
 });
 
 test('Veilwater terrace has a real height drop beneath the waterfall',()=>{

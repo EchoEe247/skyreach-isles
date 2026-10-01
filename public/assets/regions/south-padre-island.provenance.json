@@ -1,0 +1,34 @@
+{
+  "asset": "south-padre-island.glb",
+  "title": "South Padre Island Texas",
+  "source": "User-provided file South_Padre_Island_Texas.glb",
+  "license": "User-provided asset; repository does not assert third-party reuse rights.",
+  "sha256": "3b76f4ff571914e727ba34763642e3dec165a1d3cb18c12540773e1b3947b251",
+  "bytes": 28363044,
+  "gltf": {
+    "version": 2,
+    "nodes": 132,
+    "meshes": 111,
+    "materials": 34,
+    "embeddedImages": 8,
+    "animations": 0,
+    "approxTriangles": 724219
+  },
+  "integration": {
+    "horizontalScale": 0.08,
+    "verticalScale": 0.9005,
+    "translation": [
+      1487.4903125,
+      0,
+      30.1008
+    ],
+    "waterMesh": "hidden; Skyreach animated ocean remains authoritative",
+    "performance": "lazy-loaded near South Padre; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
+    "autoLowMediumApproxVisibleTriangles": 291478,
+    "culledSourceTriangles": {
+      "water": 78803,
+      "vegetation": 297598,
+      "jetties": 56340
+    }
+  }
+}

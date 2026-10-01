@@ -1,34 +1,105 @@
 import * as T from 'three';
-import {SOUTH_PADRE as R,spiLandHeight} from '../core/south-padre.js';
-import {terrainHeight} from '../core/world.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {SOUTH_PADRE as R,spiLandHeight,spiRouteHeight} from '../core/south-padre.js';
 
-export function createSouthPadreRegion(scene,obstacles){
+const material=(color)=>new T.MeshLambertMaterial({color,flatShading:true});
+
+function addFallback(group){
+ const fallback=new T.Group();fallback.name='SPI loading fallback';group.add(fallback);
+ const roadMat=material(0x353b3e),sandMat=material(0xd7c692),townMat=material(0xd6aa86);
+ // Port Isabel loading pad.
+ const port=new T.Mesh(new T.BoxGeometry(R.portIsabel.halfX*2,.45,R.portIsabel.halfZ*2),townMat);
+ port.position.set(R.portIsabel.center.x,R.portIsabel.elevation-.25,R.portIsabel.center.z);fallback.add(port);
+ // Lightweight causeway deck exactly follows the shared collision centerline.
+ for(let i=0;i<R.route.length-1;i++){
+  const a=R.route[i],b=R.route[i+1],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz),dy=b.y-a.y;
+  const deck=new T.Mesh(new T.BoxGeometry(len+.8,.7,13),roadMat);
+  deck.position.set((a.x+b.x)/2,(a.y+b.y)/2-.2,(a.z+b.z)/2);
+  deck.rotation.y=-Math.atan2(dz,dx);
+  deck.rotation.z=Math.atan2(dy,len);
+  fallback.add(deck);
+ }
+ // Very cheap island ribbon so the route stays visually grounded while the GLB streams.
+ const points=R.shoreline,geo=new T.BufferGeometry(),verts=[],idx=[];
+ for(let i=0;i<points.length;i++){
+  const [z,c,h]=points[i],y=Math.max(.1,spiLandHeight(c,z)??.8)-.15;
+  verts.push(c-h,y,z,c+h,y,z);
+  if(i){const k=i*2;idx.push(k-2,k-1,k,k-1,k+1,k)}
+ }
+ geo.setAttribute('position',new T.Float32BufferAttribute(verts,3));geo.setIndex(idx);geo.computeVertexNormals();
+ const ribbon=new T.Mesh(geo,sandMat);fallback.add(ribbon);
+ return fallback;
+}
+
+function regionDistance(position){
+ const px=position.x,pz=position.z;
+ if(px>=480&&px<=1700&&pz<=330&&pz>=-4700)return 0;
+ return Math.hypot(px-R.portIsabel.center.x,pz-R.portIsabel.center.z);
+}
+
+export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
  const group=new T.Group();group.name='South Padre Island + Port Isabel';scene.add(group);
- const mats={road:new T.MeshLambertMaterial({color:0x343b40}),sand:new T.MeshLambertMaterial({color:0xd6c493,flatShading:true}),town:new T.MeshLambertMaterial({color:0xe8b995,flatShading:true}),roof:new T.MeshLambertMaterial({color:0x934f42,flatShading:true}),white:new T.MeshLambertMaterial({color:0xf3eee0}),red:new T.MeshLambertMaterial({color:0xc83d32}),green:new T.MeshLambertMaterial({color:0x54a66a,flatShading:true}),trunk:new T.MeshLambertMaterial({color:0x77563a})};
- const box=(w,h,d,x,y,z,m)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;group.add(o);return o};
- // Detailed continuous mainland/island ground patch, sampled from shared collision heights.
- const geo=new T.PlaneGeometry(1100,250,220,50);geo.rotateX(-Math.PI/2);const a=geo.attributes.position,col=[];
- for(let i=0;i<a.count;i++){const x=a.getX(i)+1450,z=a.getZ(i),landH=spiLandHeight(x,z),h=landH??-8;a.setXYZ(i,x,h,z);const c=new T.Color(h<0?0xd6c493:h<3?0xd6c493:0x5da66a);col.push(c.r,c.g,c.b)}
- geo.setAttribute('color',new T.Float32BufferAttribute(col,3));geo.computeVertexNormals();const land=new T.Mesh(geo,new T.MeshLambertMaterial({vertexColors:true,flatShading:true}));land.receiveShadow=true;group.add(land);
- // Causeway deck follows the analytic route profile; overlapping spans avoid gaps at ramps.
- const dummy=new T.Object3D(),points=R.route,span=points.at(-1).x-points[0].x,deckGeo=new T.BoxGeometry(span/120+1,.75,14),deckMesh=new T.InstancedMesh(deckGeo,mats.road,121),piers=new T.InstancedMesh(new T.BoxGeometry(2,1,2),new T.MeshLambertMaterial({color:0x737b7b}),32);let decks=0,pierCount=0;
- for(let n=0;n<=120;n++){const x=points[0].x+span*n/120,y=terrainHeight(x,0);dummy.position.set(x,y,0);dummy.updateMatrix();deckMesh.setMatrixAt(decks++,dummy.matrix);if(y>4&&n%4===0){dummy.position.set(x,y/2,0);dummy.scale.set(1,y,1);dummy.updateMatrix();piers.setMatrixAt(pierCount++,dummy.matrix);dummy.scale.set(1,1,1)}}
- deckMesh.count=decks;piers.count=pierCount;group.add(deckMesh,piers);
- // Port Isabel's compact waterfront town, repeated geometry batched by InstancedMesh.
- const houseGeo=new T.BoxGeometry(1,1,1),roofGeo=new T.ConeGeometry(1,1,4),houses=[];
- for(let row=0;row<5;row++)for(let col=0;col<7;col++){const x=R.portIsabel.center.x-44+col*14,z=-38+row*19;if(Math.abs(z)<10)continue;const w=7+(row+col)%3,h=5+(col%3)*1.3,d=8;houses.push({x,z,w,h,d});}
- const buildings=new T.InstancedMesh(houseGeo,mats.town,houses.length),roofMesh=new T.InstancedMesh(roofGeo,mats.roof,houses.length);
- houses.forEach((v,i)=>{dummy.position.set(v.x,2.2+v.h/2,v.z);dummy.scale.set(v.w,v.h,v.d);dummy.updateMatrix();buildings.setMatrixAt(i,dummy.matrix);dummy.position.set(v.x,2.2+v.h+.7,v.z);dummy.scale.set(v.w*.72,1.4,v.d*.72);dummy.rotation.set(0,Math.PI/4,0);dummy.updateMatrix();roofMesh.setMatrixAt(i,dummy.matrix);obstacles.push({x:v.x,z:v.z,r:Math.max(v.w,v.d)*.7})});
- buildings.castShadow=roofMesh.castShadow=true;group.add(buildings,roofMesh);
- // Iconic Port Isabel lighthouse: white/red tapered low-poly bands and lantern.
- const tower=new T.Group();tower.position.set(R.lighthouse.x,2.2,R.lighthouse.z);group.add(tower);
- for(let n=0;n<5;n++){const m=new T.Mesh(new T.CylinderGeometry(3.1-n*.25,3.35-n*.25,5.2,10),mats.white);m.position.y=2.6+n*5.1;m.castShadow=true;tower.add(m)}
- const lantern=new T.Mesh(new T.CylinderGeometry(1.8,2,2,8),new T.MeshLambertMaterial({color:0x39464b}));lantern.position.y=29;tower.add(lantern);const lamp=new T.Mesh(new T.SphereGeometry(1,8,6),new T.MeshBasicMaterial({color:0xffe79a}));lamp.position.y=29;tower.add(lamp);obstacles.push({x:R.lighthouse.x,z:R.lighthouse.z,r:4});
- // Dense south-city blocks taper into a sparse protected northern dune/wetland landscape.
- const city=[];for(let row=0;row<6;row++)for(let col=0;col<5;col++){const x=1660+col*17,z=-40+row*16;if(x>1815)continue;const h=6+(row+col)%5*2;city.push({x,z,h})}
- const cityMesh=new T.InstancedMesh(houseGeo,mats.town,city.length),cityRoofMesh=new T.InstancedMesh(houseGeo,mats.roof,city.length);city.forEach((v,i)=>{dummy.position.set(v.x,2.5+v.h/2,v.z);dummy.scale.set(10,v.h,9);dummy.updateMatrix();cityMesh.setMatrixAt(i,dummy.matrix);dummy.position.set(v.x,2.5+v.h+.5,v.z);dummy.scale.set(10.7,1,9.7);dummy.updateMatrix();cityRoofMesh.setMatrixAt(i,dummy.matrix)});group.add(cityMesh,cityRoofMesh);
- const palmGeo=new T.ConeGeometry(2.3,5,5),palmLeaves=new T.IcosahedronGeometry(3,0),trunks=new T.InstancedMesh(new T.CylinderGeometry(.35,.48,5,5),mats.trunk,42),leaves=new T.InstancedMesh(palmLeaves,mats.green,42);let count=0;
- for(let i=0;i<42;i++){const x=1515+(i%7)*44,z=-42+Math.floor(i/7)*17;if(x>1830&&i%3)continue;const y=terrainHeight(x,z);dummy.position.set(x,y+2.5,z);dummy.updateMatrix();trunks.setMatrixAt(count,dummy.matrix);dummy.position.set(x,y+6,z);dummy.scale.set(1.5,1,1.5);dummy.updateMatrix();leaves.setMatrixAt(count++,dummy.matrix)}
- trunks.count=leaves.count=count;group.add(trunks,leaves);palmGeo.dispose();
- let visible=true;return {group,update({position}){const near=Math.hypot(position.x-1450,position.z)<1000;if(near!==visible){visible=near;group.visible=near}},status(){return {visible:group.visible,buildings:houses.length,routeSegments:R.route.length-1,destination:R.destination.name}}};
+ const fallback=addFallback(group),modelHolder=new T.Group();modelHolder.name='Uploaded South Padre GLB';group.add(modelHolder);
+ let state='deferred',requested=false,model=null,meshCount=0,triangleCount=0,vegetation=[],jetties=[];
+ const loader=new GLTFLoader();
+
+ function requestModel(){
+  if(requested)return;requested=true;state='loading';
+  loader.load(new URL(R.model.path,document.baseURI).href,gltf=>{
+   model=gltf.scene;
+   model.name='South Padre Island Texas — user supplied';
+   model.scale.set(R.model.scale.x,R.model.scale.y,R.model.scale.z);
+   model.position.set(R.model.position.x,R.model.position.y,R.model.position.z);
+   model.updateMatrixWorld(true);
+   model.traverse(o=>{
+    if(!o.isMesh)return;
+    meshCount++;
+    const pos=o.geometry?.getAttribute?.('position'),index=o.geometry?.index;
+    triangleCount+=index?index.count/3:(pos?pos.count/3:0);
+    o.castShadow=false;o.receiveShadow=false;
+    const n=o.name||'';
+    if(n.startsWith('Water'))o.visible=false; // use Skyreach's animated ocean instead of a duplicate flat ocean.
+    if(n.startsWith('Vegetation'))vegetation.push(o);
+    if(n.startsWith('Jetties'))jetties.push(o);
+    if(o.material){
+     const mats=Array.isArray(o.material)?o.material:[o.material];
+     for(const m of mats){if(m){m.side=T.FrontSide;if(m.emissiveIntensity>2)m.emissiveIntensity=2}}
+    }
+   });
+   modelHolder.add(model);fallback.visible=false;state='ready';
+   onToast('South Padre Island loaded · Port Isabel → causeway → island is ready to drive.',3500);
+  },undefined,e=>{
+   console.warn('South Padre GLB failed; using route fallback',e);state='fallback';fallback.visible=true;
+   onToast('South Padre detailed model could not load. Drive route fallback remains available.',4200);
+  });
+ }
+
+ let visible=true,lastDetail=null;
+ return {
+  group,
+  update({position,quality='auto'}){
+   const distance=regionDistance(position),near=distance<R.model.visibilityRadius;
+   if(near!==visible){visible=near;group.visible=near}
+   if(distance<R.model.loadRadius)requestModel();
+   if(model&&state==='ready'){
+    // The uploaded source is 724k triangles. On Auto/Low/Medium we retain the exact
+    // terrain, Port Isabel, roads, bridge, buildings and landmarks while culling its
+    // heaviest repeated vegetation and jetty decoration. High restores them.
+    const full=quality==='high';
+    if(full!==lastDetail){
+     vegetation.forEach(o=>o.visible=full);
+     jetties.forEach(o=>o.visible=full);
+     lastDetail=full;
+    }
+   }
+  },
+  preload:requestModel,
+  status(){return {
+   state,visible:group.visible,source:R.model.path,sourceSha256:R.model.sourceSha256,
+   meshCount,triangleCount,vegetationMeshes:vegetation.length,jettiesMeshes:jetties.length,
+   fallbackVisible:fallback.visible,routeSegments:R.route.length-1,
+   destination:R.destination.name,port:R.portDestination.name,
+   bridgePeak:R.causeway.peakHeight
+  }}
+ };
 }
