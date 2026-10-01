@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, fly the airliner through sky rings, launch NASA's SLS continuously from Earth to the Moon, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, pilot a diving submarine, fly the airliner through sky rings, launch NASA's SLS continuously from Earth to the Moon, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -12,7 +12,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
 
-Tap **Explore** (or press **M**) to chart a destination, locate your speedboat, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+Tap **Explore** (or press **M**) to chart a destination, locate your speedboat or submarine, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 
@@ -33,6 +33,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
 - Detailed user-supplied sports car for the player and color-varied town traffic
 - Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
+- Playable user-supplied Abyss submarine with separate Boost, Dive, and Surface controls, live depth telemetry, seabed-aware movement, underwater camera support, and a live Explore-map locator
 - Detailed airliner using the existing flight controls and physics
 - Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere, across the 100 km Karman line, through interbody space, and down to the Moon
 - Six beacon objectives and eight airborne rings
@@ -74,6 +75,8 @@ The player car and four town traffic cars use `public/assets/vehicles/sports_car
 
 The boat uses `public/assets/boats/speedboat.glb` at its source scale. The source bow points along +X, so the visual is rotated -90° around Y to match Skyreach's +Z vehicle-forward convention. Existing boarding distance, steering, water movement, speed, dock placement, and camera behavior are unchanged. Shorelines of the home island and three offshore islands are collidable, as are the sea-arch pillars. Open ocean has no artificial coordinate boundary. The procedural boat is retained only as a load-failure fallback.
 
+The submarine uses the user-supplied `public/assets/vehicles/submarine.glb`, normalized at runtime to the game's vehicle scale. It starts offshore in water deep enough to move immediately while remaining reachable from the home island. The left stick handles forward/reverse and steering, **Boost** increases propulsion, **Dive** descends, and **Surface** rises. The depth limiter follows the local seafloor and blocks forward movement before the hull would intersect terrain. Explore includes a live **Find my submarine** course and chart marker. A lightweight procedural submarine remains only as a model-load fallback.
+
 The airplane uses `public/assets/aircraft/airliner.glb` at 30% source scale. Its +Z nose orientation matches Skyreach's existing flight rig, so the established flight controls and physics remain unchanged. The procedural airplane is retained only as a load-failure fallback.
 
 The rocket uses NASA's official `Space Launch System (SLS) Block 1.stl` at `public/assets/space/nasa-sls-block1.stl`. Skyreach normalizes orientation/scale, removes only the STL's large printable display plinth so it does not fly with the vehicle, and applies the recognizable orange-core/white-booster presentation in Three.js. A procedural SLS-shaped fallback remains available only if the STL fails to load. `public/assets/space/nasa-blue-marble-2048.png` provides the NASA Earth texture used for the high-altitude view. Provenance metadata is stored beside both NASA assets.
@@ -112,7 +115,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 Current master verification after the full space-stack remediation:
 
-- **75/75 Node tests pass**.
+- **78/78 Node tests pass on a clean committed tree**.
 - npm run build passes. The game-owned JS is split to ~107 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.

@@ -12,6 +12,7 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 .b{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--cream);touch-action:none;text-align:center}
 #act{right:22px;bottom:calc(150px + env(safe-area-inset-bottom,0px));width:76px;height:76px;background:rgba(56,182,196,.75)}
 #jump{right:112px;bottom:calc(52px + env(safe-area-inset-bottom,0px));width:68px;height:68px}
+#dive{display:none;right:112px;bottom:calc(132px + env(safe-area-inset-bottom,0px));width:68px;height:68px;background:rgba(38,126,170,.78)}
 #boost{right:22px;bottom:calc(40px + env(safe-area-inset-bottom,0px));width:76px;height:76px;background:rgba(255,179,71,.75);color:var(--ink)}
 #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:radial-gradient(circle at 50% 70%,rgba(255,140,60,.55),rgba(20,24,58,.93) 70%);z-index:9}
 #start h1{font:italic 700 clamp(44px,12vw,96px)/1 "Iowan Old Style",Palatino,Georgia,serif;margin:0 0 14px;color:var(--cream)}

@@ -20,3 +20,14 @@ export function boatCanTravel(x,z){
   if([-1,1].some(side=>Math.hypot(x-(falls.x-148),z-(falls.z+15+side*16))<7.5))return false;
   return terrainHeight(x,z)<=-.7;
 }
+
+export function submarineMaxDepth(x,z,seabedClearance=1.25){
+  const floor=terrainHeight(x,z);
+  return Math.max(.45,Math.min(28,-floor-Math.max(.5,seabedClearance)));
+}
+
+export function submarineCanTravel(x,z,depth=.45,seabedClearance=.55){
+  if(!boatCanTravel(x,z))return false;
+  const floor=terrainHeight(x,z),centerY=-Math.max(.45,depth);
+  return centerY>=floor+Math.max(.5,seabedClearance);
+}

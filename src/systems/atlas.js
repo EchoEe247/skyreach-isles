@@ -31,9 +31,13 @@ export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
     btn.innerHTML='<span class="atlas-number">'+String(n+1).padStart(2,'0')+'</span><span><strong>'+p.name+'</strong><small>'+(p.description||'A familiar landmark on the home island.')+'</small><em>'+(isNew?'OFFSHORE · LAND & EXPLORE':'HOME ISLAND')+'</em></span>';
     btn.onclick=()=>{onSelect(p);close();};entries.append(btn);return btn;
   });
-  const boatBtn=document.createElement('button');boatBtn.type='button';boatBtn.className='atlas-place atlas-boat';
-  boatBtn.innerHTML='<span class="atlas-number">↗</span><span><strong>Find my speedboat</strong><small>Plot a course to wherever you last left it.</small></span>';
-  boatBtn.onclick=()=>{const boat=vehicles.find(v=>v.type==='boat');onSelect({name:'Your speedboat',get x(){return boat.g.position.x},get z(){return boat.g.position.z}});close()};entries.prepend(boatBtn);
+  const addVehicleLocator=(type,title,description,icon)=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='atlas-place atlas-vehicle atlas-'+type;
+    btn.innerHTML='<span class="atlas-number">'+icon+'</span><span><strong>'+title+'</strong><small>'+description+'</small></span>';
+    btn.onclick=()=>{const vehicle=vehicles.find(v=>v.type===type);if(!vehicle)return;onSelect({name:title.replace('Find my ','Your '),vehicleType:type,get x(){return vehicle.g.position.x},get z(){return vehicle.g.position.z}});close()};entries.prepend(btn);return btn;
+  };
+  addVehicleLocator('submarine','Find my submarine','Plot a live course to the Abyss submarine, wherever you last left it.','▽');
+  addVehicleLocator('boat','Find my speedboat','Plot a course to wherever you last left it.','↗');
   function close(){panel.hidden=true;onOpen(false);toggle.focus()}
   function open(){panel.hidden=false;onOpen(true);cards.forEach((c,n)=>c.classList.toggle('visited',!!listed[n].on));destinationCards.forEach((c,n)=>c.classList.toggle('selected',destinations[n]===lastTarget));draw(lastPosition,lastTarget);panel.querySelector('.atlas-close').focus()}
   toggle.onclick=()=>panel.hidden?open():close();
@@ -64,6 +68,11 @@ export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
       const[x,y]=point(p);ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle=p===target?'#ffd487':'#ff9b38';ctx.fillRect(-4,-4,8,8);ctx.restore();
       ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffd7a0';ctx.fillText(p.shortName||p.name,x,y-13);
     }
+    for(const v of vehicles){
+      if(v.type!=='boat'&&v.type!=='submarine')continue;
+      const[x,y]=point(v.g.position),selected=target?.vehicleType===v.type;ctx.fillStyle=selected?'#ffd487':v.type==='submarine'?'#69aef5':'#6fe7f1';ctx.beginPath();ctx.arc(x,y,selected?6:4,0,Math.PI*2);ctx.fill();
+      ctx.font='700 9px system-ui';ctx.textAlign='center';ctx.fillStyle=v.type==='submarine'?'#a9d1ff':'#aef8ff';ctx.fillText(v.type==='submarine'?'SUB':'BOAT',x,y-10);
+    }
     const[x,y]=point(position);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
   }
   return {
@@ -75,7 +84,7 @@ export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
       const pt=p=>[(p.x-position.x)/span*size+60,(p.z-position.z)/span*size+60];
       for(const p of places){const[x,y]=pt(p);context.fillStyle=p.on?'#aac8b5':'#e7cc8d';context.fillRect(x-2,y-2,4,4)}
       for(const p of destinations){const[x,y]=pt(p);context.fillStyle='#ff9b38';context.save();context.translate(x,y);context.rotate(Math.PI/4);context.fillRect(-3,-3,6,6);context.restore()}
-      for(const v of vehicles){const[x,y]=pt(v.g.position);context.fillStyle=v.type==='boat'?'#6fe7f1':v.type==='car'?'#ef7556':v.type==='rocket'?'#ff9b38':'#f5d27a';context.fillRect(x-2,y-2,4,4)}
+      for(const v of vehicles){const[x,y]=pt(v.g.position);context.fillStyle=v.type==='boat'?'#6fe7f1':v.type==='submarine'?'#69aef5':v.type==='car'?'#ef7556':v.type==='rocket'?'#ff9b38':'#f5d27a';context.fillRect(x-2,y-2,4,4)}
       for(const marker of markers){if(marker.on)continue;const[x,y]=pt(marker);context.fillStyle=marker.color||'#8ff7ff';context.beginPath();context.arc(x,y,2,0,Math.PI*2);context.fill()}
       if(target){
         let[x,y]=pt(target);const dx=x-60,dy=y-60,r=Math.hypot(dx,dy);
