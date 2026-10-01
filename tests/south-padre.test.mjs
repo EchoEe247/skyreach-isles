@@ -19,6 +19,17 @@ test('uploaded SPI model contains Port Isabel, Queen Isabella bridge, roads and 
   assert.ok((gltf.meshes||[]).length>=100);
 });
 
+test('SPI visual scale is believable relative to player and vehicles',()=>{
+  assert.equal(SOUTH_PADRE.model.scale.x,.32);
+  assert.equal(SOUTH_PADRE.model.scale.y,.32);
+  assert.equal(SOUTH_PADRE.model.scale.z,.32);
+  assert.ok(SOUTH_PADRE.model.bridgeYScale>2.5);
+  const route=SOUTH_PADRE.route;
+  const span=Math.hypot(route.at(-1).x-route[0].x,route.at(-1).z-route[0].z);
+  assert.ok(span>1500,'Port Isabel to Padre Boulevard drive should no longer be miniature');
+  assert.ok(SOUTH_PADRE.portIsabel.halfX>=200&&SOUTH_PADRE.portIsabel.halfZ>=180);
+});
+
 test('SPI road route is continuous from Port Isabel across the raised causeway to Padre Boulevard',()=>{
   const route=SOUTH_PADRE.route;
   assert.ok(route.length>=9);

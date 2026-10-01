@@ -33,8 +33,10 @@ function addFallback(group){
 
 function regionDistance(position){
  const px=position.x,pz=position.z;
- if(px>=480&&px<=1700&&pz<=330&&pz>=-4700)return 0;
- return Math.hypot(px-R.portIsabel.center.x,pz-R.portIsabel.center.z);
+ let best=Math.hypot(px-R.portIsabel.center.x,pz-R.portIsabel.center.z);
+ best=Math.min(best,Math.hypot(px-R.destination.x,pz-R.destination.z));
+ for(const [z,c] of R.shoreline)best=Math.min(best,Math.hypot(px-c,pz-z));
+ return best;
 }
 
 export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
@@ -50,6 +52,8 @@ export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
    model.name='South Padre Island Texas — user supplied';
    model.scale.set(R.model.scale.x,R.model.scale.y,R.model.scale.z);
    model.position.set(R.model.position.x,R.model.position.y,R.model.position.z);
+   const bridge=model.getObjectByName('Bridge_QueenIsabella');
+   if(bridge)bridge.scale.y=R.model.bridgeYScale;
    model.updateMatrixWorld(true);
    model.traverse(o=>{
     if(!o.isMesh)return;

@@ -15,20 +15,21 @@
     "approxTriangles": 724219
   },
   "integration": {
-    "horizontalScale": 0.08,
-    "verticalScale": 0.9005,
+    "horizontalScale": 0.32,
+    "verticalScale": 0.32,
     "translation": [
-      1487.4903125,
+      2733.96125,
       0,
-      30.1008
+      120.4032
     ],
     "waterMesh": "hidden; Skyreach animated ocean remains authoritative",
-    "performance": "lazy-loaded near South Padre; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
+    "performance": "lazy-loaded near South Padre; uniform 0.32 model scale fixes player/car/building proportions; bridge keeps a separate vertical correction; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
     "autoLowMediumApproxVisibleTriangles": 291478,
     "culledSourceTriangles": {
       "water": 78803,
       "vegetation": 297598,
       "jetties": 56340
-    }
+    },
+    "bridgeVerticalScale": 2.8140625
   }
 }
