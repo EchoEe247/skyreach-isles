@@ -34,7 +34,7 @@ New world modules:
 - src/systems/island-scenery.js: island meshes, instanced vegetation/rocks/paths, ruins, jetty, waterfall, surf, dolphins, fireflies and pooled wakes.
 - src/systems/living-world.js: rain particles, event manifestations/resolution state, and ambient ferry traffic.
 - src/systems/atlas.js and src/atlas.css: chart, field notes, course selection and scrolling radar.
-- src/systems/multiverse-isle.js: Nexus Isle portal hub, three transformable original homage characters, realm-specific movement, platform surfaces, ring collection, smash interactions, and return-to-Nightweaver flow.
+- src/systems/multiverse-isle.js: Nexus Isle portal hub, three transformable original homage characters, transformation FX, vertical-aware platform grounding, Jump checkpoints/sweep hazards, ordered timed Velocity rings/boost pads/checkpoints, Breaker cabinets/patrolling guards/combo scoring, realm recovery, and return-to-Nightweaver flow.
 
 ## State and persistence
 
