@@ -6,7 +6,7 @@
 
 Enrich Skyreach Isles in one coordinated pass using selected free assets that fit the existing world. Asset packs are source libraries, not content dumps. Only pieces that improve a specific location, interaction, or visual gap are imported.
 
-This document records the September 30 enrichment baseline. That baseline included the sports car/traffic, speedboat, airliner, NASA SLS, offshore islands, weather, NPC schedules, audio, exploration objectives, and the 9-minute-day / 3-minute-night cycle. The later maintained build additionally includes continuous Earth-Moon flight, lunar terrain, and two user-provided boardable alien spacecraft; those later systems are documented in README.md and docs/ARCHITECTURE.md.
+This document records the September 30 enrichment baseline. That baseline included the sports car/traffic, speedboat, airliner, NASA SLS, offshore islands, weather, NPC schedules, audio, exploration objectives, and the 9-minute-day / 3-minute-night cycle. The later maintained build additionally includes continuous Earth-Moon flight, streamed lunar terrain, NASA LRO/LOLA Moon data, and two user-provided boardable alien spacecraft; those later systems are documented in README.md and docs/ARCHITECTURE.md.
 
 Current asset-rights status, including user-provided models whose third-party redistribution terms are not yet independently confirmed, is tracked in [ASSET-RIGHTS.md](ASSET-RIGHTS.md).
 

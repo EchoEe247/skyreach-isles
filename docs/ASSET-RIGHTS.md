@@ -4,7 +4,8 @@ Skyreach Isles is a public repository, so source provenance and redistribution r
 
 ## Rights documented
 
-- NASA SLS and Blue Marble provenance are recorded under `public/assets/space/`.
+- NASA SLS, the Blender-derived mobile SLS, Blue Marble, and NASA CGI Moon Kit LRO/LOLA assets have provenance recorded under `public/assets/space/`. The mobile SLS remains derived from the preserved original NASA geometry.
+- NASA Moon imagery/elevation provenance and source URLs are recorded in `public/assets/space/moon-provenance.json`.
 - The curated environment/animal pass uses Quaternius assets recorded as CC0 in the environment manifest and bundled license text.
 - Generated/procedural repository-authored visuals do not depend on a third-party model license.
 

@@ -94,7 +94,7 @@ The spacecraft HUD adds **TARGET**, **AUTO NAV**, and **TIME** controls. A cyan 
 
 Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB. The SLS STL and NASA Earth texture are deferred until the rocket is used, and the alien GLBs are deferred until Moon travel/boarding makes them relevant, reducing initial network and main-thread work.
 
-Earth return is bidirectional for the SLS: TARGET EARTH + AUTO NAV guides back to the original launch-site corridor, then hands the rocket continuously back to the atmospheric model near 10 km altitude for manual braking/descent and normal ground exit. Moon walking is bounded to the rendered local terrain patch so the player cannot walk onto invisible collision ground.
+Earth return is bidirectional for every spacecraft. TARGET EARTH + AUTO NAV guides toward the original Earth return corridor; the SLS can hand continuously back to the atmospheric model as high as 85 km inside its reentry envelope, while alien craft use their own lower-speed atmospheric handoff. Ground contact now distinguishes controlled landing from destructive impact. Lunar terrain recenters deterministically around off-site landings and walking, so Moon exploration is no longer confined to a fixed local patch.
 
 ## World and audio systems
 
@@ -110,10 +110,10 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-Current master verification after the Claude-audit repair pass:
+Current master verification after the full space-stack remediation:
 
 - **70/70 Node tests pass**.
-- npm run build passes. The game-owned JS is split to ~97 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
+- npm run build passes. The game-owned JS is split to ~107 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.
 - Local development serving returns HTTP 200.
@@ -191,13 +191,17 @@ public/
       urban/
     space/
       nasa-sls-block1.stl
+      nasa-sls-block1-mobile.stl
       nasa-blue-marble-2048.png
+      nasa-lroc-moon-2k.jpg
+      nasa-lola-moon-dem-1k.jpg
       provenance.json
+      earth-provenance.json
+      moon-provenance.json
       alien/
         alien_spaceship.glb
         alien_ship.glb
         provenance.json
-      earth-provenance.json
   manifest.webmanifest
   sw.js
   icons/
@@ -214,6 +218,8 @@ tests/
   environment-assets.test.mjs
   exploration.test.mjs
   living-world.test.mjs
+  moon.test.mjs
+  sls-mobile.test.mjs
   spaceflight.test.mjs
   storage.test.mjs
   vehicle-asset.test.mjs
@@ -226,6 +232,7 @@ docs/
   ASSET-RIGHTS.md
   CURATED-ASSETS.md
   LIVING-ISLES.md
+  SPACE-REMEDIATION.md
   WORLD-EXPANSION.md
 ```
 

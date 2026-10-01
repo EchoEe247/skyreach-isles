@@ -165,12 +165,16 @@ The current Node test suite covers:
 - weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
 - deterministic rocket ascent, atmosphere-density decay, altitude-dependent Earth gravity, invertible render-altitude mapping, and Kármán-line space blending
 - launch-site-preserving Earth return/reentry state and Moon-to-Earth cruise corridor
+- destructive versus controlled lunar/terrestrial impact semantics
+- celestial SAS damping versus inertial SAS-off steering and manual high-warp limiting
+- streamed lunar terrain recentering plus 1.62 m/s² lunar walking gravity
+- vacuum-specific SLS/alien audio behavior and the optimized 55k-triangle SLS asset envelope
 
 ## Current verification status
 
-As of the current Earth-Moon audit-repair build, the repository test suite is **70/70 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
+As of the current full space-remediation build, the repository test suite is **70/70 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
 
-Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, lunar-site projection, render-distance compression, safe warp limits, physical Moon-cruise interception, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
+Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, streamed lunar terrain, impact/crash thresholds, celestial SAS/manual divergence, manual-warp safety, physical Moon/Earth AUTO NAV interception, vacuum spacecraft audio, the mobile SLS derivative, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
 
 The deterministic transfer test verifies a physical Moon intercept rather than a teleport. Headless Termux Chromium is not accepted as visual evidence for the current space build because its EGL/WebGL path fails to initialize; native/mobile visual QA remains a rendered-session concern.
 
