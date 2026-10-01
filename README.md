@@ -97,7 +97,7 @@ The main island now contains a compressed but complete LAX airport footprint in 
 
 The existing player airliner is relocated to Runway 24R and keeps the established aircraft physics. **Explore** now exposes both **LAX International Airport** and **Find my airplane**, so the aircraft remains discoverable after the player lands elsewhere.
 
-The player visual is now `public/assets/characters/nightweaver_LOD0.glb`. The source contains 104 meshes, roughly 166k triangles, six materials, and embedded textures. It is normalized to **2.8 world units tall**, slightly taller than the procedural NPC range, while retaining the existing player collision radius and camera behavior. Because the supplied asset has no skeletal animation clips, Skyreach keeps movement readable with a lightweight whole-character gait/bob/lean treatment while batching static source meshes by material to avoid roughly 100 draw submissions.
+The player visual is now `public/assets/characters/nightweaver_LOD0.glb`. The source contains 104 meshes, roughly 166k triangles, six materials, and embedded textures. It is normalized to **2.8 world units tall**, slightly taller than the procedural NPC range, while retaining the existing player collision radius and camera behavior. Because the supplied asset has no skeletal animation clips, Skyreach builds a lightweight procedural articulation rig from Claude's semantic limb meshes. Shoulders, elbows, hips, and knees now animate in an alternating walk/run gait with torso counter-rotation, smooth idle return, and subtle cape response; high-detail paired armor overlays are spatially split into the same limb groups so the detailed appearance moves with the body.
 
 `public/assets/space/jwst.glb` is deferred until **JWST VIEW** is actually opened, so normal ascent no longer pays the model parse/merge cost. JWST VIEW switches to an orbit camera around the observatory, adds a denser deep-space star field, and keeps Earth and Moon visible through the game's compressed celestial rendering rather than loading a separate scene. Returning from the view restores the existing player/vehicle state.
 
@@ -141,7 +141,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v19`.
+`public/sw.js` currently uses cache version `skyreach-v20`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

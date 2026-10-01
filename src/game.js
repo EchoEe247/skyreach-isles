@@ -116,7 +116,45 @@ function mergeTexturedStaticByMaterial(source){
  const g=new T.Group();for(const {mat,geos} of buckets.values()){const merged=mergeGeometries(geos,false);if(!merged)continue;const mesh=new T.Mesh(merged,mat.clone());mesh.castShadow=true;mesh.receiveShadow=false;g.add(mesh)}return g.children.length?g:source.clone(true)
 }
 const PLAYER_VISUAL_HEIGHT=2.8,heroModelUrl=new URL('assets/characters/nightweaver_LOD0.glb',document.baseURI).href;
-new GLTFLoader().load(heroModelUrl,gltf=>{const visual=mergeTexturedStaticByMaterial(gltf.scene);visual.updateMatrixWorld(true);const bb=new T.Box3().setFromObject(visual),sz=bb.getSize(new T.Vector3()),ctr=bb.getCenter(new T.Vector3()),scale=PLAYER_VISUAL_HEIGHT/Math.max(.001,sz.y);visual.position.set(-ctr.x,-bb.min.y,-ctr.z);const root=new T.Group();root.scale.setScalar(scale);root.add(visual);hero.add(root);heroRig.visible=false;hero.userData.nightweaver=root;hero.userData.model='nightweaver_LOD0.glb';hero.userData.modelState='ready'},undefined,e=>{console.warn('Nightweaver player model failed; using fallback',e);heroRig.visible=true;hero.userData.modelState='fallback'});
+function nightweaverSlice(geo,predicate){
+ const g=geo.index?geo.toNonIndexed():geo.clone(),pos=g.getAttribute('position');if(!pos)return null;
+ const keep=[];for(let i=0;i<pos.count;i+=3){const x=(pos.getX(i)+pos.getX(i+1)+pos.getX(i+2))/3,y=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,z=(pos.getZ(i)+pos.getZ(i+1)+pos.getZ(i+2))/3;if(predicate(x,y,z))keep.push(i,i+1,i+2)}
+ if(!keep.length)return null;const out=new T.BufferGeometry();
+ for(const [name,a] of Object.entries(g.attributes)){const src=a.array,dst=new src.constructor(keep.length*a.itemSize);let k=0;for(const vi of keep)for(let j=0;j<a.itemSize;j++)dst[k++]=src[vi*a.itemSize+j];out.setAttribute(name,new T.BufferAttribute(dst,a.itemSize,a.normalized))}
+ out.computeBoundingSphere();return out
+}
+function buildNightweaverRig(source){
+ source.updateMatrixWorld(true);
+ const bucketNames=['static','armLU','armLL','armRU','armRL','legLU','legLL','legRU','legRL','cape'],buckets=Object.fromEntries(bucketNames.map(k=>[k,new Map()]));
+ const put=(bucket,mat,geo)=>{if(!geo?.getAttribute('position')?.count)return;const key=mat.uuid;if(!buckets[bucket].has(key))buckets[bucket].set(key,{mat,geos:[]});buckets[bucket].get(key).geos.push(geo)};
+ const explicit=n=>{
+  if(/^(delt|pauldron|upperArm)L$/.test(n))return'armLU';if(/^(elbow|forearm|bracer|launcher|glow|palm|thumb)L$/.test(n))return'armLL';
+  if(/^(delt|pauldron|upperArm)R$/.test(n))return'armRU';if(/^(elbow|forearm|bracer|launcher|glow|palm|thumb)R$/.test(n))return'armRL';
+  if(/^(thigh|stripe)L$/.test(n))return'legLU';if(/^(kneePad|calf|bootCuff|bootBand|foot|sole)L$/.test(n))return'legLL';
+  if(/^(thigh|stripe)R$/.test(n))return'legRU';if(/^(kneePad|calf|bootCuff|bootBand|foot|sole)R$/.test(n))return'legRL';
+  if(/^cape_/.test(n))return'cape';return null
+ };
+ source.traverse(o=>{if(!o.isMesh)return;const mats=Array.isArray(o.material)?o.material:[o.material];if(mats.length!==1)return;const mat=mats[0],name=o.name||'',base=o.geometry.clone();base.applyMatrix4(o.matrixWorld);if(!base.getAttribute('normal'))base.computeVertexNormals();
+  const direct=explicit(name);if(direct){put(direct,mat,base);return}
+  if(/^shoulder_/.test(name)){put('armLU',mat,nightweaverSlice(base,x=>x<0));put('armRU',mat,nightweaverSlice(base,x=>x>=0));return}
+  if(/^arm_/.test(name)){put('armLU',mat,nightweaverSlice(base,(x,y)=>x<0&&y>=1.16));put('armLL',mat,nightweaverSlice(base,(x,y)=>x<0&&y<1.16));put('armRU',mat,nightweaverSlice(base,(x,y)=>x>=0&&y>=1.16));put('armRL',mat,nightweaverSlice(base,(x,y)=>x>=0&&y<1.16));return}
+  if(/^hand_/.test(name)){put('armLL',mat,nightweaverSlice(base,x=>x<0));put('armRL',mat,nightweaverSlice(base,x=>x>=0));return}
+  if(/^leg_/.test(name)){put('legLU',mat,nightweaverSlice(base,(x,y)=>x<0&&y>=.5));put('legLL',mat,nightweaverSlice(base,(x,y)=>x<0&&y<.5));put('legRU',mat,nightweaverSlice(base,(x,y)=>x>=0&&y>=.5));put('legRL',mat,nightweaverSlice(base,(x,y)=>x>=0&&y<.5));return}
+  if(/^boot_/.test(name)){put('legLL',mat,nightweaverSlice(base,x=>x<0));put('legRL',mat,nightweaverSlice(base,x=>x>=0));return}
+  put('static',mat,base)
+ });
+ const root=new T.Group(),staticG=new T.Group();root.add(staticG);
+ const pivot=(name,xyz,parent=root)=>{const g=new T.Group();g.name=name;g.position.set(...xyz);parent.add(g);return g};
+ const armLU=pivot('NW_Shoulder_L',[-.32,1.48,0]),armLL=pivot('NW_Elbow_L',[-.43+.32,1.16-1.48,.02],armLU);
+ const armRU=pivot('NW_Shoulder_R',[.32,1.48,0]),armRL=pivot('NW_Elbow_R',[.43-.32,1.16-1.48,.02],armRU);
+ const legLU=pivot('NW_Hip_L',[-.10,.88,0]),legLL=pivot('NW_Knee_L',[-.11+.10,.50-.88,.055],legLU);
+ const legRU=pivot('NW_Hip_R',[.10,.88,0]),legRL=pivot('NW_Knee_R',[.11-.10,.50-.88,.055],legRU);
+ const cape=pivot('NW_Cape',[0,1.49,-.14]),groups={static:staticG,armLU,armLL,armRU,armRL,legLU,legLL,legRU,legRL,cape};
+ const worldPivot={static:[0,0,0],armLU:[-.32,1.48,0],armLL:[-.43,1.16,.02],armRU:[.32,1.48,0],armRL:[.43,1.16,.02],legLU:[-.10,.88,0],legLL:[-.11,.50,.055],legRU:[.10,.88,0],legRL:[.11,.50,.055],cape:[0,1.49,-.14]};
+ for(const name of bucketNames)for(const {mat,geos} of buckets[name].values()){const merged=mergeGeometries(geos.map(g=>g.index?g.toNonIndexed():g),false);if(!merged)continue;const mesh=new T.Mesh(merged,mat.clone());mesh.castShadow=true;mesh.receiveShadow=false;const p=worldPivot[name];mesh.position.set(-p[0],-p[1],-p[2]);groups[name].add(mesh)}
+ root.userData.rig={armLU,armLL,armRU,armRL,legLU,legLL,legRU,legRL,cape,staticG};return root
+}
+new GLTFLoader().load(heroModelUrl,gltf=>{const visual=buildNightweaverRig(gltf.scene);visual.updateMatrixWorld(true);const bb=new T.Box3().setFromObject(visual),sz=bb.getSize(new T.Vector3()),ctr=bb.getCenter(new T.Vector3()),scale=PLAYER_VISUAL_HEIGHT/Math.max(.001,sz.y);visual.position.set(-ctr.x,-bb.min.y,-ctr.z);const root=new T.Group();root.scale.setScalar(scale);root.add(visual);hero.add(root);heroRig.visible=false;hero.userData.nightweaver=root;hero.userData.nightweaverVisual=visual;hero.userData.rig=visual.userData.rig;hero.userData.model='nightweaver_LOD0.glb';hero.userData.modelState='ready'},undefined,e=>{console.warn('Nightweaver player model failed; using fallback',e);heroRig.visible=true;hero.userData.modelState='fallback'});
 
 const nm=['Mara','Odd','Juno','Bram','Tilda','Pip','Kessa','Old Rui'],ln=['Golden hour again. Best light on the isles.','The lighthouse keeper swears the beacons sing.','That red car? Take it. Nobody remembers who owns it.','Planes need a long run. Hold Boost and pull up.','The eastern beacon is out past the hills.','I saw a boat tied at the west shore.','Mind the fountain, it bites.','Beacons on peaks. Fly, don\'t climb.'];
 const skins=[0xf1c8a0,0xc68a5f,0x8d5a3b,0xe9b98a],cols=[0xd9534f,0x4a90a4,0xe8b04a,0x7d5ba6,0x5a9e6f,0xd98cb3];
@@ -380,7 +418,7 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
  if(mode=='foot'){const sp_=(bo?11:6.5)*(onMoon?.62:(P.y<-.3?.55:1))*tailwind(),dx=Math.sin(yaw)*jY-Math.cos(yaw)*jX,dz=Math.cos(yaw)*jY+Math.sin(yaw)*jX,m=Math.hypot(dx,dz);let mv_=0;
   if(m>.05){const kk=Math.min(1,m)/m,nx=P.x+dx*kk*sp_*dt,nz=P.z+dz*kk*sp_*dt;if(onMoon)moonSurface.ensureCentered(nx,nz);if((onMoon&&moonSurface.contains(nx,nz,4))||(!onMoon&&(hf(nx,nz)>-6||dk(nx,nz)))){P.x=nx;P.z=nz}hero.rotation.y+=ad(Math.atan2(dx,dz)-hero.rotation.y)*Math.min(1,dt*12);mv_=1}
   if(!onMoon)col2(P,.5);hero.vy=(hero.vy||0)-(onMoon?LUNAR_GRAVITY_MPS2:25)*dt;P.y+=hero.vy*dt;const g=onMoon?MOON_RENDER_BASE_Y+moonSurface.heightAt(P.x,P.z):Math.max(gr(P.x,P.z),-.7),og=P.y<=g+.05;if(P.y<g){P.y=g;hero.vy=0}if(ju&&og)hero.vy=onMoon?2.65:9;
-  hero.ph=(hero.ph||0)+dt*(bo?14:9)*mv_;anim(hero,hero.ph,og?mv_*(bo?1.1:.7):.8);if(hero.t)hero.t.rotation.x=Math.sin(tm_*6)*.25-.1-mv_*.3;if(hero.userData.nightweaver){const nw=hero.userData.nightweaver;nw.position.y=og&&mv_?Math.abs(Math.sin(hero.ph))*0.045:0;nw.rotation.z+=( (-jX*.035)-nw.rotation.z)*Math.min(1,dt*8)}hero.position.copy(P)}
+  hero.ph=(hero.ph||0)+dt*(bo?14:9)*mv_;anim(hero,hero.ph,og?mv_*(bo?1.1:.7):.8);if(hero.t)hero.t.rotation.x=Math.sin(tm_*6)*.25-.1-mv_*.3;if(hero.userData.nightweaver){const nw=hero.userData.nightweaver,rig=hero.userData.rig,swing=Math.sin(hero.ph),walk=og?mv_:0,amp=walk*(bo?.72:.54),ease=Math.min(1,dt*11);nw.position.y=og&&mv_?Math.abs(Math.sin(hero.ph*2))*.032:0;nw.rotation.z+=((-jX*.025)-nw.rotation.z)*ease;if(rig){const toward=(g,x,z=0)=>{g.rotation.x+=(x-g.rotation.x)*ease;g.rotation.z+=(z-g.rotation.z)*ease};toward(rig.armLU,-swing*amp*.82,jX*.035*walk);toward(rig.armRU,swing*amp*.82,jX*.035*walk);toward(rig.legLU,swing*amp);toward(rig.legRU,-swing*amp);toward(rig.armLL,Math.max(0,swing)*.12*walk);toward(rig.armRL,Math.max(0,-swing)*.12*walk);toward(rig.legLL,Math.max(0,-swing)*.62*walk);toward(rig.legRL,Math.max(0,swing)*.62*walk);toward(rig.cape,-.035-walk*.06-Math.abs(swing)*walk*.035);rig.staticG.rotation.y+=((-swing*walk*.035)-rig.staticG.rotation.y)*ease}}hero.position.copy(P)}
  else{const c=cur,g=c.g,p=g.position;let sc=0;
   if(c.type=='car'){c.sp+=jY*(bo?44:26)*tailwind()*dt;c.sp-=c.sp*(jY?.5:1.6)*dt;c.h-=jX*cl(Math.abs(c.sp)/7,0,1)*1.7*dt*Math.sign(c.sp||1);const ox=p.x,oz=p.z;p.x+=Math.sin(c.h)*c.sp*dt;p.z+=Math.cos(c.h)*c.sp*dt;if(hf(p.x,p.z)<-.4){p.x=ox;p.z=oz;c.sp*=-.3}col2(p,2.3);const fy=hf(p.x+Math.sin(c.h)*2,p.z+Math.cos(c.h)*2),by=hf(p.x-Math.sin(c.h)*2,p.z-Math.cos(c.h)*2);p.y=hf(p.x,p.z);g.rotation.x=-Math.atan((fy-by)/4);g.rotation.z=-jX*c.sp*.004;sc=c.sp}
   else if(c.type=='boat'){c.sp+=jY*(bo?36:20)*tailwind()*dt;c.sp-=c.sp*.6*dt;c.h-=jX*cl(Math.abs(c.sp)/6,0,1)*1.2*dt;const ox=p.x,oz=p.z;p.x+=Math.sin(c.h)*c.sp*dt;p.z+=Math.cos(c.h)*c.sp*dt;if(!boatCanTravel(p.x,p.z)){p.x=ox;p.z=oz;c.sp*=-.3}p.y=Math.sin(tm_*1.7)*.18-.1;g.rotation.x=Math.sin(tm_*1.3)*.03-c.sp*.004;g.rotation.z=-jX*.12+Math.sin(tm_*1.1)*.03;sc=c.sp}

@@ -40,6 +40,12 @@ test('Nightweaver LOD0 is the textured user-selected player asset',async()=>{
   for(const image of doc.images??[])assert.ok(!image.uri,'Nightweaver textures must be embedded');
 });
 
+test('Nightweaver exposes semantic limb meshes for procedural articulation',async()=>{
+  const {doc}=await glb('../public/assets/characters/nightweaver_LOD0.glb');
+  const names=new Set((doc.nodes??[]).map(n=>n.name));
+  for(const name of ['upperArmL','forearmL','thighL','calfL','upperArmR','forearmR','thighR','calfR'])assert.ok(names.has(name),name+' must remain available for the runtime rig');
+});
+
 test('LAX, airplane locator, and JWST view are exposed in the game UI',async()=>{
   const [game,atlas,html]=await Promise.all([
     readFile(new URL('../src/game.js',import.meta.url),'utf8'),
@@ -48,6 +54,13 @@ test('LAX, airplane locator, and JWST view are exposed in the game UI',async()=>
   ]);
   assert.match(game,/LAX International Airport/);
   assert.match(game,/PLAYER_VISUAL_HEIGHT=2\.8/);
+  assert.match(game,/buildNightweaverRig/);
+  assert.match(game,/NW_Shoulder_L/);
+  assert.match(game,/NW_Elbow_R/);
+  assert.match(game,/NW_Hip_L/);
+  assert.match(game,/NW_Knee_R/);
+  assert.match(game,/toward\(rig\.armLU,-swing\*amp\*\.82/);
+  assert.match(game,/toward\(rig\.legRU,-swing\*amp/);
   assert.match(game,/nightweaver_LOD0\.glb/);
   assert.match(game,/if\(telescopeView&&jwst\.userData\.modelState==='deferred'\)ensureJwstModel/);
   assert.match(game,/assets\/space\/jwst\.glb/);

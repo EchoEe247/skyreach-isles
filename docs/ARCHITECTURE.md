@@ -48,6 +48,7 @@ The maintained game uses detailed GLB visuals while keeping the original procedu
 - `public/assets/vehicles/sports_car.glb`: player car and four traffic variants; only the named `paint` material is recolored.
 - `public/assets/boats/speedboat.glb`: source scale, rotated -90° around Y so its +X bow matches Skyreach's +Z forward convention.
 - `public/assets/aircraft/airliner.glb`: uniform 0.30 scale; its +Z nose already matches the flight rig.
+- `public/assets/characters/nightweaver_LOD0.glb`: high-detail player replacement with embedded textures. It has no skin/animation clips, so runtime builds shoulder/elbow/hip/knee pivot groups from Claude's semantic limb meshes and spatially partitions paired high-detail armor meshes by side/joint; each articulated group is material-batched before rendering.
 - `public/assets/space/nasa-sls-block1.stl`: official NASA SLS Block 1 geometry, normalized at load time; only the printable display-plinth triangles are discarded before rendering, then the rocket is colored in-engine for the orange core/white boosters.
 - `public/assets/space/nasa-blue-marble-2048.png`: NASA Blue Marble texture for the high-altitude Earth representation.
 - `public/assets/space/alien/alien_spaceship.glb`: user-provided Alien Scout visual; textured PBR asset with normals/UVs, loaded directly as the compact lunar craft.
