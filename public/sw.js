@@ -1,5 +1,5 @@
-const CACHE='skyreach-v12';
-const SHELL=['./','./index.html','./manifest.webmanifest'];
+const CACHE='skyreach-v13';
+const SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)));
@@ -11,13 +11,15 @@ self.addEventListener('activate',event=>{
   self.clients.claim();
 });
 
-const networkFirst=request=>fetch(request).then(response=>{
-  if(response.ok){
-    const copy=response.clone();
-    caches.open(CACHE).then(cache=>cache.put(request,copy));
-  }
-  return response;
-}).catch(()=>caches.match(request));
+const networkFirst=async(request,timeoutMs=5000)=>{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const response=await fetch(request,{signal:controller.signal});
+    if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
+    return response;
+  }catch{return caches.match(request)}
+  finally{clearTimeout(timer)}
+};
 
 self.addEventListener('fetch',event=>{
   const request=event.request;
@@ -25,7 +27,7 @@ self.addEventListener('fetch',event=>{
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
   if(request.mode==='navigate'||url.pathname.endsWith('.glb')){
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirst(request,url.pathname.endsWith('.glb')?3500:5000));
     return;
   }
   event.respondWith(

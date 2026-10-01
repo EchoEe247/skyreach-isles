@@ -73,6 +73,8 @@ The Moon is physically placed about 384,400 km from Earth with a 1,737.4 km radi
 
 Cruise assist computes a physical thrust/braking command toward the selected Earth or Moon target. It does not teleport or rewrite position. Player-selected 1x-400x simulation acceleration is automatically clamped near either world so approach and landing remain controllable.
 
+For SLS Earth return, the celestial state retains the original launch-site x/z coordinates. TARGET EARTH guides into that corridor; once horizontal alignment is within 300 m, altitude is below 15 km, and speed is below 100 m/s, the vehicle hands back into `spaceflight.js` with radial/tangential velocity preserved. Reentry, descent, touchdown and exit then use the normal atmospheric/ground path rather than a reset or teleport.
+
 ## World continuity
 
 The home island and three offshore islands are finite terrain features in an unbounded ocean. All use the same height query for walking, vehicle grounding, chart generation and shoreline collision. Sea-arch pillars have explicit boat collision while the middle remains navigable.
@@ -123,9 +125,9 @@ World events are intermittent rather than a second checklist. Washed-up cargo, l
 
 Automatic quality chooses a conservative preset from browser-reported device memory/CPU information when available. The player can cycle Auto, Low, Medium, and High without leaving the game. Pixel ratio and shadow rendering are the main runtime quality controls.
 
-Detailed GLB meshes currently disable their own dynamic shadows where appropriate to avoid turning visual upgrades into an unnecessary mobile GPU cost.
+Detailed GLB meshes currently disable their own dynamic shadows where appropriate to avoid turning visual upgrades into an unnecessary mobile GPU cost. The NASA Earth texture and 13.7 MB SLS STL are no longer fetched during module startup; they load when the rocket is used. The two Moon alien GLBs are likewise deferred until Moon travel or boarding requires them. Humanoid characters share unit geometry and cached materials, and NPC steering reuses a temporary vector instead of allocating a clone per NPC per frame.
 
-The production bundle still emits Vite's >500 kB chunk warning; this is non-fatal and is primarily a future code-splitting/performance-maintenance item rather than a current deployment blocker.
+The app-owned production JavaScript is split from Three.js through Vite manual chunking: the current game chunk is about 97 KB minified while the Three.js vendor chunk is about 606 KB. Vite therefore still emits a >500 kB warning for the vendor chunk, but game-code deploys can reuse the separately cached Three.js payload.
 
 The ocean adds low-amplitude vertex waves on a 100×100 grid. Surf is generated from sampled coastline contours. Wakes use a pool of 64 instances. Palms, rocks and stepping stones are instanced. Original forest instances now have computed bounds for frustum culling.
 
@@ -133,13 +135,13 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v12`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v13`.
 
 Service-worker behavior:
 
 1. The application shell (`./`, `index.html`, and `manifest.webmanifest`) is pre-cached during install.
 2. Navigation requests are network-first with cached fallback.
-3. Same-origin `.glb` model requests are network-first with cached fallback.
+3. Same-origin `.glb` model requests are network-first with cached fallback and a 3.5-second abort timeout before falling back to cache.
 4. Other same-origin GET assets use cache-first behavior and are cached after successful network retrieval.
 5. Activation removes older Skyreach cache versions and claims open clients.
 
@@ -157,15 +159,16 @@ The current Node test suite covers:
 - adaptive audio mix behavior, weather ambience, and bounded gains
 - open-ocean boat travel, shoreline blocking, and far-ocean terrain stability
 - exploration nearest-objective/bearing/distance helpers
-- backward-compatible persistence for eight discoveries
+- backward-compatible persistence for eight discoveries plus storage-denial fallback when localStorage access throws
 - offshore shore approaches, cove entry, waterfall terrain drop and sea-arch passage/pillars
 - bounded waterfall audio gains
 - weather continuity/bounds across a full cycle, storm-only lightning, four NPC schedule periods, and intermittent event cadence
 - deterministic rocket ascent, atmosphere-density decay, altitude-dependent Earth gravity, invertible render-altitude mapping, and Kármán-line space blending
+- launch-site-preserving Earth return/reentry state and Moon-to-Earth cruise corridor
 
 ## Current verification status
 
-As of the current Earth-Moon build, the repository test suite is **57/57 passing** and the production Vite build succeeds. git diff --check is clean. Local serving has returned HTTP 200 for the current build.
+As of the current Earth-Moon audit-repair build, the repository test suite is **60/60 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
 
 Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, lunar-site projection, render-distance compression, safe warp limits, physical Moon-cruise interception, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
 

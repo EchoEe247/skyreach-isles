@@ -44,7 +44,7 @@ function oscillator(ctx,type,freq){
 }
 
 export function createWorldAudio(){
-  let ctx=null,master=null,noise=null,layers=null,engines=null,started=false,stepClock=0,wildClock=2;
+  let ctx=null,master=null,noise=null,layers=null,engines=null,started=false,paused=false,stepClock=0,wildClock=2;
 
   const target=(param,value,time=.08)=>{
     if(!ctx)return;
@@ -52,7 +52,7 @@ export function createWorldAudio(){
   };
 
   function start(){
-    if(started){ctx?.resume?.();return}
+    if(started){paused=false;ctx?.resume?.();return}
     try{
       ctx=new (window.AudioContext||window.webkitAudioContext)();
       const compressor=ctx.createDynamicsCompressor();
@@ -80,7 +80,7 @@ export function createWorldAudio(){
         plane1:oscillator(ctx,'sawtooth',90),plane2:oscillator(ctx,'sine',310)
       };
       Object.values(engines).forEach(x=>x.gain.connect(master));
-      started=true;
+      started=true;paused=false;
       ctx.resume?.();
     }catch{}
   }
@@ -118,9 +118,9 @@ export function createWorldAudio(){
   }
 
   function update(state){
-    if(!started||!ctx)return;
+    if(!started||!ctx||paused)return;
     if(ctx.state==='suspended')ctx.resume?.();
-    const mix=computeAudioMix(state),speed=Math.abs(state.speed||0),mode=state.mode||'foot',now=ctx.currentTime;
+    const mix=computeAudioMix(state),speed=Math.abs(state.speed||0),mode=state.mode||'foot';
     target(layers.wind.gain.gain,mix.wind,.16);target(layers.wind.filter.frequency,700+speed*18+(state.altitude||0)*.8,.2);target(layers.rain.gain.gain,mix.rain,.18);
     target(layers.waterfall.gain.gain,mix.waterfall,.25);target(layers.ocean.gain.gain,mix.ocean,.2);target(layers.surf.gain.gain,mix.surf,.22);
     target(layers.land.gain.gain,mix.land,.3);target(layers.town.gain.gain,mix.town,.3);
@@ -147,5 +147,7 @@ export function createWorldAudio(){
     }
   }
 
-  return {start,update};
+  const suspend=()=>{paused=true;try{if(ctx&&ctx.state==='running')ctx.suspend()}catch{}};
+  const resume=()=>{paused=false;try{if(started&&ctx&&ctx.state==='suspended')ctx.resume()}catch{}};
+  return {start,update,suspend,resume};
 }

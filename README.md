@@ -46,7 +46,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Real-scale Earth-Moon celestial navigation with target selection, physical cruise guidance, and proximity-limited 1x/10x/50x/100x/400x simulation-time acceleration
 - Explorable low-gravity lunar terrain with a landing site, crater field, rocks, and two boardable alien spacecraft: Alien Scout and Alien Strike Ship
 - Adaptive offline WebAudio soundscape: surface-aware footsteps, weather wind and rain, surf, ocean wash, land/town ambience, car engine and road noise, boat engine and wake, airliner engine and jet noise, daytime birds, and nighttime insects
-- Installable/offline-capable PWA behavior after the first successful load
+- Installable PWA behavior with offline fallback for the app shell and assets already cached by prior successful loads
 
 ## Run locally
 
@@ -92,7 +92,9 @@ Skyreach now extends the existing no-cut SLS ascent into a physical Earth-Moon s
 
 The spacecraft HUD adds **TARGET**, **CRUISE**, and **TIME** controls. Cruise is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
 
-Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB.
+Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB. The SLS STL and NASA Earth texture are deferred until the rocket is used, and the alien GLBs are deferred until Moon travel/boarding makes them relevant, reducing initial network and main-thread work.
+
+Earth return is bidirectional for the SLS: TARGET EARTH + CRUISE guides back to the original launch-site corridor, then hands the rocket continuously back to the atmospheric model near 10 km altitude for manual braking/descent and normal ground exit. Moon walking is bounded to the rendered local terrain patch so the player cannot walk onto invisible collision ground.
 
 ## World and audio systems
 
@@ -104,11 +106,12 @@ Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb
 
 ## Current verification
 
-Current master verification after the Earth-Moon and alien-spacecraft work:
+Current master verification after the Claude-audit repair pass:
 
-- **57/57 Node tests pass**.
-- npm run build passes; Vite still reports the known non-fatal large-chunk warning.
+- **60/60 Node tests pass**.
+- npm run build passes. The game-owned JS is split to ~97 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
+- npm audit reports 0 vulnerabilities.
 - Local development serving returns HTTP 200.
 - Deterministic transfer coverage verifies that Moon cruise physically intercepts the lunar landing corridor without teleporting.
 - The current transfer profile reaches the final guided corridor at roughly 899 m lunar altitude and about 8.1 m/s before manual landing control.
@@ -117,7 +120,7 @@ Current master verification after the Earth-Moon and alien-spacecraft work:
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v12`.
+`public/sw.js` currently uses cache version `skyreach-v13`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
@@ -193,6 +196,9 @@ public/
       earth-provenance.json
   manifest.webmanifest
   sw.js
+  icons/
+    icon-192.png
+    icon-512.png
 tests/
   aircraft-asset.test.mjs
   alien-assets.test.mjs
@@ -213,6 +219,7 @@ legacy/
 docs/
   ARCHITECTURE.md
   ASSET-INTEGRATION-PLAN.md
+  ASSET-RIGHTS.md
   CURATED-ASSETS.md
   LIVING-ISLES.md
   WORLD-EXPANSION.md
@@ -221,6 +228,10 @@ docs/
 ## Development rule
 
 Preserve the feel and playability of the baseline while improving the internals incrementally. Do not rewrite working systems merely to chase architecture. New subsystems should move out of `game.js` when they have a clear interface and can be verified independently.
+
+## Asset/licensing status
+
+See [Asset rights status](docs/ASSET-RIGHTS.md) for documented sources and the user-provided models whose third-party redistribution rights still require confirmation.
 
 ## World expansion verification
 

@@ -46,4 +46,4 @@ These bullets are historical evidence for the curated-asset pass, not the curren
 
 ## Current repository status
 
-The maintained build now also includes continuous Earth-Moon flight, lunar terrain, and two boardable user-provided alien spacecraft. The current repository suite is **57/57 passing**, the production build succeeds, and the current cache version is skyreach-v12. Headless Termux Chromium still cannot be treated as current visual acceptance evidence because EGL/WebGL initialization is unavailable there; use the actual playable browser session for native/mobile visual and frame-pacing judgment.
+The maintained build now also includes continuous Earth-Moon flight, lunar terrain, and two boardable user-provided alien spacecraft. The current repository suite is **60/60 passing**, the production build succeeds, and the current cache version is skyreach-v13. Headless Termux Chromium still cannot be treated as current visual acceptance evidence because EGL/WebGL initialization is unavailable there; use the actual playable browser session for native/mobile visual and frame-pacing judgment.

@@ -8,6 +8,8 @@ Enrich Skyreach Isles in one coordinated pass using selected free assets that fi
 
 This document records the September 30 enrichment baseline. That baseline included the sports car/traffic, speedboat, airliner, NASA SLS, offshore islands, weather, NPC schedules, audio, exploration objectives, and the 9-minute-day / 3-minute-night cycle. The later maintained build additionally includes continuous Earth-Moon flight, lunar terrain, and two user-provided boardable alien spacecraft; those later systems are documented in README.md and docs/ARCHITECTURE.md.
 
+Current asset-rights status, including user-provided models whose third-party redistribution terms are not yet independently confirmed, is tracked in [ASSET-RIGHTS.md](ASSET-RIGHTS.md).
+
 ## Public-web licensing rule
 
 Skyreach Isles is published from a public GitHub repository and serves assets directly to browsers. Prefer assets licensed CC0 or otherwise explicitly allowing redistribution in this form.

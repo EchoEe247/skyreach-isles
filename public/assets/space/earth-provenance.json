@@ -3,7 +3,7 @@
     {
       "bytes": 1511379,
       "creator": "NASA/Goddard Space Flight Center Scientific Visualization Studio",
-      "destination": "/data/data/com.termux/files/home/MainWorkspace/skyreach-isles/public/assets/space/nasa-blue-marble-2048.png",
+      "destination": "public/assets/space/nasa-blue-marble-2048.png",
       "expanded_bytes": null,
       "extracted_to": null,
       "license": "NASA media/reproduction guidelines",

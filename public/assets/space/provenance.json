@@ -3,7 +3,7 @@
     {
       "bytes": 13721684,
       "creator": "NASA / Space Launch System Program Office",
-      "destination": "/data/data/com.termux/files/home/MainWorkspace/skyreach-isles/public/assets/space/nasa-sls-block1.stl",
+      "destination": "public/assets/space/nasa-sls-block1.stl",
       "expanded_bytes": null,
       "extracted_to": null,
       "license": "NASA 3D Resources / NASA media usage guidelines",

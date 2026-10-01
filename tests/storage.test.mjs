@@ -7,27 +7,32 @@ globalThis.localStorage={
   setItem:(key,value)=>values.set(key,String(value))
 };
 
-const {loadProgress,saveProgress}=await import('../src/core/storage.js');
+const {loadProgress,saveProgress,loadSettings,saveSettings}=await import('../src/core/storage.js');
 
 test('progress defaults are backward compatible',()=>{
   values.clear();
   assert.deepEqual(loadProgress(),{beacons:[],rings:[],shards:[],discoveries:[]});
 });
-
 test('progress persists the expanded exploration state',()=>{
   values.clear();
-  const expected={
-    beacons:[true,false],
-    rings:[true],
-    shards:[false,true,true],
-    discoveries:[true,false,true]
-  };
+  const expected={beacons:[true,false],rings:[true],shards:[false,true,true],discoveries:[true,false,true]};
   saveProgress(expected);
   assert.deepEqual(loadProgress(),expected);
 });
-
 test('eight landmark discoveries survive save and reload',()=>{
   const discoveries=Array.from({length:8},()=>true);
   saveProgress({beacons:[true],rings:[],shards:[],discoveries});
   assert.deepEqual(loadProgress().discoveries,discoveries);
+});
+test('storage denial cannot crash startup loads or saves',()=>{
+  const old=globalThis.localStorage;
+  globalThis.localStorage={
+    getItem(){throw new Error('blocked')},
+    setItem(){throw new Error('blocked')}
+  };
+  assert.deepEqual(loadProgress(),{beacons:[],rings:[],shards:[],discoveries:[]});
+  assert.deepEqual(loadSettings(),{quality:'auto'});
+  assert.doesNotThrow(()=>saveProgress({beacons:[true]}));
+  assert.doesNotThrow(()=>saveSettings({quality:'high'}));
+  globalThis.localStorage=old;
 });

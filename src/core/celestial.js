@@ -61,17 +61,37 @@ function gravityAt(position){
 
 export function initCelestialFromRocket(state){
   const altitude=Math.max(0,state.altitude||0),heading=Number(state.heading)||0,vh=Number.isFinite(state.velocityHeading)?state.velocityHeading:heading;
-  return {position:[0,EARTH_RADIUS_M+altitude,0],velocity:[Math.sin(vh)*(state.horizontalSpeed||0),state.verticalSpeed||0,Math.cos(vh)*(state.horizontalSpeed||0)],heading,pitch:Math.max(0,Number(state.pitch)||0),yawRate:0,pitchRate:0,landedBody:null};
+  const worldX=Number(state.worldX)||0,worldZ=Number(state.worldZ)||0;
+  return {position:[worldX,EARTH_RADIUS_M+altitude,worldZ],velocity:[Math.sin(vh)*(state.horizontalSpeed||0),state.verticalSpeed||0,Math.cos(vh)*(state.horizontalSpeed||0)],earthSite:[worldX,0,worldZ],heading,pitch:Math.max(0,Number(state.pitch)||0),yawRate:0,pitchRate:0,landedBody:null};
 }
 export function moonLandingTarget(altitude=600){return add(MOON_SITE,mul(MOON_SITE_UP,Math.max(0,altitude)))}
-export function earthReturnTarget(altitude=120000){return [0,EARTH_RADIUS_M+Math.max(0,altitude),0]}
+export function earthReturnTarget(state={},altitude=12000){
+  const site=state.earthSite||[0,0,0];
+  return [site[0],EARTH_RADIUS_M+Math.max(0,altitude),site[2]];
+}
 export function targetDistance(state,target='moon'){
-  const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget():moonLandingTarget();
+  const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state):moonLandingTarget();
   return len(sub(t,p));
 }
+export function atmosphericStateFromCelestial(state){
+  const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],up=radialUp(p,[0,0,0]);
+  const verticalSpeed=dot(vel,up),tangent=sub(vel,mul(up,verticalSpeed)),horizontalSpeed=len(tangent);
+  return {
+    altitude:Math.max(0,len(p)-EARTH_RADIUS_M),
+    verticalSpeed,
+    horizontalSpeed,
+    velocityHeading:horizontalSpeed>.001?Math.atan2(tangent[0],tangent[2]):(state.heading||0),
+    heading:state.heading||0,
+    pitch:0,
+    pitchRate:0,
+    yawRate:0,
+    worldX:p[0],
+    worldZ:p[2]
+  };
+}
 export function cruiseCommand(state,target='moon',profile={}){
-  const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],metrics=bodyMetrics(p),targetPos=target==='earth'?earthReturnTarget():moonLandingTarget(600);
-  const delta=sub(targetPos,p),distance=len(delta),toTarget=norm(delta),speed=len(vel),forwardSpeed=dot(vel,toTarget),accel=Math.max(4,profile.acceleration||36);
+  const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],metrics=bodyMetrics(p),targetPos=target==='earth'?earthReturnTarget(state):moonLandingTarget(600);
+  const delta=sub(targetPos,p),distance=len(delta),toTarget=norm(delta),accel=Math.max(4,profile.acceleration||36);
   let desiredSpeed=Math.min(profile.cruiseSpeed||18000,Math.sqrt(Math.max(0,2*accel*Math.max(0,distance-1800)))*.62);
   if(target==='moon'&&metrics.moonAltitude<250000)desiredSpeed=Math.min(desiredSpeed,clamp(distance*.012+3,3,700));
   if(target==='earth'&&metrics.earthAltitude<350000)desiredSpeed=Math.min(desiredSpeed,clamp(metrics.earthAltitude*.012+80,80,1200));

@@ -1,10 +1,14 @@
 {
   "name": "Skyreach Isles",
   "short_name": "Skyreach",
-  "description": "Explore a living island by foot, car, boat and plane.",
+  "description": "Explore Earth, the open ocean and the Moon by foot, car, boat, plane and spacecraft.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#14183a",
   "theme_color": "#14183a",
-  "orientation": "landscape"
+  "orientation": "landscape",
+  "icons": [
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
+  ]
 }
