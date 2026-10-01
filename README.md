@@ -1,6 +1,6 @@
 # Skyreach Isles
 
-Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town, drive the car, sail across the open ocean, pilot a diving submarine, fly the airliner through sky rings, launch NASA's SLS continuously from Earth to the Moon, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
+Skyreach Isles is a mobile-first 3D exploration game built with Three.js. Walk through the island town as Nightweaver, drive the car, visit and fly from the integrated LAX airport, sail across the open ocean, pilot a diving submarine, launch NASA's SLS continuously from Earth to the Moon, inspect the James Webb Space Telescope from a dedicated deep-space view, explore the lunar surface, fly two alien spacecraft, explore three offshore islands, and light all six beacons.
 
 **Play:** https://echoee247.github.io/skyreach-isles/
 
@@ -12,7 +12,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Ember Ruins:** a stone approach to a broken observatory, fallen columns, and a sea-view summit.
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
 
-Tap **Explore** (or press **M**) to chart a destination, locate your speedboat or submarine, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
+Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, or submarine, choose **LAX International Airport**, or choose **NASA Launch Complex** for direct map/compass guidance to the SLS launch pad. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
 Ocean detail includes gentle geometric swells, coastline-shaped surf bands, and a persistent foam wake. Offshore terrain now fades beneath the water without exposing square support-mesh seams, and Veilwater's cascade uses terrain-conforming flow, soft mist, and a grounded pool instead of hard rectangular spray.
 
@@ -34,7 +34,9 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Detailed user-supplied sports car for the player and color-varied town traffic
 - Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
 - Playable user-supplied Abyss submarine with separate Boost, Dive, and Surface controls, live depth telemetry, seabed-aware movement, underwater camera support, and a live Explore-map locator
-- Detailed airliner using the existing flight controls and physics
+- Detailed airliner relocated to the integrated four-runway **LAX International Airport**, with runway-ready spawn placement and a live Explore-map locator
+- User-supplied **Nightweaver LOD0** replaces the procedural player visual; its 104 source meshes are batched by material at runtime while preserving embedded textures
+- Dedicated **JWST VIEW** button loads the user-supplied James Webb Space Telescope on demand and opens an orbitable deep-space observatory view with Earth, Moon, stars, and Sun context
 - Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere, across the 100 km Karman line, through interbody space, and down to the Moon
 - Six beacon objectives and eight airborne rings
 - Ten hidden Skyshards; finding all of them unlocks a permanent Tailwind speed bonus
@@ -89,6 +91,16 @@ The mobile flight HUD separates speed, altitude, and atmospheric region so objec
 
 Asset provenance is recorded beside each detailed vehicle/space asset, including the two user-provided lunar alien craft.
 
+## LAX, Nightweaver, and JWST
+
+The main island now contains a compressed but complete LAX airport footprint in its southeast quadrant. `src/core/world.js` owns the airport-site contract and blends the natural terrain into a flat 10-unit airport plateau with a softened perimeter. The supplied `lax_airport.glb` is 150×110 source units and is rendered at 1.25× scale, fitting inside that flattened zone. Airport buildings contribute lightweight collision circles, runway/apron lights are instanced, and procedural trees/rocks are excluded from the airport footprint.
+
+The existing player airliner is relocated to Runway 24R and keeps the established aircraft physics. **Explore** now exposes both **LAX International Airport** and **Find my airplane**, so the aircraft remains discoverable after the player lands elsewhere.
+
+The player visual is now `public/assets/characters/nightweaver_LOD0.glb`. The source contains 104 meshes, roughly 166k triangles, six materials, and embedded textures. Because the supplied asset has no skeletal animation clips, Skyreach keeps movement readable with a lightweight whole-character gait/bob/lean treatment while batching static source meshes by material to avoid roughly 100 draw submissions.
+
+`public/assets/space/jwst.glb` is deferred until needed. **JWST VIEW** switches to an orbit camera around the observatory, adds a denser deep-space star field, and keeps Earth and Moon visible through the game's compressed celestial rendering rather than loading a separate scene. Returning from the view restores the existing player/vehicle state.
+
 ## Continuous Earth-to-Moon flight
 
 Skyreach now extends the existing no-cut SLS ascent into a physical Earth-Moon simulation. At the Karman-line handoff the rocket keeps its velocity and attitude, while `src/core/celestial.js` begins full 3D position/velocity integration in meters. Earth and Moon gravity are applied continuously, the Moon uses its real approximate 384,400 km separation and 1,737.4 km radius, and camera-relative logarithmic rendering keeps those distances stable on mobile without teleporting the craft.
@@ -113,10 +125,10 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-Current master verification after the full space-stack remediation:
-
-- **78/78 Node tests pass on a clean committed tree**.
-- npm run build passes. The game-owned JS is split to ~107 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
+- The LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
+- The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
+- The committed tree retains the known-good SLS derivative, so repository CI remains the authority for the clean-tree full-suite result.
+- Vite still reports the known non-fatal >500 kB warning for the Three.js vendor chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.
 - Local development serving returns HTTP 200.
@@ -127,7 +139,7 @@ Current master verification after the full space-stack remediation:
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v17`.
+`public/sw.js` currently uses cache version `skyreach-v18`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

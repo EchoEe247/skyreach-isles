@@ -17,6 +17,9 @@ The following files were supplied directly during development and are intentiona
 - `public/assets/space/alien/alien_ship.glb`
 - `public/assets/boats/speedboat.glb`
 - `public/assets/aircraft/airliner.glb`
+- `public/assets/world/lax_airport.glb`
+- `public/assets/space/jwst.glb`
+- `public/assets/characters/nightweaver_LOD0.glb`
 
 Their provenance files record hashes and integration details. Public availability in this repository should not be interpreted as a claim that third-party redistribution or commercial-use rights have been independently verified.
 

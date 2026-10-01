@@ -36,6 +36,7 @@ export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
     btn.innerHTML='<span class="atlas-number">'+icon+'</span><span><strong>'+title+'</strong><small>'+description+'</small></span>';
     btn.onclick=()=>{const vehicle=vehicles.find(v=>v.type===type);if(!vehicle)return;onSelect({name:title.replace('Find my ','Your '),vehicleType:type,get x(){return vehicle.g.position.x},get z(){return vehicle.g.position.z}});close()};entries.prepend(btn);return btn;
   };
+  addVehicleLocator('plane','Find my airplane','Plot a live course to your airliner at LAX or wherever you last landed it.','✈');
   addVehicleLocator('submarine','Find my submarine','Plot a live course to the Abyss submarine, wherever you last left it.','▽');
   addVehicleLocator('boat','Find my speedboat','Plot a course to wherever you last left it.','↗');
   function close(){panel.hidden=true;onOpen(false);toggle.focus()}

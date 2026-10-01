@@ -1,0 +1,9 @@
+{
+  "title": "LAX airport",
+  "creator": "Muse-generated model supplied by the user",
+  "origin": "User-provided asset copied from the user device Downloads during this development session.",
+  "license_status": "Not independently verified. Do not infer redistribution or commercial-use rights from inclusion in this repository.",
+  "sha256": "18cbac95059d2e4f2026d6045722ecddaf0ca7bda2ae0709bf6b84c3f5397151",
+  "bytes": 229832,
+  "integration": "Main-island airport world asset; source geometry is runtime-batched by material."
+}

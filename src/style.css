@@ -67,3 +67,17 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 @keyframes targetPulse{0%,100%{transform:scale(.9);opacity:.72}50%{transform:scale(1.08);opacity:1}}
 
 #cruise.active{color:#9fffdc!important;border-color:rgba(120,255,210,.62)!important;background:rgba(22,108,94,.76)!important;box-shadow:0 0 12px rgba(100,255,215,.22)}
+
+#telescope{position:absolute;right:14px;top:240px;pointer-events:auto;border:1px solid rgba(143,246,255,.34);padding:7px 10px;color:#bdf9ff;background:rgba(10,30,52,.62);font:700 11px system-ui,sans-serif;letter-spacing:.04em;touch-action:manipulation}
+#telescope.active{color:#14183a;background:rgba(143,246,255,.9);border-color:#d9ffff}
+#telescopeHud{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:min(78vw,380px);padding:9px 14px;text-align:center;background:rgba(3,8,22,.62);border-color:rgba(143,246,255,.28)}
+#telescopeHud[hidden]{display:none}
+#telescopeHud small{font-size:8px;letter-spacing:.18em;color:#8fe9ff}
+#telescopeHud strong{font:700 14px/1.2 system-ui;color:#ffe29a;letter-spacing:.04em}
+#telescopeHud span{font-size:10px;color:#d7e7ef;opacity:.88}
+#ui.telescope-mode #obj,#ui.telescope-mode #nav,#ui.telescope-mode #map,#ui.telescope-mode #spd,#ui.telescope-mode #joy,#ui.telescope-mode #act,#ui.telescope-mode #jump,#ui.telescope-mode #dive,#ui.telescope-mode #boost,#ui.telescope-mode #rocketCtl,#ui.telescope-mode #atlas-toggle{display:none!important}
+#ui.telescope-mode #quality{top:58px}
+#ui.telescope-mode #telescope{top:94px}
+@media (max-width:620px){#telescope{top:240px}#telescopeHud{top:10px;min-width:68vw;max-width:72vw}#ui.telescope-mode #quality{top:64px}#ui.telescope-mode #telescope{top:100px}}
+
+#ui.rocket-mode #telescope{top:258px}

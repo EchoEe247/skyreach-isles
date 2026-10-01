@@ -18,7 +18,7 @@ Current extracted modules:
 - `src/core/math.js`: deterministic RNG and shared math helpers.
 - `src/core/storage.js`: versioned localStorage persistence for progress and settings.
 - `src/core/quality.js`: mobile-aware quality resolution and renderer configuration.
-- `src/core/world.js`: terrain-height evaluation plus the open-ocean boat-navigation contract.
+- `src/core/world.js`: terrain-height evaluation, the LAX flattened-site contract, and the open-ocean boat-navigation contract.
 - `src/core/spaceflight.js`: deterministic SLS atmosphere, gravity, drag, altitude mapping, Kármán-line state, and rocket integration.
 - `src/core/celestial.js`: deterministic Earth-Moon 3D position/velocity integration, two-body gravity, spacecraft target guidance, render-coordinate compression, lunar approach mapping, and safe time acceleration.
 - `src/core/daylight.js`: asymmetric 9-minute-day / 3-minute-night timing and bounded lighting profiles.
