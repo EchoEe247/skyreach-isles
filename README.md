@@ -84,6 +84,14 @@ The mobile flight HUD separates speed, altitude, and atmospheric region so objec
 
 Asset provenance is recorded beside each detailed vehicle/space asset.
 
+## Continuous Earth-to-Moon flight
+
+Skyreach now extends the existing no-cut SLS ascent into a physical Earth-Moon simulation. At the Karman-line handoff the rocket keeps its velocity and attitude, while `src/core/celestial.js` begins full 3D position/velocity integration in meters. Earth and Moon gravity are applied continuously, the Moon uses its real approximate 384,400 km separation and 1,737.4 km radius, and camera-relative logarithmic rendering keeps those distances stable on mobile without teleporting the craft.
+
+The spacecraft HUD adds **TARGET**, **CRUISE**, and **TIME** controls. Cruise is guidance, not a scene skip: it physically accelerates and brakes along the current trajectory. Time acceleration cycles 1x/10x/50x/100x/400x and automatically collapses near either world. The Moon grows from a distant globe into a streamed local crater field and landing pad. The final lunar descent returns to manual control at low approach speed.
+
+Two user-supplied alien craft are parked at the lunar site: `alien_spaceship.glb` as **Alien Scout** and `alien_ship.glb` as **Alien Strike Ship**. Both are boardable spacecraft using the same interbody simulation. The Strike Ship's 119 source meshes are merged by material at load time to reduce mobile draw-call pressure; missing normals are generated in memory without modifying the original GLB.
+
 ## World and audio systems
 
 `src/core/world.js` owns terrain-height evaluation plus the explicit boat-navigation contract. The island shoreline remains collidable, while open ocean is intentionally unbounded. Far-ocean terrain depth is capped for stable long-distance queries.
@@ -94,7 +102,7 @@ Asset provenance is recorded beside each detailed vehicle/space asset.
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v11`.
+`public/sw.js` currently uses cache version `skyreach-v12`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
@@ -126,12 +134,14 @@ src/
     storage.js
     world.js
     spaceflight.js
+    celestial.js
     archipelago.js
   systems/
     audio.js
     exploration.js
     island-scenery.js
     living-world.js
+    moon.js
     atlas.js
 public/
   assets/
@@ -148,6 +158,10 @@ public/
       nasa-sls-block1.stl
       nasa-blue-marble-2048.png
       provenance.json
+      alien/
+        alien_spaceship.glb
+        alien_ship.glb
+        provenance.json
       earth-provenance.json
   manifest.webmanifest
   sw.js

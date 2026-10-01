@@ -56,6 +56,16 @@ For numerical stability, physical rocket altitude is mapped to render height wit
 
 The mobile HUD exposes separate speed, physical altitude, and atmospheric-region cells plus a 20–100% throttle preset and SAS toggle. The near-surface water plane is now 40 km across and crossfades with local terrain between 18–70 km physical altitude while the curved NASA Earth representation fades in, preventing the old square-ocean edge from appearing during ascent. The live browser smoke checks cover ~105 m, 16.6 km, 44.2 km, and ~297 km.
 
+## Earth-Moon interbody simulation
+
+`src/core/celestial.js` owns the physical interbody layer. The atmospheric SLS model remains authoritative through launch and crosses into celestial state at the Karman line with velocity and attitude preserved. Celestial state uses meter-scale 3D vectors, inverse-square Earth/Moon gravity, deterministic thrust integration, body-relative altitude, target guidance, and proximity-limited simulation acceleration.
+
+The Moon is physically placed about 384,400 km from Earth with a 1,737.4 km radius. Rendering uses a floating/camera-relative compressed representation instead of placing Three.js objects hundreds of millions of world units apart. The spacecraft remains near a stable render anchor during cruise while Earth and Moon are rendered from physical relative vectors; this avoids precision loss and prevents a visible scene transition at the atmospheric handoff.
+
+`src/systems/moon.js` provides the local lunar landing/exploration patch: deterministic cratered terrain, rocks, landing pad, and low-gravity walking. The distant Moon globe fades out as the local patch becomes relevant. The two lunar alien craft share the same celestial physics as the SLS. The larger 119-mesh craft is merged by material at runtime before display to reduce draw submissions on Pixel-class hardware.
+
+Cruise assist computes a physical thrust/braking command toward the selected Earth or Moon target. It does not teleport or rewrite position. Player-selected 1x-400x simulation acceleration is automatically clamped near either world so approach and landing remain controllable.
+
 ## World continuity
 
 The home island and three offshore islands are finite terrain features in an unbounded ocean. All use the same height query for walking, vehicle grounding, chart generation and shoreline collision. Sea-arch pillars have explicit boat collision while the middle remains navigable.
@@ -105,7 +115,7 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v11`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v12`.
 
 Service-worker behavior:
 

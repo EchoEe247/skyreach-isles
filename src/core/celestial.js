@@ -104,7 +104,7 @@ export function stepCelestial(state,input,dt,profile={}){
 }
 export function renderDistance(distanceM){return 1200*Math.log1p(Math.max(0,distanceM)/100000)}
 export function renderRelativeVector(relative){const d=len(relative);return d<1e-6?[0,0,0]:mul(relative,renderDistance(d)/d)}
-export function angularRenderRadius(radiusM,distanceM){const d=Math.max(radiusM+1,distanceM),rd=renderDistance(d),angle=Math.asin(clamp(radiusM/d,0,.9999));return Math.min(26000,Math.max(1,Math.tan(angle)*rd))}
+export function angularRenderRadius(radiusM,distanceM){const d=Math.max(radiusM+1,distanceM),rd=renderDistance(d),angle=Math.asin(clamp(radiusM/d,0,.9999));return Math.min(rd*.94,26000,Math.max(1,Math.tan(angle)*rd))}
 const SITE_BASIS=basisForUp(MOON_SITE_UP);
 export function moonPhysicalFromLocal(x,z,altitude=0){return add(MOON_SITE,add(mul(SITE_BASIS.east,x),add(mul(SITE_BASIS.north,z),mul(MOON_SITE_UP,altitude))))}
 export function projectMoonLocal(position){const rel=sub(position,MOON_SITE);return {x:dot(rel,SITE_BASIS.east),z:dot(rel,SITE_BASIS.north),altitude:len(sub(position,MOON_CENTER))-MOON_RADIUS_M}}
