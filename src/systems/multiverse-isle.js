@@ -39,7 +39,7 @@ function buildBreaker(){
  const lA=limbBox(g,.36,.88,.40,skin,-.84,2.02,0),rA=limbBox(g,.36,.88,.40,skin,.84,2.02,0),lL=limbBox(g,.40,.86,.44,navy,-.31,1.02,0),rL=limbBox(g,.40,.86,.44,navy,.31,1.02,0);
  box(lA,.56,.46,.56,cream,0,-.98,.02);box(rA,.56,.46,.56,cream,0,-.98,.02);box(lL,.50,.22,.64,dark,0,-.91,.12);box(rL,.50,.22,.64,dark,0,-.91,.12);g.userData.limbs={lA,rA,lL,rL,torso};return g;
 }
-function makeCheckpoint(root,x,y,z,color){const g=new T.Group();g.position.set(x,y,z);cyl(g,.11,.16,3.4,mat(0x4a506b),0,1.7,0,7);const halo=new T.Mesh(new T.TorusGeometry(1.15,.08,6,24),basic(color,.7));halo.rotation.x=Math.PI/2;halo.position.y=.12;g.add(halo);root.add(g);return {g,halo,x,y,z}}
+function makeCheckpoint(root,x,y,z,color,recoverX=x,recoverZ=z){const g=new T.Group();g.position.set(x,y,z);cyl(g,.11,.16,3.4,mat(0x4a506b),0,1.7,0,7);const halo=new T.Mesh(new T.TorusGeometry(1.15,.08,6,24),basic(color,.7));halo.rotation.x=Math.PI/2;halo.position.y=.12;g.add(halo);root.add(g);return {g,halo,x:recoverX,y,z:recoverZ,markerX:x,markerZ:z}}
 function makeGuard(){
  const g=new T.Group(),body=mat(0x6347a8,0x391a7d,.35),eye=basic(0xff5e75),metal=mat(0x30374b),shell=new T.Mesh(new T.SphereGeometry(1.22,10,7),body);shell.scale.y=.72;shell.position.y=1.42;g.add(shell);box(g,1.32,.16,.12,eye,0,1.58,1.02);
  for(const sx of[-1,1]){cyl(g,.18,.22,1.22,metal,sx*.80,.56,0,6);box(g,.54,.22,.78,metal,sx*.80,-.04,.14)}const tip=new T.Mesh(new T.SphereGeometry(.14,7,5),eye);tip.position.set(0,2.78,0);g.add(tip);g.userData.tip=tip;return g;
@@ -63,15 +63,22 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
 
  const speedRings=[],speedPads=[],speedCheckpoints=[],springs=[],spikes=[],trackPoints=[];
  for(let i=0;i<24;i++){
-  const t=i/23,x=cx-121+t*91+Math.sin(t*Math.PI*2)*7,z=cz-55+Math.sin(t*Math.PI*2.35)*49+Math.cos(t*Math.PI)*7,y=heightAt(x,z)+2.45;
-  trackPoints.push({x,z});const ring=new T.Mesh(new T.TorusGeometry(2.05,.23,8,24),mat(0xffd443,0xffa600,1.05));ring.position.set(x,y,z);root.add(ring);speedRings.push({g:ring,x,z,y,on:false,index:i});
-  if([2,7,12,17,21].includes(i)){const pad=box(root,5.8,.16,7.5,mat(0x2879e8,0x31eaff,1),x,heightAt(x,z)+.18,z);speedPads.push({g:pad,x,z,index:i})}
-  if([0,6,12,18].includes(i))speedCheckpoints.push(makeCheckpoint(root,x,heightAt(x,z),z,0x4feaff));
+  const t=i/23,x=cx-121+t*91+Math.sin(t*Math.PI*2)*7,z=cz-55+Math.sin(t*Math.PI*2.35)*49+Math.cos(t*Math.PI)*7,ground=Math.max(heightAt(x,z),.65),ringY=ground+2.25;
+  trackPoints.push({x,z,y:ground});const ring=new T.Mesh(new T.TorusGeometry(1.72,.20,8,24),mat(0xffd443,0xffa600,1.05));ring.position.set(x,ringY,z);root.add(ring);speedRings.push({g:ring,x,z,y:ringY,on:false,index:i});
+  if([2,7,12,17,21].includes(i)){const pad=box(root,6.4,.16,8.2,mat(0x2879e8,0x31eaff,1),x,ground+.18,z);speedPads.push({g:pad,x,z,y:ground,index:i})}
  }
  for(let i=0;i<speedRings.length;i++){const a=trackPoints[Math.max(0,i-1)],b=trackPoints[Math.min(trackPoints.length-1,i+1)],yaw=Math.atan2(b.x-a.x,b.z-a.z);speedRings[i].g.rotation.y=yaw;const pad=speedPads.find(p=>p.index===i);if(pad)pad.g.rotation.y=yaw}
- for(const i of[5,11,18]){const r=speedRings[i],g=cyl(root,1.25,1.25,.38,mat(0xe13e4c),r.x,heightAt(r.x,r.z)+.28,r.z,12);const coil=new T.Mesh(new T.TorusGeometry(.82,.14,6,16),mat(0xffda62));coil.rotation.x=Math.PI/2;coil.position.copy(g.position).add(new T.Vector3(0,.36,0));root.add(coil);springs.push({g,x:r.x,z:r.z,cooldown:0})}
- for(const i of[8,15,20]){const r=speedRings[i],x=r.x+3.8,z=r.z,y=heightAt(x,z),g=new T.Group();g.position.set(x,y,z);for(const d of[-.6,0,.6]){const spike=new T.Mesh(new T.ConeGeometry(.28,1.15,6),mat(0xc6dbea));spike.position.set(d,.58,0);g.add(spike)}root.add(g);spikes.push({g,x,z,y})}
- const speedGate=makePortal(0x30d9ff,'Velocity finish'),lastRing=speedRings.at(-1);speedGate.position.set(lastRing.x,heightAt(lastRing.x,lastRing.z)+3.2,lastRing.z);speedGate.scale.setScalar(.64);root.add(speedGate);
+ for(const i of[0,6,12,18]){const p=trackPoints[i],a=trackPoints[Math.max(0,i-1)],b=trackPoints[Math.min(trackPoints.length-1,i+1)],dx=b.x-a.x,dz=b.z-a.z,m=Math.hypot(dx,dz)||1,nx=dz/m,nz=-dx/m;speedCheckpoints.push(makeCheckpoint(root,p.x+nx*5.8,p.y,p.z+nz*5.8,0x4feaff,p.x,p.z))}
+ const loopIndex=10,loopPoint=trackPoints[loopIndex],loopPrev=trackPoints[loopIndex-1],loopNext=trackPoints[loopIndex+1],loopDX=loopNext.x-loopPrev.x,loopDZ=loopNext.z-loopPrev.z,loopLen=Math.hypot(loopDX,loopDZ)||1,loopFX=loopDX/loopLen,loopFZ=loopDZ/loopLen,LOOP_RADIUS=6.4,LOOP_DURATION=1.35;
+ const speedLoop={index:loopIndex,x:loopPoint.x,z:loopPoint.z,y:loopPoint.y,fx:loopFX,fz:loopFZ,radius:LOOP_RADIUS};
+ const loopGroup=new T.Group();loopGroup.position.set(speedLoop.x,speedLoop.y+LOOP_RADIUS,speedLoop.z);loopGroup.rotation.y=Math.atan2(loopFX,loopFZ)-Math.PI/2;
+ const loopTrack=new T.Mesh(new T.TorusGeometry(LOOP_RADIUS,.64,10,64),mat(0xd59a49));loopTrack.castShadow=true;loopTrack.receiveShadow=true;loopGroup.add(loopTrack);
+ const loopRailOuter=new T.Mesh(new T.TorusGeometry(LOOP_RADIUS+.82,.12,6,64),basic(0x42e9ff,.88)),loopRailInner=new T.Mesh(new T.TorusGeometry(LOOP_RADIUS-.82,.12,6,64),basic(0x42e9ff,.72));loopGroup.add(loopRailOuter,loopRailInner);root.add(loopGroup);
+ realmSign(root,'FULL LOOP',speedLoop.x,speedLoop.y+LOOP_RADIUS*2+2.4,speedLoop.z,'#72f3ff',12);
+ for(const i of[5,11,18]){const r=speedRings[i],p=trackPoints[i],g=cyl(root,1.25,1.25,.38,mat(0xe13e4c),r.x,p.y+.28,r.z,12);const coil=new T.Mesh(new T.TorusGeometry(.82,.14,6,16),mat(0xffda62));coil.rotation.x=Math.PI/2;coil.position.copy(g.position).add(new T.Vector3(0,.36,0));root.add(coil);springs.push({g,x:r.x,z:r.z,cooldown:0})}
+ for(const i of[8,15,20]){const r=speedRings[i],p=trackPoints[i],a=trackPoints[Math.max(0,i-1)],b=trackPoints[Math.min(trackPoints.length-1,i+1)],dx=b.x-a.x,dz=b.z-a.z,m=Math.hypot(dx,dz)||1,nx=dz/m,nz=-dx/m,x=r.x+nx*3.2,z=r.z+nz*3.2,y=p.y,g=new T.Group();g.position.set(x,y,z);for(const d of[-.6,0,.6]){const spike=new T.Mesh(new T.ConeGeometry(.28,1.15,6),mat(0xc6dbea));spike.position.set(d,.58,0);g.add(spike)}root.add(g);spikes.push({g,x,z,y})}
+ const speedGate=makePortal(0x30d9ff,'Velocity finish'),lastRing=speedRings.at(-1),lastTrack=trackPoints.at(-1);speedGate.position.set(lastRing.x,lastTrack.y+3.2,lastRing.z);speedGate.scale.setScalar(.64);root.add(speedGate);
+ function trackSurfaceAt(x,z){let best={distance:Infinity,y:heightAt(x,z)};for(let i=1;i<trackPoints.length;i++){const a=trackPoints[i-1],b=trackPoints[i],vx=b.x-a.x,vz=b.z-a.z,len2=vx*vx+vz*vz,t=len2?Math.max(0,Math.min(1,((x-a.x)*vx+(z-a.z)*vz)/len2)):0,px=a.x+vx*t,pz=a.z+vz*t,d=Math.hypot(x-px,z-pz);if(d<best.distance)best={distance:d,y:a.y+(b.y-a.y)*t}}return best}
 
  const smashables=[],guards=[],cityX=cx+92,cityZ=cz+6;
  for(let i=0;i<12;i++){
@@ -86,11 +93,11 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
  addRealmScenery(root,{cx,cz,heightAt,trackPoints,city:{x:cityX,z:cityZ},smashables,velocityPortal:portals[0],breakerPortal:portals[1]});
 
  const SPIN_DURATION=1.2,SPIN_TURNS=4,SPIN_PIVOT_Y=1.35;
- let active=null,dashTimer=0,spinTimer=0,punchTimer=0,hurtCooldown=0,elapsed=0,finishTime=null,speedCheckpoint=0,combo=0,comboTimer=0,score=0;
+ let active=null,dashTimer=0,spinTimer=0,punchTimer=0,hurtCooldown=0,elapsed=0,finishTime=null,speedCheckpoint=0,combo=0,comboTimer=0,score=0,loopRide=-1,loopDone=false;
  const completed={velocity:false,breaker:false},bestTimes={velocity:null},hits={velocity:0};
  const setBaseVisible=v=>{baseRig.visible=v&&hero.userData.modelState!=='ready';if(hero.userData.nightweaver)hero.userData.nightweaver.visible=v};
  const showVariant=id=>{for(const [k,v] of Object.entries(variants))v.visible=k===id;setBaseVisible(!id)};
- function resetRealm(id){completed[id]=false;elapsed=0;finishTime=null;dashTimer=spinTimer=punchTimer=0;hurtCooldown=.8;combo=score=0;comboTimer=0;if(id==='velocity'){speedCheckpoint=0;hits.velocity=0;for(const r of speedRings){r.on=false;r.g.visible=true}}if(id==='breaker'){for(const t of [...smashables,...guards]){t.on=false;t.g.visible=true;t.hp=t.maxHp;t.g.scale.setScalar(1)}}}
+ function resetRealm(id){completed[id]=false;elapsed=0;finishTime=null;dashTimer=spinTimer=punchTimer=0;hurtCooldown=.8;combo=score=0;comboTimer=0;if(id==='velocity'){speedCheckpoint=0;hits.velocity=0;loopRide=-1;loopDone=false;for(const r of speedRings){r.on=false;r.g.visible=true}}if(id==='breaker'){for(const t of [...smashables,...guards]){t.on=false;t.g.visible=true;t.hp=t.maxHp;t.g.scale.setScalar(1)}}}
  function enter(d,position){active=d.id;resetRealm(active);showVariant(active);position.set(d.start.x,heightAt(d.start.x,d.start.z),d.start.z);burst(position,d.color);onHaptic([30,30,55]);onToast(d.id==='velocity'?'Volt Runner active · clear 24 gold gates in order. Boost, Spin Dash, springs and clean lines decide your time.':'Brick Titan active · demolish 12 towers and 6 guards. Towers take multiple punches; chain hits for bigger combos.',5600)}
  function leave(position){active=null;showVariant(null);position.set(cx,hubY+.1,cz-2);burst(position,0xcaa6ff);onHaptic(25);onToast('Returned to the Nexus fork as Nightweaver.',3000)}
  function travelToHub(position){leave(position);return true}
@@ -104,15 +111,15 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
  function smash(target){punchTimer=.38;target.hp--;combo=comboTimer>0?combo+1:1;comboTimer=2.6;score+=75*combo;onHaptic([18,20,36]);emitDebris(target);target.g.scale.multiplyScalar(.98);burst(target.g.position,target.kind==='guard'?0xff5e75:0xffb45e);if(target.hp<=0){target.on=true;target.g.visible=false;score+=200*combo}const done=targets().filter(t=>t.on).length,total=targets().length;if(done===total){completed.breaker=true;finishTime=elapsed;onToast('BREAKER CITY CLEARED · '+score+' points · return to Nexus when ready.',4600)}else onToast((target.kind==='guard'?'GUARD ':'TOWER ')+(target.on?'DOWN':'HIT')+' · '+done+'/'+total+' · COMBO ×'+combo,1200)}
  function interact(position){const ret=nearestReturn(position);if(ret){leave(position);return true}if(!active){const p=nearestPortal(position);if(p){enter(p,position);return true}return false}if(active==='velocity'){spinTimer=SPIN_DURATION;dashTimer=Math.max(dashTimer,SPIN_DURATION);onHaptic(15);return true}const target=nearestSmash(position);if(target){smash(target);return true}if(active==='breaker'){punchTimer=.28;onHaptic(10);return true}return false}
  function actionLabel(position){if(nearestReturn(position))return 'Return';if(!active&&nearestPortal(position))return 'Enter';if(active==='velocity')return 'SPIN DASH';if(nearestSmash(position))return 'SMASH';if(active==='breaker')return 'PUNCH';return null}
- function surfaceHeight(x,z,base){return base}
+ function surfaceHeight(x,z,base){if(active==='velocity'&&loopRide<0){const s=trackSurfaceAt(x,z);if(s.distance<=6.2)return Math.max(base,s.y)}return base}
  function resolveCollision(position,radius=.5){if(active!=='breaker')return false;let moved=false;for(const t of targets()){if(t.on)continue;const r=t.kind==='guard'?1.45:4,dx=position.x-t.g.position.x,dz=position.z-t.g.position.z,d=Math.hypot(dx,dz),min=r+radius;if(d<min){const nx=d>.001?dx/d:1,nz=d>.001?dz/d:0;position.x=t.g.position.x+nx*min;position.z=t.g.position.z+nz*min;moved=true}}return moved}
- function speedMultiplier(){if(active!=='velocity')return 1;return dashTimer>0?3.4:2.15}
+ function speedMultiplier(){if(active!=='velocity')return 1;return loopRide>=0?3.7:dashTimer>0?3.4:2.15}
  function jumpVelocity(base=9){return active==='velocity'?9.2:active==='breaker'?7.8:base}
  function respawnVelocity(position){const cp=speedCheckpoints[speedCheckpoint]||speedCheckpoints[0];position.set(cp.x,cp.y+.15,cp.z);dashTimer=spinTimer=0;hits.velocity++;hurtCooldown=1;onHaptic([75,40,75]);onToast('Circuit recovery · checkpoint restored.',1900);return true}
  function updateAvatar(time,moving,boosting){
   const v=active?variants[active]:null;if(!v)return;const l=v.userData.limbs;if(!l)return;const rate=active==='velocity'?(boosting?20:15):7.5,ph=time*rate,walk=moving?1:0,amp=(active==='velocity'?.9:.48)*walk,s=Math.sin(ph),ease=.22;
   l.lA.rotation.x+=(s*amp-l.lA.rotation.x)*ease;l.rA.rotation.x+=(-s*amp-l.rA.rotation.x)*ease;l.lL.rotation.x+=(-s*amp-l.lL.rotation.x)*ease;l.rL.rotation.x+=(s*amp-l.rL.rotation.x)*ease;l.torso.rotation.y+=(-s*amp*.08-l.torso.rotation.y)*ease;if(punchTimer>0){l.lA.rotation.x=-1.65;l.rA.rotation.x=-1.65}
-  if(active==='velocity'&&spinTimer>0){const phase=1-spinTimer/SPIN_DURATION,a=-phase*Math.PI*2*SPIN_TURNS;v.rotation.x=a;v.position.y=SPIN_PIVOT_Y*(1-Math.cos(a));v.position.z=-SPIN_PIVOT_Y*Math.sin(a)}else{v.rotation.x=0;v.position.y=0;v.position.z=0}if(l.trail)l.trail.visible=active==='velocity'&&moving&&(boosting||dashTimer>0);
+  if(active==='velocity'&&loopRide>=0){const a=-loopRide*Math.PI*4;v.rotation.x=a;v.position.y=SPIN_PIVOT_Y*(1-Math.cos(a));v.position.z=-SPIN_PIVOT_Y*Math.sin(a)}else if(active==='velocity'&&spinTimer>0){const phase=1-spinTimer/SPIN_DURATION,a=-phase*Math.PI*2*SPIN_TURNS;v.rotation.x=a;v.position.y=SPIN_PIVOT_Y*(1-Math.cos(a));v.position.z=-SPIN_PIVOT_Y*Math.sin(a)}else{v.rotation.x=0;v.position.y=0;v.position.z=0}if(l.trail)l.trail.visible=active==='velocity'&&moving&&(boosting||dashTimer>0||loopRide>=0);
  }
  function update({time,dt,position,moving=false,boosting=false}){
   let resetVertical=false,bounceVelocity=0;root.visible=!!active||dist2(position,{x:cx,z:cz})<430;for(const id of Object.keys(variants))variants[id].visible=active===id;
@@ -122,21 +129,27 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
   for(const d of debris)if(d.life>0){d.life-=dt;d.g.position.addScaledVector(d.v,dt);d.v.y-=18*dt;d.g.rotation.x+=dt*4;d.g.rotation.z+=dt*2.4;if(d.life<=0)d.g.visible=false}
   if(active==='velocity'){
    const next=speedRings.findIndex(r=>!r.on);for(const r of speedRings){r.g.material.emissiveIntensity=r.on?0:(r.index===next?1.6:.15);r.g.rotation.z+=dt*(r.index===next?2.1:.8)}
-   for(const p of speedPads)if(dist2(position,p)<4.5)dashTimer=Math.max(dashTimer,.75);
-   for(const spring of springs){spring.cooldown=Math.max(0,spring.cooldown-dt);if(spring.cooldown<=0&&dist2(position,spring)<2.4){spring.cooldown=1;bounceVelocity=15;dashTimer=Math.max(dashTimer,.8);onHaptic([18,18,32])}}
-   if(hurtCooldown<=0&&spikes.some(s=>dist2(position,s)<1.7))resetVertical=respawnVelocity(position);
-   const n=speedRings.findIndex(r=>!r.on),target=n<0?null:speedRings[n];
-   if(target&&Math.hypot(position.x-target.x,position.z-target.z)<3.1){target.on=true;target.g.visible=false;onHaptic(10);const count=speedRings.filter(r=>r.on).length;if(count===7)speedCheckpoint=1;if(count===13)speedCheckpoint=2;if(count===19)speedCheckpoint=3;if(count===speedRings.length){completed.velocity=true;finishTime=elapsed;bestTimes.velocity=bestTimes.velocity==null?elapsed:Math.min(bestTimes.velocity,elapsed);onToast('VELOCITY COMPLETE · '+elapsed.toFixed(1)+'s · RANK '+rankFor(elapsed),4200)}}
-   if(heightAt(position.x,position.z)<-.6||dist2(position,{x:cx,z:cz})>island.radius*1.08)resetVertical=respawnVelocity(position);
+   if(loopRide>=0){
+    loopRide=Math.min(1,loopRide+dt/LOOP_DURATION);const a=-Math.PI/2+loopRide*Math.PI*2,h=Math.cos(a)*LOOP_RADIUS,v=Math.sin(a)*LOOP_RADIUS;position.x=speedLoop.x+speedLoop.fx*h;position.z=speedLoop.z+speedLoop.fz*h;position.y=speedLoop.y+LOOP_RADIUS+v+.08;resetVertical=true;dashTimer=Math.max(dashTimer,.35);
+    if(loopRide>=1){loopRide=-1;loopDone=true;position.x=speedLoop.x+speedLoop.fx*3.1;position.z=speedLoop.z+speedLoop.fz*3.1;position.y=speedLoop.y+.12;dashTimer=1;onHaptic([24,18,45]);onToast('FULL LOOP CLEARED · keep your speed!',1800)}
+   }else{
+    for(const p of speedPads)if(dist2(position,p)<4.8)dashTimer=Math.max(dashTimer,.75);
+    for(const spring of springs){spring.cooldown=Math.max(0,spring.cooldown-dt);if(spring.cooldown<=0&&dist2(position,spring)<2.4){spring.cooldown=1;bounceVelocity=15;dashTimer=Math.max(dashTimer,.8);onHaptic([18,18,32])}}
+    if(hurtCooldown<=0&&spikes.some(s=>dist2(position,s)<1.7))resetVertical=respawnVelocity(position);
+    const n=speedRings.findIndex(r=>!r.on),target=n<0?null:speedRings[n];
+    if(target&&Math.hypot(position.x-target.x,position.z-target.z)<3.1){target.on=true;target.g.visible=false;onHaptic(10);const count=speedRings.filter(r=>r.on).length;if(count===7)speedCheckpoint=1;if(count===13)speedCheckpoint=2;if(count===19)speedCheckpoint=3;if(count===speedRings.length){completed.velocity=true;finishTime=elapsed;bestTimes.velocity=bestTimes.velocity==null?elapsed:Math.min(bestTimes.velocity,elapsed);onToast('VELOCITY COMPLETE · '+elapsed.toFixed(1)+'s · RANK '+rankFor(elapsed),4200)}}
+    const cleared=speedRings.filter(r=>r.on).length;if(!loopDone&&cleared>=11&&dist2(position,speedLoop)<3.5&&moving){loopRide=0;resetVertical=true;dashTimer=Math.max(dashTimer,.8);onHaptic([20,20,35]);onToast('FULL LOOP · momentum locked!',1500)}
+    const track=trackSurfaceAt(position.x,position.z);if((heightAt(position.x,position.z)<-.6&&track.distance>7.5)||dist2(position,{x:cx,z:cz})>island.radius*1.08)resetVertical=respawnVelocity(position);
+   }
   }
   if(active==='breaker'){
    for(const [i,g] of guards.entries())if(!g.on){const a=time*.45+g.phase;g.g.position.x=g.homeX+Math.sin(a)*5.5;g.g.position.z=g.homeZ+Math.cos(a*.83)*4.2;g.g.position.y=heightAt(g.g.position.x,g.g.position.z);g.x=g.g.position.x;g.z=g.g.position.z;g.g.rotation.y=a;g.g.userData.tip.material.opacity=.55+.45*Math.sin(time*5+i);if(hurtCooldown<=0&&dist2(position,g.g.position)<2.2){hurtCooldown=1.1;combo=0;comboTimer=0;const dx=position.x-g.g.position.x,dz=position.z-g.g.position.z,m=Math.hypot(dx,dz)||1;position.x+=dx/m*3.8;position.z+=dz/m*3.8;onHaptic([40,30,50]);onToast('Guard impact · combo broken.',1500)}}
   }
   updateAvatar(time,moving,boosting);const near=!active?nearestPortal(position):null;return {active,hint:actionLabel(position)||'',status:active?statusText():(near?near.name+' · become '+near.character:null),resetVertical,bounceVelocity};
  }
- function statusText(){if(active==='velocity'){const count=speedRings.filter(r=>r.on).length,t=finishTime??elapsed;return 'Volt Runner · '+count+'/24 gates · CP '+(speedCheckpoint+1)+'/4 · '+t.toFixed(1)+'s'+(completed.velocity?' · RANK '+rankFor(t):'')}if(active==='breaker'){const done=targets().filter(t=>t.on).length;return 'Brick Titan · '+done+'/'+targets().length+' targets · Score '+score+(combo?' · ×'+combo:'')}return null}
- function guidance(){if(active==='velocity')return speedRings.find(r=>!r.on)||{name:'Finish Gate',x:speedGate.position.x,z:speedGate.position.z};if(active==='breaker'){const t=targets().filter(x=>!x.on).sort((a,b)=>dist2(hero.position,a.g.position)-dist2(hero.position,b.g.position))[0];return t?{name:t.kind==='guard'?'Security Guard':'Demolition Target',x:t.g.position.x,z:t.g.position.z}:null}return null}
+ function statusText(){if(active==='velocity'){const count=speedRings.filter(r=>r.on).length,t=finishTime??elapsed;return 'Volt Runner · '+count+'/24 gates · CP '+(speedCheckpoint+1)+'/4 · '+t.toFixed(1)+'s'+(loopRide>=0?' · LOOP':'')+(completed.velocity?' · RANK '+rankFor(t):'')}if(active==='breaker'){const done=targets().filter(t=>t.on).length;return 'Brick Titan · '+done+'/'+targets().length+' targets · Score '+score+(combo?' · ×'+combo:'')}return null}
+ function guidance(){if(active==='velocity'){if(loopRide>=0)return {name:'Full Loop',x:speedLoop.x,z:speedLoop.z};const r=speedRings.find(r=>!r.on);return r?{name:'Gate '+(r.index+1)+'/24',x:r.x,z:r.z}:{name:'Finish Gate',x:speedGate.position.x,z:speedGate.position.z}};if(active==='breaker'){const t=targets().filter(x=>!x.on).sort((a,b)=>dist2(hero.position,a.g.position)-dist2(hero.position,b.g.position))[0];return t?{name:t.kind==='guard'?'Security Guard':'Demolition Target',x:t.g.position.x,z:t.g.position.z}:null}return null}
  function isTransformed(){return !!active}
- function stats(){return {completed:{...completed},bestTimes:{...bestTimes},hits:{...hits},score,combo,speedCheckpoint}}
- return {destination:{id:MULTIVERSE_ISLAND_ID,name:'Nexus Isle',shortName:'NEXUS',x:cx,z:cz,icon:'◎',category:'OFFSHORE · TWO PLAYABLE DISTRICTS',description:'Two large separated districts: Velocity District for high-speed time trials and Breaker City for destruction combat.'},surfaceHeight,resolveCollision,speedMultiplier,jumpVelocity,interact,actionLabel,update,statusText,guidance,isTransformed,travelToHub,chooseRealm,restart,stats,activeRealm:()=>active,completed:()=>({...completed}),portals,returnPads,speedRings,speedPads,speedCheckpoints,springs,spikes,speedGate,smashables,guards,variants,root};
+ function stats(){return {completed:{...completed},bestTimes:{...bestTimes},hits:{...hits},score,combo,speedCheckpoint,loopActive:loopRide>=0,loopDone}}
+ return {destination:{id:MULTIVERSE_ISLAND_ID,name:'Nexus Isle',shortName:'NEXUS',x:cx,z:cz,icon:'◎',category:'OFFSHORE · TWO PLAYABLE DISTRICTS',description:'Two large separated districts: Velocity District for high-speed time trials and Breaker City for destruction combat.'},surfaceHeight,resolveCollision,speedMultiplier,jumpVelocity,interact,actionLabel,update,statusText,guidance,isTransformed,travelToHub,chooseRealm,restart,stats,activeRealm:()=>active,completed:()=>({...completed}),portals,returnPads,speedRings,speedPads,speedCheckpoints,springs,spikes,speedLoop,loopGroup,speedGate,smashables,guards,variants,root};
 }

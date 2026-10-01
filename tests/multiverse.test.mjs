@@ -25,7 +25,7 @@ test('Velocity and Breaker entrances are physically separated across Nexus Isle'
 
 test('Velocity District is a long ordered 24-gate course with four checkpoints',()=>{
  const {system}=makeWorld(),p=enter(system,'velocity');
- assert.equal(system.speedRings.length,24);assert.equal(system.speedCheckpoints.length,4);assert.ok(system.speedPads.length>=5);assert.equal(system.springs.length,3);assert.equal(system.spikes.length,3);
+ assert.equal(system.speedRings.length,24);assert.equal(system.speedCheckpoints.length,4);assert.ok(system.speedPads.length>=5);assert.equal(system.springs.length,3);assert.equal(system.spikes.length,3);assert.ok(system.speedLoop.radius>=6);
  const later=system.speedRings[4];p.set(later.x,terrainHeight(later.x,later.z),later.z);system.update({time:1,dt:.016,position:p,moving:true});assert.equal(later.on,false);
  const first=system.speedRings[0];p.set(first.x,terrainHeight(first.x,first.z),first.z);system.update({time:2,dt:.016,position:p,moving:true});assert.equal(first.on,true);
 });
@@ -44,7 +44,11 @@ test('Spin Dash pivots around the body center and returns exactly neutral',()=>{
 
 test('Velocity ring milestones advance checkpoint recovery',()=>{
  const {system}=makeWorld(),p=enter(system,'velocity');
- for(let i=0;i<19;i++){const r=system.speedRings[i];p.set(r.x,terrainHeight(r.x,r.z),r.z);system.update({time:i+1,dt:.016,position:p,moving:true})}
+ for(let i=0;i<=10;i++){const r=system.speedRings[i];p.set(r.x,terrainHeight(r.x,r.z),r.z);system.update({time:i+1,dt:.016,position:p,moving:true})}
+ assert.equal(system.stats().loopActive,true);
+ for(let i=0;i<100&&system.stats().loopActive;i++)system.update({time:12+i*.02,dt:.02,position:p,moving:true});
+ assert.equal(system.stats().loopDone,true);
+ for(let i=11;i<19;i++){const r=system.speedRings[i];p.set(r.x,terrainHeight(r.x,r.z),r.z);system.update({time:15+i,dt:.016,position:p,moving:true})}
  assert.equal(system.stats().speedCheckpoint,3);
 });
 
@@ -70,7 +74,20 @@ test('travelToHub and return pads restore Nightweaver',()=>{
  enter(system,'breaker');const ret=system.returnPads.find(r=>r.id==='breaker');p.set(ret.x,terrainHeight(ret.x,ret.z),ret.z);assert.equal(system.interact(p),true);assert.equal(system.activeRealm(),null);
 });
 
-test('guidance points to the next course gate or demolition target',()=>{
- const {system}=makeWorld(),p=enter(system,'velocity');assert.equal(system.guidance().x,system.speedRings[0].x);
+test('guidance always names the next course gate instead of exposing undefined',()=>{
+ const {system}=makeWorld(),p=enter(system,'velocity'),g=system.guidance();assert.equal(g.x,system.speedRings[0].x);assert.equal(g.name,'Gate 1/24');assert.equal(g.name.includes('undefined'),false);
  system.travelToHub(p);enter(system,'breaker');assert.ok(/Target|Guard/.test(system.guidance().name));
+});
+
+test('Velocity checkpoint posts are offset from the running line',()=>{
+ const {system}=makeWorld();
+ for(const cp of system.speedCheckpoints)assert.ok(Math.hypot(cp.markerX-cp.x,cp.markerZ-cp.z)>5);
+});
+
+test('Velocity full loop carries the runner vertically and exits back onto the course',()=>{
+ const {system}=makeWorld(),p=enter(system,'velocity');
+ for(let i=0;i<=10;i++){const r=system.speedRings[i];p.set(r.x,terrainHeight(r.x,r.z),r.z);system.update({time:i+1,dt:.016,position:p,moving:true})}
+ assert.equal(system.stats().loopActive,true);const startY=p.y,max=[];
+ for(let i=0;i<100&&system.stats().loopActive;i++){system.update({time:20+i*.02,dt:.02,position:p,moving:true});max.push(p.y)}
+ assert.equal(system.stats().loopDone,true);assert.ok(Math.max(...max)>startY+system.speedLoop.radius*1.5);assert.ok(Math.abs(p.y-system.speedLoop.y)<1);
 });

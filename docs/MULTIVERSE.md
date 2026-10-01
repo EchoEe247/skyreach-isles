@@ -8,13 +8,14 @@ The former platforming replica has been removed completely. Nexus Isle now reser
 
 The west side of Nexus Isle is a dedicated high-speed time-trial district.
 
-- 24 ordered gold gates on a continuous procedural checker track.
+- 24 ordered gold gates on a wider terrain-following procedural checker track.
 - Five boost pads and a much faster realm movement profile.
 - Spin Dash on Action / E with a body-centered four-turn animation.
+- One full rideable vertical loop is integrated into the ordered route; reaching it with the required gate progression carries Volt Runner around the loop and exits back onto the track.
 - Three spring launchers and three spike hazard groups.
-- Four checkpoint recovery positions.
+- Four checkpoint recovery positions; their marker posts are offset from the running line so they no longer block the character/camera.
 - Live elapsed time, best time, and S/A/B/C finish ranks.
-- Guidance always points at the next valid ordered gate.
+- Guidance always points at the next valid ordered gate with a real label such as `Gate 8/24`; the previous `undefined` compass label is removed.
 - Its entrance portal and scenery are physically separated from Breaker City.
 
 ### Breaker City — Brick Titan
@@ -43,5 +44,7 @@ The island remains present in Explore/Atlas and can be reached physically by nor
 - No ripped or official franchise assets are used.
 
 ## Verification boundary
+
+The Pixel screenshots from 2026-10-01 exposed crowded oversized decorative arches, checkpoint obstruction, a narrow/partly floating course, `undefined` objective labels, and landscape HUD clutter. The current pass removes the decorative arch spam, widens and terrain-aligns the track, makes the track itself a gameplay surface, offsets checkpoint posts, hides unrelated global controls while a realm is active, and adds the functional full loop.
 
 Automated tests and the production build remain the correctness gates. This environment still cannot provide trustworthy WebGL visual acceptance, so native/mobile visual feel should be judged in the actual Pixel browser.

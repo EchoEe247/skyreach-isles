@@ -93,7 +93,9 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 #realm-jump{border-color:#ef6266!important}#realm-velocity{border-color:#5ddeee!important}#realm-breaker{border-color:#ffa24b!important}
 #realm-result{font:700 12px system-ui;color:#9ff0b5}#realm-result:empty{display:none}
 #ui.realm-mode #obj,#ui:has(#realm-hub:not([hidden])) #obj{display:none}
+#ui.realm-mode #quality,#ui.realm-mode #telescope,#ui.realm-mode #nexus,#ui.realm-mode #atlas-toggle{display:none!important}
 #ui.realm-mode #nav{top:198px;left:14px;transform:none}
 #ui.telescope-mode #nexus,#ui.telescope-mode #realm-hub,#ui.telescope-mode #realm-hud{display:none}
 button.b{color:var(--cream);font:inherit;cursor:pointer}
 @media(max-width:620px){#realm-hub,#realm-hud{left:8px;top:10px;max-width:calc(100vw - 158px);padding:9px;gap:5px}#realm-hud small{font-size:10px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:11px}#ui.realm-mode #nav{top:220px;max-width:calc(100vw - 172px);font-size:10px}#realm-hub>div{flex-direction:column}}
+@media (orientation:landscape) and (max-height:560px){#realm-hub,#realm-hud{left:10px;top:8px;max-width:58vw;padding:8px;gap:3px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:10px}#realm-hud small{font-size:9px;line-height:1.25}#realm-hub button,#realm-hud button{min-height:30px;padding:4px 8px;font-size:10px}#ui.realm-mode #nav{top:150px;left:10px;max-width:42vw;font-size:9px;padding:5px 8px}#map{width:92px;height:92px;right:10px;top:10px}#joy{width:112px;height:112px;left:14px;bottom:14px}#knob{left:35px;top:35px;width:42px;height:42px}#act{right:18px;bottom:135px;width:66px;height:66px}#jump{right:98px;bottom:30px;width:60px;height:60px}#boost{right:18px;bottom:24px;width:68px;height:68px}}

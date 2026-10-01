@@ -17,15 +17,14 @@ export function addRealmScenery(root,{cx,cz,heightAt,trackPoints,city,smashables
 
  // Velocity District: continuous checker ribbon, luminous rails, arch gates and palms.
  for(let i=1;i<trackPoints.length;i++){
-  const a=trackPoints[i-1],b=trackPoints[i],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz),steps=Math.ceil(len/2.7),ux=dx/len,uz=dz/len;
+  const a=trackPoints[i-1],b=trackPoints[i],dx=b.x-a.x,dz=b.z-a.z,dy=(b.y??heightAt(b.x,b.z))-(a.y??heightAt(a.x,a.z)),len=Math.hypot(dx,dz),steps=Math.ceil(len/2.7),ux=dx/len,uz=dz/len,yaw=Math.atan2(dx,dz),pitch=-Math.atan2(dy,len);
   for(let j=0;j<steps;j++){
-   const t=(j+.5)/steps,x=a.x+dx*t,z=a.z+dz*t,y=heightAt(x,z)+.07,tile=box((i+j)%2?0xb8753e:0xe6b66f,x,y,z,8.5,.12,len/steps+.18);tile.rotation.y=Math.atan2(dx,dz);
-   for(const side of[-1,1]){const rail=box(side<0?0x3ed4e5:0x2c9fc5,x+uz*side*4.55,y+.16,z-ux*side*4.55,.24,.24,len/steps+.15);rail.rotation.y=tile.rotation.y}
+   const t=(j+.5)/steps,x=a.x+dx*t,z=a.z+dz*t,base=(a.y??heightAt(a.x,a.z))+dy*t,y=base+.07,tile=box((i+j)%2?0xb8753e:0xe6b66f,x,y,z,11,.14,len/steps+.22);tile.rotation.order='YXZ';tile.rotation.y=yaw;tile.rotation.x=pitch;
+   for(const side of[-1,1]){const rail=box(side<0?0x3ed4e5:0x2c9fc5,x+uz*side*5.75,y+.18,z-ux*side*5.75,.26,.28,len/steps+.18);rail.rotation.order='YXZ';rail.rotation.y=yaw;rail.rotation.x=pitch}
   }
  }
  for(let i=0;i<9;i++){const p=trackPoints[Math.min(trackPoints.length-1,i*3)],x=p.x-8-(i%2)*4,z=p.z+10-(i%3)*5,y=heightAt(x,z);mesh(new T.CylinderGeometry(.30,.46,5.5,7),0x7b5534,x,y+2.75,z);for(let j=0;j<5;j++){const a=j/5*Math.PI*2,m=mesh(new T.ConeGeometry(1.15,4.6,4),0x2d9d61,x+Math.sin(a)*1.5,y+5.5,z+Math.cos(a)*1.5);m.rotation.z=.9;m.rotation.y=a}}
  for(const p of [trackPoints[5],trackPoints[12],trackPoints[19]]){const y=heightAt(p.x,p.z);for(const side of[-1,1])box(0x34486b,p.x+side*5.2,y+3,p.z,.55,6,.55);box(0x46dff0,p.x,y+6,p.z,10.8,.35,.55)}
- for(let i=0;i<7;i++){const p=trackPoints[Math.min(trackPoints.length-1,2+i*3)],y=heightAt(p.x,p.z);mesh(new T.TorusGeometry(5.2,.16,6,24),0x4edff0,p.x,y+5.5,p.z).rotation.y=Math.PI/2}
 
  // Breaker City: streets, sidewalks, high-rises, lamps and barricades.
  for(let lane=-2;lane<=2;lane++){const x=city.x+lane*13,y=heightAt(x,city.z);box(0x2e313b,x,y+.05,city.z,7,.10,58);for(let z=-24;z<=24;z+=8)box(0xe8d36a,x,y+.12,city.z+z,.22,.05,3.2)}

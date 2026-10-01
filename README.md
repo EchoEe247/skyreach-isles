@@ -96,7 +96,7 @@ Asset provenance is recorded beside each detailed vehicle/space asset, including
 
 Nexus Isle now focuses entirely on **two physically separated, larger districts**. The former platforming replica has been removed from the project rather than hidden.
 
-- **Velocity District / Volt Runner:** occupies the west side of Nexus Isle as a 24-gate ordered time-trial course. It has a continuous checker track, five boost pads, four checkpoints, three springs, three spike hazards, Spin Dash, stronger realm-specific speed, live timing, best-time tracking, and S/A/B/C finish ranks.
+- **Velocity District / Volt Runner:** occupies the west side of Nexus Isle as a 24-gate ordered time-trial course. It has a wider terrain-following checker track, five boost pads, four off-line checkpoints, three springs, three spike hazards, Spin Dash, a rideable vertical full loop, stronger realm-specific speed, live timing, best-time tracking, and S/A/B/C finish ranks.
 - **Breaker City / Brick Titan:** occupies the east side as a larger street-grid demolition arena with **12 multi-hit towers** and **6 patrolling security guards**. Towers take two or three punches, targets stay physically solid until destroyed, debris bursts on impact, guards can break combos, and rapid hits multiply the score.
 
 The central Nexus is now a simple fork/return plaza between those two destinations rather than a three-world cluster. The two in-world entrances are more than 120 world units apart, each district has its own scenery, signage and return pad, and **MULTIVERSE** still provides fast access while the island remains physically reachable by normal exploration.
@@ -151,7 +151,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v25`.
+`public/sw.js` currently uses cache version `skyreach-v26`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
