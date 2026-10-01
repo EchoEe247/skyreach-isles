@@ -97,9 +97,9 @@ The main island now contains a compressed but complete LAX airport footprint in 
 
 The existing player airliner is relocated to Runway 24R and keeps the established aircraft physics. **Explore** now exposes both **LAX International Airport** and **Find my airplane**, so the aircraft remains discoverable after the player lands elsewhere.
 
-The player visual is now `public/assets/characters/nightweaver_LOD0.glb`. The source contains 104 meshes, roughly 166k triangles, six materials, and embedded textures. Because the supplied asset has no skeletal animation clips, Skyreach keeps movement readable with a lightweight whole-character gait/bob/lean treatment while batching static source meshes by material to avoid roughly 100 draw submissions.
+The player visual is now `public/assets/characters/nightweaver_LOD0.glb`. The source contains 104 meshes, roughly 166k triangles, six materials, and embedded textures. It is normalized to **2.8 world units tall**, slightly taller than the procedural NPC range, while retaining the existing player collision radius and camera behavior. Because the supplied asset has no skeletal animation clips, Skyreach keeps movement readable with a lightweight whole-character gait/bob/lean treatment while batching static source meshes by material to avoid roughly 100 draw submissions.
 
-`public/assets/space/jwst.glb` is deferred until needed. **JWST VIEW** switches to an orbit camera around the observatory, adds a denser deep-space star field, and keeps Earth and Moon visible through the game's compressed celestial rendering rather than loading a separate scene. Returning from the view restores the existing player/vehicle state.
+`public/assets/space/jwst.glb` is deferred until **JWST VIEW** is actually opened, so normal ascent no longer pays the model parse/merge cost. JWST VIEW switches to an orbit camera around the observatory, adds a denser deep-space star field, and keeps Earth and Moon visible through the game's compressed celestial rendering rather than loading a separate scene. Returning from the view restores the existing player/vehicle state.
 
 ## Continuous Earth-to-Moon flight
 
@@ -126,6 +126,8 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 ## Current verification
 
 - The LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
+- Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
+- AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
 - The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
 - The committed tree retains the known-good SLS derivative, so repository CI remains the authority for the clean-tree full-suite result.
 - Vite still reports the known non-fatal >500 kB warning for the Three.js vendor chunk.
@@ -139,7 +141,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v18`.
+`public/sw.js` currently uses cache version `skyreach-v19`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

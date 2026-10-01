@@ -47,7 +47,9 @@ test('LAX, airplane locator, and JWST view are exposed in the game UI',async()=>
     readFile(new URL('../index.html',import.meta.url),'utf8')
   ]);
   assert.match(game,/LAX International Airport/);
+  assert.match(game,/PLAYER_VISUAL_HEIGHT=2\.8/);
   assert.match(game,/nightweaver_LOD0\.glb/);
+  assert.match(game,/if\(telescopeView&&jwst\.userData\.modelState==='deferred'\)ensureJwstModel/);
   assert.match(game,/assets\/space\/jwst\.glb/);
   assert.match(atlas,/Find my airplane/);
   assert.match(html,/id="telescope"[^>]*>JWST VIEW</);

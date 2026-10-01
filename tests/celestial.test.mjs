@@ -14,6 +14,30 @@ test('rocket celestial handoff preserves velocity components',()=>{
   assert.ok(Math.abs(s.velocity[1]-1200)<1e-6);
 });
 
+test('Karman handoff exposes finite telemetry immediately and caps Moon warp near Earth',()=>{
+  const s=initCelestialFromRocket({altitude:100000,verticalSpeed:2264,horizontalSpeed:0,heading:Math.PI,pitch:.35});
+  for(const value of [s.earthAltitude,s.moonAltitude,s.speed,s.earthVerticalSpeed,s.moonVerticalSpeed])assert.ok(Number.isFinite(value));
+  assert.ok(Math.abs(s.earthAltitude-100000)<1e-6);
+  assert.equal(safeWarp(s,400,'moon'),10);
+});
+
+test('400x AUTO NAV remains finite through the post-Karman departure',()=>{
+  let s=initCelestialFromRocket({altitude:100000,verticalSpeed:2264,horizontalSpeed:0,heading:Math.PI,velocityHeading:Math.PI,pitch:.35});
+  for(let i=0;i<900;i++){
+    s=stepCelestial(s,{cruise:true,target:'moon',warp:400,sas:true,engineAvailable:true},.05,{acceleration:40,turnRate:.48,cruiseSpeed:18500});
+    assert.equal(s.numericalFault,false);
+    for(const value of [...s.position,...s.velocity,s.earthAltitude,s.moonAltitude,s.speed])assert.ok(Number.isFinite(value));
+  }
+});
+
+test('celestial integrator rolls back an overflow instead of returning NaN or Infinity',()=>{
+  const s=initCelestialFromRocket({altitude:100000,verticalSpeed:1200,horizontalSpeed:0,heading:Math.PI,pitch:.35});
+  s.velocity=[Number.MAX_VALUE,Number.MAX_VALUE,Number.MAX_VALUE];
+  const next=stepCelestial(s,{cruise:true,target:'moon',warp:400,sas:true,engineAvailable:true},.05,{acceleration:40});
+  assert.equal(next.numericalFault,true);
+  for(const value of [...next.position,...next.velocity,next.earthAltitude,next.moonAltitude,next.speed])assert.ok(Number.isFinite(value));
+});
+
 test('celestial integration is deterministic',()=>{
   const base=initCelestialFromRocket({altitude:120000,verticalSpeed:1700,horizontalSpeed:900,velocityHeading:Math.PI,heading:Math.PI,pitch:.5});
   const a=stepCelestial(base,{throttle:.7,steerX:.2,steerY:.1,sas:true,warp:1,target:'moon'},1/60,{acceleration:40});
