@@ -29,4 +29,8 @@ All **15 multiverse regression tests pass**, including all three transforms/retu
 
 Full local suite: **100/101**. The sole failure is the pre-existing uncommitted `public/assets/space/nasa-sls-block1-mobile.stl` modification (27,119 triangles instead of the committed 55,000); it is outside this task and excluded from these commits. The deployed build uses the committed derivative. GitHub CI is the full clean-tree gate.
 
-Cloud-browser verification is recorded after deployment; local Termux browser checks are deliberately not used for visual acceptance.
+GitHub Actions run 36876914527 passed all 101 tests, built the production game, and deployed commit e611220. The live HTML exposes the new portal selector.
+
+Visual acceptance remains blocked, not passed: the cloud-browser console reports THREE.WebGLRenderer could not create a context (GL_VENDOR/GL_RENDERER Disabled). The browser-skill runtime in the ChatGPT execution environment also fails to launch because socket creation is not permitted. Local Termux browser checks were not used, as requested.
+
+Follow-up controls preserve vertical velocity during Spin Dash/Smash and orient the runner toward the next gate on entry. The pre-existing local rocket derivative remains untouched.

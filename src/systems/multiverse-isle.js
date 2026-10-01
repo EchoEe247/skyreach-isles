@@ -262,7 +262,7 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
     hurtCooldown=Math.max(0,hurtCooldown-dt);spinTimer=Math.max(0,spinTimer-dt);punchTimer=Math.max(0,punchTimer-dt);
     if(active&&finishTime===null)elapsed+=dt;
     for(const d of debris)if(d.life>0){d.life-=dt;d.g.position.addScaledVector(d.v,dt);d.v.y-=18*dt;d.g.rotation.x+=dt*4;d.g.visible=d.life>0}
-    
+
     for(const p of portals){p.g.userData.ring.rotation.z+=dt*.38;p.g.userData.halo.rotation.z-=dt*.22;p.g.userData.inner.material.opacity=.16+.09*Math.sin(time*2.2+p.p.x*.01)}
     for(const r of returnPads)r.halo.rotation.z+=dt*.9;
     if(transformFxLife>0){transformFxLife-=dt;const t=1-transformFxLife/.7;transformFx.scale.setScalar(.5+t*4);transformFx.material.opacity=Math.max(0,(1-t)*.8);if(transformFxLife<=0)transformFx.visible=false}
