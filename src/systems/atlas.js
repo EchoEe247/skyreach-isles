@@ -1,6 +1,6 @@
 import {terrainHeight} from '../core/world.js';
 
-export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
+export function createAtlas({places,vehicles,dayForgeVehicles=[],destinations=[],onSelect,onOpen}) {
   const toggle=document.createElement('button');
   toggle.id='atlas-toggle';toggle.className='g';toggle.type='button';toggle.textContent='Explore';
   toggle.setAttribute('aria-label','Open island chart');document.getElementById('ui').append(toggle);
@@ -39,6 +39,12 @@ export function createAtlas({places,vehicles,destinations=[],onSelect,onOpen}) {
   addVehicleLocator('plane','Find my airplane','Plot a live course to your airliner at LAX or wherever you last landed it.','✈');
   addVehicleLocator('submarine','Find my submarine','Plot a live course to the Abyss submarine, wherever you last left it.','▽');
   addVehicleLocator('boat','Find my speedboat','Plot a course to wherever you last left it.','↗');
+  for(const vehicle of dayForgeVehicles){
+    const btn=document.createElement('button');btn.type='button';btn.className='atlas-place atlas-vehicle atlas-'+vehicle.type;btn.dataset.vehicle=vehicle.id;
+    const icon=vehicle.type==='boat'?'⚓':vehicle.type==='plane'?'✈':'▰';
+    btn.innerHTML='<span class="atlas-number">'+icon+'</span><span><strong>'+vehicle.name+'</strong><small>Set a live course to this playable '+vehicle.type+'; the locator follows it as it moves.</small></span>';
+    btn.onclick=()=>{onSelect({id:vehicle.id,name:vehicle.name,vehicleId:vehicle.id,vehicleType:vehicle.type,get x(){return vehicle.g.position.x},get z(){return vehicle.g.position.z}});close()};entries.prepend(btn);
+  }
   function close(){panel.hidden=true;onOpen(false);toggle.focus()}
   function open(){panel.hidden=false;onOpen(true);cards.forEach((c,n)=>c.classList.toggle('visited',!!listed[n].on));destinationCards.forEach((c,n)=>c.classList.toggle('selected',destinations[n]===lastTarget));draw(lastPosition,lastTarget);panel.querySelector('.atlas-close').focus()}
   toggle.onclick=()=>panel.hidden?open():close();
