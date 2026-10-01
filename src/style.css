@@ -81,3 +81,19 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 @media (max-width:620px){#telescope{top:240px}#telescopeHud{top:10px;min-width:68vw;max-width:72vw}#ui.telescope-mode #quality{top:64px}#ui.telescope-mode #telescope{top:100px}}
 
 #ui.rocket-mode #telescope{top:258px}
+
+/* Multiverse navigation keeps objectives readable and touch controls clear. */
+#nexus{position:absolute;right:14px;top:278px;pointer-events:auto;padding:9px 10px;color:#f7d2ff;border:1px solid #b382dc;font:700 11px system-ui;background:rgba(39,20,65,.85)}
+#realm-hub,#realm-hud{position:absolute;left:14px;top:18px;max-width:min(520px,calc(100vw - 170px));padding:13px;display:flex;flex-direction:column;gap:7px;background:rgba(15,20,38,.90);pointer-events:auto;border-color:#be9dff}
+#realm-hub[hidden],#realm-hud[hidden],#nexus-home[hidden]{display:none}
+#realm-hub strong,#realm-hud strong{font:800 13px system-ui;letter-spacing:.08em;color:#ffe6ae}
+#realm-hub span,#realm-hud span{font:12px system-ui}#realm-hud small{font:11px/1.45 system-ui;opacity:.85}
+#realm-hub>div,#realm-hud>div{display:flex;flex-wrap:wrap;gap:7px}
+#realm-hub button,#realm-hud button{min-height:36px;padding:7px 10px;color:#fff;background:#363455;border:1px solid #9181b0;border-radius:8px;font:600 11px system-ui;touch-action:manipulation}
+#realm-jump{border-color:#ef6266!important}#realm-velocity{border-color:#5ddeee!important}#realm-breaker{border-color:#ffa24b!important}
+#realm-result{font:700 12px system-ui;color:#9ff0b5}#realm-result:empty{display:none}
+#ui.realm-mode #obj,#ui:has(#realm-hub:not([hidden])) #obj{display:none}
+#ui.realm-mode #nav{top:198px;left:14px;transform:none}
+#ui.telescope-mode #nexus,#ui.telescope-mode #realm-hub,#ui.telescope-mode #realm-hud{display:none}
+button.b{color:var(--cream);font:inherit;cursor:pointer}
+@media(max-width:620px){#realm-hub,#realm-hud{left:8px;top:10px;max-width:calc(100vw - 158px);padding:9px;gap:5px}#realm-hud small{font-size:10px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:11px}#ui.realm-mode #nav{top:220px;max-width:calc(100vw - 172px);font-size:10px}#realm-hub>div{flex-direction:column}}

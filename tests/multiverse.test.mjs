@@ -43,6 +43,7 @@ test('Jump sweep hazard restores the latest checkpoint',()=>{
   const {system}=makeWorld(),p=enter(system,'jump'),cp=system.jumpCheckpoints[1];
   p.set(cp.x,cp.y,cp.z);system.update({time:0,dt:.016,position:p,moving:true});
   assert.equal(system.stats().jumpCheckpoint,1);
+  system.update({time:1,dt:1.1,position:p});
   const h=system.jumpHazards[0],time=1.25,angle=time*h.speed+h.phase;
   p.set(h.x+Math.cos(angle)*h.r*.45,h.y,h.z-Math.sin(angle)*h.r*.45);
   const state=system.update({time,dt:.016,position:p,moving:true});
@@ -51,7 +52,7 @@ test('Jump sweep hazard restores the latest checkpoint',()=>{
 
 test('Velocity Circuit requires rings in order and activates a faster boost pad multiplier',()=>{
   const {system}=makeWorld(),p=enter(system,'velocity');
-  const later=system.speedRings[3];p.set(later.x,terrainHeight(later.x,later.z),later.z);system.update({time:1,dt:.016,position:p,moving:true,boosting:false});
+  const later=system.speedRings[2];p.set(later.x,terrainHeight(later.x,later.z),later.z);system.update({time:1,dt:.016,position:p,moving:true,boosting:false});
   assert.equal(later.on,false,'later rings cannot be collected out of order');
   const first=system.speedRings[0];p.set(first.x,terrainHeight(first.x,first.z),first.z);system.update({time:2,dt:.016,position:p,moving:true,boosting:false});
   assert.equal(first.on,true);assert.equal(system.speedMultiplier(),1.9);
@@ -87,4 +88,47 @@ test('portal proximity identifies the realm and completed Jump finish gate retur
   const hub=system.update({time:0,dt:.016,position:p});assert.match(hub.status,/Jump Kingdom/);system.interact(p);
   for(const token of system.jumpTokens){p.set(token.x,token.y,token.z);system.update({time:1,dt:.016,position:p,moving:true})}
   assert.equal(system.completed().jump,true);p.copy(system.goalArch.position);assert.equal(system.actionLabel(p),'Return');assert.equal(system.interact(p),true);assert.equal(system.activeRealm(),null);
+});
+
+test('replay clears completed flags and resets collectibles and timer',()=>{
+ const {system}=makeWorld(),p=enter(system,'velocity');
+ for(const r of system.speedRings){p.set(r.x,r.y,r.z);system.update({time:1,dt:.1,position:p})}
+ assert.equal(system.completed().velocity,true);const finished=system.stats().finishTime;
+ system.update({time:3,dt:2,position:p});assert.equal(system.stats().elapsed,finished,'finish time must freeze');
+ system.restart(p);assert.equal(system.completed().velocity,false);assert.equal(system.stats().finishTime,null);
+ assert.ok(system.speedRings.every(r=>!r.on));assert.equal(system.stats().elapsed,0);
+});
+test('falling between platforms recovers at a checkpoint and grace prevents immediate repeat damage',()=>{
+ const {system}=makeWorld(),p=enter(system,'jump');
+ p.set(system.platforms[2].x,10,system.platforms[2].z);
+ const state=system.update({time:2,dt:2,position:p,verticalSpeed:-10});
+ assert.equal(state.resetVertical,true);assert.equal(system.stats().hits.jump,1);assert.ok(p.y>=system.platforms[0].top);
+});
+test('large descending physics steps land on the crossed surface',()=>{
+ const {system}=makeWorld();enter(system,'jump');const p=system.platforms[4];
+ assert.equal(system.surfaceHeight(p.x,p.z,10,p.top-.6,-18,p.top+.3),p.top);
+});
+test('stomps bounce, gold blocks award coins and springs launch the runner',()=>{
+ const {system}=makeWorld(),p=enter(system,'jump'),e=system.enemies[0];
+ const time=2;p.set(e.p.x+Math.sin(time*1.1+e.index)*2,e.p.top+1,e.p.z);
+ const stomp=system.update({time,dt:.02,position:p,verticalSpeed:-4});
+ assert.equal(e.on,true);assert.equal(stomp.bounceVelocity,9);assert.ok(system.stats().coinScore>=3);
+ const b=system.questionBlocks[0];p.set(b.g.position.x,b.g.position.y-2,b.g.position.z);
+ system.update({time:3,dt:.02,position:p,verticalSpeed:4});assert.equal(b.on,true);
+ system.chooseRealm('velocity',p);const spring=system.springs[0];p.set(spring.x,terrainHeight(spring.x,spring.z),spring.z);
+ assert.equal(system.update({time:4,dt:.02,position:p}).bounceVelocity,11);
+});
+test('all three playable characters return to the original hero and restart cleanly',()=>{
+ const {system,baseRig}=makeWorld(),p=new T.Vector3();
+ for(const id of ['jump','velocity','breaker']){system.chooseRealm(id,p);assert.equal(system.activeRealm(),id);assert.equal(system.variants[id].visible,true);system.travelToHub(p);assert.equal(system.activeRealm(),null);assert.equal(baseRig.visible,true);assert.ok(Object.values(system.variants).every(v=>!v.visible))}
+});
+test('platform edge gaps and ascents fit the jump and sprint envelope',()=>{
+ const {system}=makeWorld(),v=10.8,gravity=25,speed=11;
+ for(let i=1;i<system.platforms.length;i++){
+  const a=system.platforms[i-1],b=system.platforms[i],dy=b.top-a.top;
+  assert.ok(dy<v*v/(2*gravity),'next platform is below apex');
+  const flight=(v+Math.sqrt(v*v-2*gravity*dy))/gravity;
+  const gap=Math.hypot(Math.max(0,Math.abs(a.x-b.x)-(a.w+b.w)/2),Math.max(0,Math.abs(a.z-b.z)-(a.d+b.d)/2));
+  assert.ok(gap+1.2<speed*flight,'edge-to-edge jump has a landing margin');
+ }
 });

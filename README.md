@@ -94,15 +94,13 @@ Asset provenance is recorded beside each detailed vehicle/space asset, including
 
 ## Multiverse Nexus
 
-Nexus Isle is a fourth offshore island reserved for expandable character realms. The first three are original homage modes rather than redistributed franchise characters or ripped assets:
+Tap **MULTIVERSE** while on foot on Earth to visit Nexus Isle. Each labeled portal transforms you into a different playable hero. A hub selector, per-world controls, objective compass, restart, and return buttons make all three modes accessible on mobile.
 
-- **Jump Kingdom / Redcap Rover:** a real raised-platform route with six prism stars, three checkpoints, three rotating sweep hazards, checkpoint recovery, and a higher realm-specific jump. Platform grounding now respects vertical approach, so the character must actually land from above instead of snapping through platform undersides.
-- **Velocity Circuit / Volt Runner:** a timed fourteen-ring route with ordered ring progression, three checkpoints, visible track ribbons, boost pads, a live timer, and substantially higher realm-specific sprint speed. Skipping ahead no longer awards later rings.
-- **Breaker Arcade / Brick Titan:** a destruction arena with nine solid neon cabinets plus four patrolling security guards. Both cabinets and guards use the normal action button as **SMASH**; fast consecutive hits build a combo multiplier and score, and destroyed targets stop blocking movement.
+- **Jump Kingdom / Redcap Rover:** Mario-inspired grass-and-brick platforming with pipes, a castle, six stars, coins, gold bonus blocks, stompable walkers, sweep hazards and checkpoints.
+- **Velocity Circuit / Volt Runner:** Sonic-inspired speed running with a continuous checker track, fourteen ordered gold ring gates, Spin Dash, boost pads, springs, spikes and a finish timer.
+- **Breaker City / Brick Titan:** Wreck-It Ralph-inspired demolition with nine city towers, four patrolling guards, oversized-fist smash animation, debris and combo scoring.
 
-Each realm has its own animated portal in the central hub. Entering a portal changes the playable character in the same open world, triggers a transformation burst, teleports to that realm's start area, changes movement/jump behavior where appropriate, and updates the existing HUD with realm progress. Jump/Velocity failures recover at the latest checkpoint instead of restarting the whole realm. Each realm also has a return pad that restores Nightweaver at the central Nexus, while completed Jump and Velocity runs unlock their finish gates as direct return portals. The three realm definitions and their gameplay are isolated in `src/systems/multiverse-isle.js` so more portals can be added later without rebuilding the island.
-
-The starter realm art is generated in-engine from original geometry and materials for low mobile overhead. A permissive CC0 platformer pack was researched as an optional later enrichment path, but this first implementation does not depend on external character assets.
+All three use original procedural characters and scenery. They are compact homage games, not full commercial-game replicas. See [Multiverse gameplay and verification](docs/MULTIVERSE.md).
 
 ## LAX, Nightweaver, and JWST
 
@@ -138,7 +136,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-- The Multiverse-specific regression suite passes **9/9**, the LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
+- The Multiverse-specific regression suite passes **15/15**, the LAX/JWST/Nightweaver regression coverage passes, and `npm run build` passes.
 - Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
 - AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
 - The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
@@ -154,7 +152,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v22`.
+`public/sw.js` currently uses cache version `skyreach-v23`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.
