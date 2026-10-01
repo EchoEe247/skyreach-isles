@@ -20,14 +20,14 @@ test('uploaded SPI model contains Port Isabel, Queen Isabella bridge, roads and 
 });
 
 test('SPI visual scale is believable relative to player and vehicles',()=>{
-  assert.equal(SOUTH_PADRE.model.scale.x,.32);
-  assert.equal(SOUTH_PADRE.model.scale.y,.32);
-  assert.equal(SOUTH_PADRE.model.scale.z,.32);
-  assert.ok(SOUTH_PADRE.model.bridgeYScale>2.5);
+  assert.equal(SOUTH_PADRE.model.scale.x,.5);
+  assert.equal(SOUTH_PADRE.model.scale.y,.5);
+  assert.equal(SOUTH_PADRE.model.scale.z,.5);
+  assert.ok(SOUTH_PADRE.model.bridgeYScale>1.7&&SOUTH_PADRE.model.bridgeYScale<2);
   const route=SOUTH_PADRE.route;
   const span=Math.hypot(route.at(-1).x-route[0].x,route.at(-1).z-route[0].z);
-  assert.ok(span>1500,'Port Isabel to Padre Boulevard drive should no longer be miniature');
-  assert.ok(SOUTH_PADRE.portIsabel.halfX>=200&&SOUTH_PADRE.portIsabel.halfZ>=180);
+  assert.ok(span>2400,'Port Isabel to Padre Boulevard drive should be materially larger than the previous integration');
+  assert.ok(SOUTH_PADRE.portIsabel.halfX>=300&&SOUTH_PADRE.portIsabel.halfZ>=280);
 });
 
 test('SPI road route is continuous from Port Isabel across the raised causeway to Padre Boulevard',()=>{
@@ -66,6 +66,8 @@ test('SPI region is lazy-loaded, quality-gated and exposed through Explore',asyn
   assert.match(game,/southPadreDestination/);assert.match(game,/portIsabelDestination/);assert.match(game,/spiCar/);
   assert.match(game,/southPadreRegion\.preload/);assert.match(game,/southPadreRegion\.update\(\{position:P,quality\}\)/);
   assert.match(region,/GLTFLoader/);assert.match(region,/R\.model\.path/);assert.match(region,/startsWith\('Water'\)/);assert.match(region,/quality==='high'/);
-  const extent=Number(atlas.match(/extent=(\d+)/)?.[1]||0);assert.ok(extent>=10000);
+  const extent=Number(atlas.match(/extent=(\d+)/)?.[1]||0);assert.ok(extent>=60000);
   assert.ok(SOUTH_PADRE.destination.name.includes('South Padre'));assert.ok(SOUTH_PADRE.portDestination.name.includes('Port Isabel'));
+  assert.equal(SOUTH_PADRE.portDestination.x,SOUTH_PADRE.carSpawn.x);assert.equal(SOUTH_PADRE.portDestination.z,SOUTH_PADRE.carSpawn.z);
+  assert.match(game,/SOUTH_PADRE\.carSpawn/);assert.match(game,/Port Isabel sports car/);
 });

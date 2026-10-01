@@ -15,21 +15,22 @@
     "approxTriangles": 724219
   },
   "integration": {
-    "horizontalScale": 0.32,
-    "verticalScale": 0.32,
+    "horizontalScale": 0.5,
+    "verticalScale": 0.5,
     "translation": [
-      2733.96125,
+      3668.814453125,
       0,
-      120.4032
+      188.13
     ],
     "waterMesh": "hidden; Skyreach animated ocean remains authoritative",
-    "performance": "lazy-loaded near South Padre; uniform 0.32 model scale fixes player/car/building proportions; bridge keeps a separate vertical correction; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
+    "performance": "lazy-loaded near South Padre; 0.50 uniform model scale enlarges Port Isabel/roads/buildings/island; bridge keeps a separate vertical correction; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
     "autoLowMediumApproxVisibleTriangles": 291478,
     "culledSourceTriangles": {
       "water": 78803,
       "vegetation": 297598,
       "jetties": 56340
     },
-    "bridgeVerticalScale": 2.8140625
+    "bridgeVerticalScale": 1.800984,
+    "portIsabelVehicle": "Dedicated boardable sports car parked at Port Isabel causeway start; Explore points to the car."
   }
 }

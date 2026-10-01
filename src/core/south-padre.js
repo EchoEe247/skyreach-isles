@@ -1,8 +1,8 @@
 // South Padre/Port Isabel gameplay contract aligned to the user-supplied GLB.
 // The first integration used 0.08 horizontal scale with 0.9005 vertical scale, which
-// made cars/player gigantic and buildings pencil-thin. Geometry is now 0.32 uniform;
+// made cars/player gigantic and buildings pencil-thin. Geometry is now 0.50 uniform;
 // only the bridge gets a vertical override so its roadway peak still reads at ~23.8 m.
-const GEO_SCALE=4;
+const GEO_SCALE=6.25;
 const ORIGIN=Object.freeze({x:1072,z:0});
 const expand=(x,z)=>Object.freeze({x:ORIGIN.x+(x-ORIGIN.x)*GEO_SCALE,z:ORIGIN.z+(z-ORIGIN.z)*GEO_SCALE});
 const routePoint=(x,z,y,name)=>Object.freeze({...expand(x,z),y,name});
@@ -17,6 +17,7 @@ const baseShoreline=[
  [-4369.9,583.2,51.4]
 ];
 const destination=expand(1458,-107),lighthouse=expand(1105.9,-8),padreBlvd=expand(1409,-373),peak=expand(1247.5,-23.1),bayProbe=expand(1260,90);
+const carSpawn=Object.freeze({x:ORIGIN.x-24,z:ORIGIN.z+8,y:.8});
 
 export const SOUTH_PADRE=Object.freeze({
  id:'south-padre-port-isabel',
@@ -24,13 +25,13 @@ export const SOUTH_PADRE=Object.freeze({
  model:Object.freeze({
    path:'assets/regions/south-padre-island.glb',
    sourceSha256:'3b76f4ff571914e727ba34763642e3dec165a1d3cb18c12540773e1b3947b251',
-   scale:Object.freeze({x:.32,y:.32,z:.32}),
-   // Keeps the Port Isabel route origin fixed while increasing the model 4x horizontally.
-   position:Object.freeze({x:2733.96125,y:0,z:120.4032}),
-   bridgeYScale:2.8140625,
+   scale:Object.freeze({x:.5,y:.5,z:.5}),
+   // Keeps the Port Isabel drive start fixed while enlarging the supplied model to 50% world scale.
+   position:Object.freeze({x:3668.814453125,y:0,z:188.13}),
+   bridgeYScale:1.800984,
    sourceTriangles:724219,
-   loadRadius:2200,
-   visibilityRadius:22000
+   loadRadius:650,
+   visibilityRadius:900
  }),
  destination:Object.freeze({
    id:'south-padre-island',name:'South Padre Island',shortName:'SPI',x:destination.x,z:destination.z,icon:'☀',
@@ -38,11 +39,12 @@ export const SOUTH_PADRE=Object.freeze({
    description:'Drive across the Queen Isabella Memorial Causeway into the full-size-feeling South Padre environment, then follow Padre Boulevard north.'
  }),
  portDestination:Object.freeze({
-   id:'port-isabel-causeway',name:'Port Isabel · Causeway Start',shortName:'PORT ISABEL',x:ORIGIN.x,z:ORIGIN.z,icon:'◆',
+   id:'port-isabel-causeway',name:'Port Isabel · Causeway Start',shortName:'PORT ISABEL',x:carSpawn.x,z:carSpawn.z,icon:'◆',
    category:'TEXAS COAST · DRIVE START',
-   description:'Board the sports car in Port Isabel and drive continuously onto the Queen Isabella Memorial Causeway and South Padre Island.'
+   description:'Your Port Isabel sports car is parked here. Board it and drive continuously onto the Queen Isabella Memorial Causeway and South Padre Island.'
  }),
- portIsabel:Object.freeze({center:Object.freeze({x:ORIGIN.x,z:ORIGIN.z}),halfX:208,halfZ:192,elevation:.8}),
+ portIsabel:Object.freeze({center:Object.freeze({x:ORIGIN.x,z:ORIGIN.z}),halfX:325,halfZ:300,elevation:.8}),
+ carSpawn,
  lighthouse:Object.freeze(lighthouse),padreBlvd:Object.freeze(padreBlvd),
  causeway:Object.freeze({peak:Object.freeze({...peak}),peakHeight:23.8,realPeakFeet:78}),
  route:Object.freeze([

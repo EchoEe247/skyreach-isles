@@ -11,7 +11,7 @@ export function createAtlas({places,vehicles,dayForgeVehicles=[],destinations=[]
     <div class="atlas-footer">Choose a shore. Follow your curiosity.<button type="button" id="atlas-clear">Clear course</button></div>`;
   document.body.append(panel);
   const base=document.createElement('canvas');base.width=base.height=440;
-  const b=base.getContext('2d'),im=b.createImageData(440,440),extent=11000;
+  const b=base.getContext('2d'),im=b.createImageData(440,440),extent=60000;
   for(let n=0;n<440*440;n++){
     const x=((n%440)/440-.5)*extent,z=((n/440|0)/440-.5)*extent,h=terrainHeight(x,z);
     const c=h<0?[17,48+Math.max(0,12+h)*2,65+Math.max(0,12+h)*2]:h<2?[195,189,146]:[66+h*.9,103+h*.7,91+h*.3];

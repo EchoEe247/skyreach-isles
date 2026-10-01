@@ -35,6 +35,7 @@ function regionDistance(position){
  const px=position.x,pz=position.z;
  let best=Math.hypot(px-R.portIsabel.center.x,pz-R.portIsabel.center.z);
  best=Math.min(best,Math.hypot(px-R.destination.x,pz-R.destination.z));
+ for(const p of R.route)best=Math.min(best,Math.hypot(px-p.x,pz-p.z));
  for(const [z,c] of R.shoreline)best=Math.min(best,Math.hypot(px-c,pz-z));
  return best;
 }
