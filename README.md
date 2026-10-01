@@ -136,7 +136,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 
 ## Current verification
 
-- The Multiverse-specific regression suite passes **15/15**. The deployed clean checkout passes **101/101** tests and `npm run build` through GitHub Actions.
+- The Multiverse-specific regression suite passes **16/16**. The deployed clean checkout passes **102/102** runtime tests and `npm run build` through GitHub Actions.
 - Kármán handoff now initializes finite celestial altitude/speed telemetry immediately instead of exposing a one-frame `NaN` altitude.
 - AUTO NAV requested at ×400 is proximity-capped near either Earth or Moon, and the celestial integrator rolls back non-finite numerical steps rather than freezing the render state.
 - The local working tree still contains an unrelated pre-existing modification to `public/assets/space/nasa-sls-block1-mobile.stl`; that local file alone causes the SLS triangle-bound regression to fail and is intentionally excluded from this integration commit.
@@ -149,7 +149,7 @@ The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-
 - The current transfer profile reaches the final guided corridor at roughly 899 m lunar altitude and about 8.1 m/s before manual landing control.
 - Headless Termux Chromium cannot provide trustworthy Three.js visual acceptance because EGL/WebGL initialization fails in that environment. This is a QA-environment limitation, not evidence of a rendered pass.
 - Cloud browser visual acceptance is also blocked by disabled WebGL; the alternate browser-skill runtime in this execution environment cannot create its required sockets. Neither is reported as a visual pass. See [Multiverse verification](docs/MULTIVERSE.md).
-- Native/mobile visual feel and frame pacing remain unverified in this delivery.
+- Native/mobile visual feel and frame pacing remain unverified in this delivery. A subsequent code audit caught and fixed Volt Runner rotating around its foot origin during Spin Dash; the corrected animation now pivots around the body center and returns exactly to neutral.
 
 ## PWA and update behavior
 

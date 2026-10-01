@@ -25,12 +25,12 @@ The on-screen realm card explains controls and exposes **Restart world** and **R
 
 Fixed terrain-dependent jump heights, large-step platform tunneling, checkpoints activating from underneath, stale completion on replay, a timer continuing after the finish, inaccessible return behavior, unlabeled portals, and the lack of an easy route to the hub. Added a short post-recovery grace period.
 
-All **15 multiverse regression tests pass**, including all three transforms/returns, replay resets, checkpoint/fall recovery, swept landings, stomps, gold blocks, spring launches, and mathematical platform jump margins. Production build passes.
+All **16 multiverse regression tests pass**, including all three transforms/returns, replay resets, checkpoint/fall recovery, swept landings, stomps, gold blocks, spring launches, and mathematical platform jump margins. Production build passes.
 
-Full local suite: **100/101**. The sole failure is the pre-existing uncommitted `public/assets/space/nasa-sls-block1-mobile.stl` modification (27,119 triangles instead of the committed 55,000); it is outside this task and excluded from these commits. The deployed build uses the committed derivative. GitHub CI is the full clean-tree gate.
+Full clean-tree GitHub suite: **102/102 runtime tests pass**. The separate local workspace still has the pre-existing uncommitted `public/assets/space/nasa-sls-block1-mobile.stl` modification; it remains outside this task and is excluded from these commits. The deployed build uses the committed derivative.
 
-GitHub Actions run 36876914527 passed all 101 tests, built the production game, and deployed commit e611220. The live HTML exposes the new portal selector.
+GitHub Actions run 36880818915 passed all 102 runtime tests, built the production game, and deployed audit-fix commit 6aff35d. The live HTML exposes the portal selector and the initial discovery counter is corrected to 0/9.
 
 Visual acceptance remains blocked, not passed: the cloud-browser console reports THREE.WebGLRenderer could not create a context (GL_VENDOR/GL_RENDERER Disabled). The browser-skill runtime in the ChatGPT execution environment also fails to launch because socket creation is not permitted. Local Termux browser checks were not used, as requested.
 
-Follow-up controls preserve vertical velocity during Spin Dash/Smash and orient the runner toward the next gate on entry. The pre-existing local rocket derivative remains untouched.
+Follow-up controls preserve vertical velocity during Spin Dash/Smash and orient the runner toward the next gate on entry. Independent audit also fixed Spin Dash to rotate Volt Runner around a body-center pivot for four complete turns, returning exactly to neutral instead of orbiting around the feet and potentially clipping through the ground. The pre-existing local rocket derivative remains untouched.
