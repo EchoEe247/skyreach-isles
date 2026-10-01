@@ -64,3 +64,5 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 #spaceTargetMarker.edge #spaceTargetRing{opacity:.45}
 #spaceTargetMarker.edge #spaceTargetPointer{display:block}
 @keyframes targetPulse{0%,100%{transform:scale(.9);opacity:.72}50%{transform:scale(1.08);opacity:1}}
+
+#cruise.active{color:#9fffdc!important;border-color:rgba(120,255,210,.62)!important;background:rgba(22,108,94,.76)!important;box-shadow:0 0 12px rgba(100,255,215,.22)}

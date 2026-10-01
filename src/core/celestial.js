@@ -72,7 +72,7 @@ export function earthReturnTarget(state={},altitude=null){
   return [site[0],EARTH_RADIUS_M+Math.max(0,targetAltitude),site[2]];
 }
 export function targetDistance(state,target='moon'){
-  const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state):moonLandingTarget();
+  const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state,0):moonLandingTarget(0);
   return len(sub(t,p));
 }
 export function targetGuidance(state,target='moon'){
@@ -102,21 +102,25 @@ export function atmosphericStateFromCelestial(state){
   };
 }
 export function cruiseCommand(state,target='moon',profile={}){
-  const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],metrics=bodyMetrics(p),targetPos=target==='earth'?earthReturnTarget(state):moonLandingTarget(600);
+  const p=state.position||[0,EARTH_RADIUS_M,0],vel=state.velocity||[0,0,0],metrics=bodyMetrics(p),site=state.earthSite||[0,0,0],earthLateral=Math.hypot(p[0]-site[0],p[2]-site[2]),earthAutoAltitude=target==='earth'&&state.autoEarthPhase==='descent'?0:500000,targetPos=target==='earth'?earthReturnTarget(state,earthAutoAltitude):moonLandingTarget(0);
   const delta=sub(targetPos,p),distance=len(delta),toTarget=norm(delta),accel=Math.max(4,profile.acceleration||36);
-  let desiredSpeed=Math.min(profile.cruiseSpeed||18000,Math.sqrt(Math.max(0,2*accel*Math.max(0,distance-1800)))*.62);
-  if(target==='moon'&&metrics.moonAltitude<250000)desiredSpeed=Math.min(desiredSpeed,clamp(distance*.012+3,3,700));
-  if(target==='earth'&&metrics.earthAltitude<350000)desiredSpeed=Math.min(desiredSpeed,clamp(metrics.earthAltitude*.012+80,80,1200));
-  const desiredVelocity=mul(toTarget,desiredSpeed),deltaVelocity=sub(desiredVelocity,vel);
-  let direction=norm(deltaVelocity),throttle=clamp(len(deltaVelocity)/(accel*5),0,1);
-  return {direction,throttle,desiredSpeed,distance,attitude:attitudeForDirection(p,direction)};
+  let desiredSpeed=Math.min(profile.cruiseSpeed||18000,Math.sqrt(Math.max(0,2*accel*Math.max(0,distance-.2)))*.58);
+  if(target==='moon'&&metrics.moonAltitude<250000)desiredSpeed=Math.min(desiredSpeed,clamp(distance*.012+.8,.8,650));
+  if(target==='earth'){
+    if(state.autoEarthPhase==='descent')desiredSpeed=Math.min(desiredSpeed,clamp(distance*.006+.8,.8,140));
+    else if(metrics.earthAltitude<5000000)desiredSpeed=Math.min(desiredSpeed,clamp(distance*.0015+20,20,1400));
+  }
+  if(distance<8)desiredSpeed=Math.min(desiredSpeed,1.5);
+  const desiredVelocity=mul(toTarget,desiredSpeed),deltaVelocity=sub(desiredVelocity,vel),g=gravityAt(p),responseTime=distance<5000?1.4:distance<100000?2.2:4.0,trackingAccel=mul(deltaVelocity,1/responseTime),requiredThrust=sub(trackingAccel,g);
+  let direction=norm(requiredThrust),throttle=clamp(len(requiredThrust)/accel,0,1);
+  return {direction,throttle,desiredSpeed,distance,targetAltitude:target==='earth'?earthAutoAltitude:0,earthLateral,requiredThrust,attitude:attitudeForDirection(p,direction)};
 }
 export function safeWarp(state,requested=1,target='moon'){
-  const m=bodyMetrics(state.position||[0,EARTH_RADIUS_M,0]),d=target==='earth'?m.earthAltitude:len(sub(moonLandingTarget(600),state.position||[0,EARTH_RADIUS_M,0]));
+  const p=state.position||[0,EARTH_RADIUS_M,0],m=bodyMetrics(p),d=target==='earth'?len(sub(earthReturnTarget(state,0),p)):len(sub(moonLandingTarget(0),p));
   if(d<10000)return 1;if(d<800000)return Math.min(requested,10);if(d<5000000)return Math.min(requested,50);if(d<30000000)return Math.min(requested,100);return Math.min(requested,400);
 }
 export function stepCelestial(state,input,dt,profile={}){
-  const s={...state,position:[...(state.position||[0,EARTH_RADIUS_M,0])],velocity:[...(state.velocity||[0,0,0])]},requestedWarp=Math.max(1,input.warp||1);
+  const s={...state,position:[...(state.position||[0,EARTH_RADIUS_M,0])],velocity:[...(state.velocity||[0,0,0])]},requestedWarp=Math.max(1,input.warp||1),engineAvailable=input.engineAvailable!==false;
   const safe=safeWarp(s,requestedWarp,input.target||'moon'),warp=input.cruise?safe:Math.min(safe,10);
   const realControlTime=Math.max(0,Math.min(.05,dt))*SPACE_TIME_SCALE;
   let total=realControlTime*warp;
@@ -124,7 +128,14 @@ export function stepCelestial(state,input,dt,profile={}){
   s.yawRate=Number(s.yawRate)||0;s.pitchRate=Number(s.pitchRate)||0;
   for(let i=0;i<steps;i++){
     if(s.crashedBody){s.velocity=[0,0,0];continue}
-    if(input.cruise)auto=cruiseCommand(s,input.target||'moon',profile);
+    if(input.cruise){
+      const navTarget=input.target||'moon';
+      if(navTarget==='earth'){
+        const alignTarget=earthReturnTarget(s,500000),alignDistance=len(sub(alignTarget,s.position)),speed=len(s.velocity);
+        if(s.autoEarthPhase!=='descent'&&alignDistance<20000&&speed<250)s.autoEarthPhase='descent';
+      }else s.autoEarthPhase=null;
+      auto=cruiseCommand(s,navTarget,profile);if(!engineAvailable)auto={...auto,throttle:0,engineAvailable:false}
+    }
     if(auto){
       s.heading+=angleDelta(auto.attitude.heading-s.heading)*Math.min(1,h*.8);
       s.pitch+=angleDelta(auto.attitude.pitch-s.pitch)*Math.min(1,h*.8);
@@ -140,7 +151,7 @@ export function stepCelestial(state,input,dt,profile={}){
       }
       s.heading+=s.yawRate*ch;s.pitch=clamp(s.pitch+s.pitchRate*ch,-Math.PI,Math.PI);
     }
-    const thrustDir=auto?auto.direction:directionFromAttitude(s.position,s.heading,s.pitch),throttle=clamp(auto?auto.throttle:(input.throttle||0),0,1),acc=(profile.acceleration||36)*throttle,g=gravityAt(s.position);
+    const thrustDir=auto?auto.direction:directionFromAttitude(s.position,s.heading,s.pitch),throttle=clamp(auto?auto.throttle:(input.throttle||0),0,1),acc=(engineAvailable?(profile.acceleration||36):0)*throttle,g=gravityAt(s.position);
     s.velocity[0]+=(g[0]+thrustDir[0]*acc)*h;s.velocity[1]+=(g[1]+thrustDir[1]*acc)*h;s.velocity[2]+=(g[2]+thrustDir[2]*acc)*h;
     s.position[0]+=s.velocity[0]*h;s.position[1]+=s.velocity[1]*h;s.position[2]+=s.velocity[2]*h;
     const metrics=bodyMetrics(s.position),body=metrics.moonAltitude<metrics.earthAltitude?'moon':'earth',center=body==='moon'?MOON_CENTER:[0,0,0],radius=body==='moon'?MOON_RADIUS_M:EARTH_RADIUS_M,rel=sub(s.position,center),r=len(rel);

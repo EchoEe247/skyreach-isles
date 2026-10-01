@@ -57,7 +57,7 @@ This document records the full remediation pass following the focused SLS / Moon
 
 ## Verification
 
-- 73/73 Node tests pass after this remediation.
+- 75/75 Node tests pass after this remediation.
 - New regression coverage includes destructive/gentle lunar impacts, celestial SAS/manual divergence, manual high-warp limiting, atmospheric crash semantics, streamed lunar recentering, physical lunar gravity, vacuum spacecraft audio, and the optimized SLS asset envelope.
 - Production Vite build passes.
 - git diff --check passes.
@@ -66,3 +66,7 @@ This document records the full remediation pass following the focused SLS / Moon
 ## Launch continuity correction
 
 A follow-up launch audit found two render-continuity faults hidden behind otherwise-correct flight physics: the celestial branch could reset spacecraft X/Z toward world origin when lunar-local blend was zero, and the Earth globe switched instantly from the full atmospheric representation to the compressed celestial representation at Kármán. The celestial render path now preserves the exact launch render anchor until lunar-local blending begins. The Earth globe now transitions smoothly from its atmospheric representation to its compressed celestial representation across 100–400 km instead of switching scale/position in one frame. Engine plumes remain visually continuous through atmospheric ascent until actual booster geometry separation exists, and liftoff clears stale ground-landing state. The rocket HUD telemetry row is five columns to avoid overlap after FUEL/HEAT were added.
+
+## AUTO NAV completion
+
+AUTO NAV now owns the complete trip while enabled. From an Earth pad with TARGET MOON it commands autonomous full-throttle liftoff, transitions continuously through Kármán, accounts for commanded autopilot throttle in fuel/FX/audio, and performs gravity-compensated interbody guidance through touchdown. Moon touchdown targets the actual surface instead of the former 600 m approach corridor. Earth return uses a persistent ALIGN phase at a 500 km waypoint over the saved landing site, then a DESCEND phase; gravity-compensated thrust tracks the descent velocity through a controlled surface contact. AUTO NAV turns OFF only after `landedBody` confirms arrival. Manual flight remains unchanged when AUTO NAV is OFF. Regression tests exercise Moon and Earth touchdown with the SLS, Alien Scout, and Alien Strike Ship profiles.

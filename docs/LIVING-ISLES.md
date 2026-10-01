@@ -54,7 +54,7 @@ Events announce once when they begin. Reaching the event radius resolves the cur
 - Teleport QA to Tideglass cargo confirmed the event resolves when the player enters its event radius.
 - The alternate Ember ferry path was sampled along every segment and remained below the boat-travel shoreline threshold.
 
-These bullets document the Living Isles release checkpoint. The current repository has since grown to **73/73 passing tests** and adds Earth-Moon flight, streamed lunar terrain, and two alien spacecraft without changing the living-world contracts above. Current repository-wide verification is summarized in README.md and docs/ARCHITECTURE.md.
+These bullets document the Living Isles release checkpoint. The current repository has since grown to **75/75 passing tests** and adds Earth-Moon flight, streamed lunar terrain, and two alien spacecraft without changing the living-world contracts above. Current repository-wide verification is summarized in README.md and docs/ARCHITECTURE.md.
 
 ## Deliberate boundaries
 

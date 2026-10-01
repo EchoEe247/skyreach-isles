@@ -39,17 +39,16 @@ test('warp automatically collapses near a target body',()=>{
   assert.equal(safeWarp(moonNear,400,'moon'),1);
 });
 
-test('Moon cruise physically intercepts the landing corridor without teleporting',()=>{
+test('Moon AUTO NAV physically completes touchdown without teleporting',()=>{
   let s=initCelestialFromRocket({altitude:100000,verticalSpeed:1600,horizontalSpeed:700,heading:Math.PI,velocityHeading:Math.PI,pitch:.35});
-  let reached=false;
-  for(let i=0;i<7000;i++){
-    s=stepCelestial(s,{cruise:true,target:'moon',warp:400,sas:true},1/60,{acceleration:40,turnRate:.48,cruiseSpeed:18500});
-    if(targetDistance(s,'moon')<300&&s.speed<35){reached=true;break}
+  for(let i=0;i<10000&&s.landedBody!=='moon'&&!s.crashedBody;i++){
+    s=stepCelestial(s,{cruise:true,target:'moon',warp:400,sas:true,engineAvailable:true},1/60,{acceleration:40,turnRate:.48,cruiseSpeed:18500});
   }
-  assert.ok(reached,'cruise should deliver a controllable final lunar approach');
+  assert.equal(s.landedBody,'moon');
+  assert.equal(s.crashedBody??null,null);
   const local=projectMoonLocal(s.position);
-  assert.ok(Math.hypot(local.x,local.z)<100,'approach should be over the landing site');
-  assert.ok(s.moonAltitude>500&&s.moonAltitude<1400,'handoff should stay above the lunar surface for manual landing');
+  assert.ok(Math.hypot(local.x,local.z)<1,'touchdown should be centered on the lunar destination');
+  assert.ok(s.impactSpeed<LANDING_MAX_SPEED_MPS);
 });
 
 test('Earth return targets the original launch site and preserves reentry velocity',()=>{
@@ -64,17 +63,15 @@ test('Earth return targets the original launch site and preserves reentry veloci
   assert.equal(a.worldZ,-40);
 });
 
-test('Moon cruise returns to the original Earth launch corridor',()=>{
+test('Earth AUTO NAV uses alignment then controlled descent to the launch site',()=>{
   let s={position:moonPhysicalFromLocal(0,0,800),velocity:[0,0,0],earthSite:[-65,0,-40],heading:0,pitch:0,landedBody:null};
-  let reached=false;
-  for(let i=0;i<6500;i++){
-    s=stepCelestial(s,{cruise:true,target:'earth',warp:400,sas:true},1/60,{acceleration:40,turnRate:.48,cruiseSpeed:18500});
-    const lateral=Math.hypot(s.position[0]+65,s.position[2]+40);
-    if(lateral<300&&s.earthAltitude<15000&&s.speed<100){reached=true;break}
+  for(let i=0;i<24000&&s.landedBody!=='earth'&&!s.crashedBody;i++){
+    s=stepCelestial(s,{cruise:true,target:'earth',warp:400,sas:true,engineAvailable:true},1/60,{acceleration:40,turnRate:.48,cruiseSpeed:18500});
   }
-  assert.equal(reached,true);
-  assert.ok(Math.hypot(s.position[0]+65,s.position[2]+40)<300);
-  assert.ok(s.earthAltitude<15000);
+  assert.equal(s.landedBody,'earth');
+  assert.equal(s.crashedBody??null,null);
+  assert.ok(Math.hypot(s.position[0]+65,s.position[2]+40)<1);
+  assert.ok(s.impactSpeed<LANDING_MAX_SPEED_MPS);
 });
 
 test('Moon guidance points near launch heading and reports the real elevation change',()=>{
@@ -126,4 +123,34 @@ test('Karman render anchor stays continuous until lunar-local blending begins',(
   assert.equal(half.x,(anchor.x+1200)/2);
   assert.equal(half.z,(anchor.z-900)/2);
   assert.deepEqual(spacecraftRenderXZ(anchor.x,anchor.z,1200,-900,1),{x:1200,z:-900});
+});
+
+test('AUTO NAV completes Moon touchdown for every spacecraft profile',()=>{
+  const profiles=[
+    {acceleration:40,turnRate:.48,cruiseSpeed:18500},
+    {acceleration:58,turnRate:.9,cruiseSpeed:26000},
+    {acceleration:72,turnRate:.72,cruiseSpeed:32000}
+  ];
+  for(const profile of profiles){
+    let state=initCelestialFromRocket({altitude:100000,verticalSpeed:1600,horizontalSpeed:700,heading:Math.PI,velocityHeading:Math.PI,pitch:.35,worldX:-65,worldZ:-40});
+    for(let i=0;i<18000&&!state.landedBody&&!state.crashedBody;i++)state=stepCelestial(state,{cruise:true,target:'moon',warp:400,sas:true,engineAvailable:true},1/60,profile);
+    assert.equal(state.landedBody,'moon');
+    assert.equal(state.crashedBody??null,null);
+    assert.ok(state.impactSpeed<LANDING_MAX_SPEED_MPS);
+  }
+});
+test('AUTO NAV completes Earth touchdown for every spacecraft profile',()=>{
+  const profiles=[
+    {acceleration:40,turnRate:.48,cruiseSpeed:18500},
+    {acceleration:58,turnRate:.9,cruiseSpeed:26000},
+    {acceleration:72,turnRate:.72,cruiseSpeed:32000}
+  ];
+  for(const profile of profiles){
+    let state={position:moonPhysicalFromLocal(0,0,4),velocity:[0,0,0],earthSite:[-65,0,-40],heading:0,pitch:0,landedBody:'moon'};
+    for(let i=0;i<36000&&state.landedBody!=='earth'&&!state.crashedBody;i++)state=stepCelestial(state,{cruise:true,target:'earth',warp:400,sas:true,engineAvailable:true},1/60,profile);
+    assert.equal(state.landedBody,'earth');
+    assert.equal(state.crashedBody??null,null);
+    assert.ok(state.impactSpeed<LANDING_MAX_SPEED_MPS);
+    assert.ok(Math.hypot(state.position[0]+65,state.position[2]+40)<1);
+  }
 });
