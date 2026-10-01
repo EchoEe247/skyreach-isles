@@ -132,3 +132,14 @@ test('platform edge gaps and ascents fit the jump and sprint envelope',()=>{
   assert.ok(gap+1.2<speed*flight,'edge-to-edge jump has a landing margin');
  }
 });
+
+
+test('Spin Dash pivots around the runner body center and returns exactly to neutral',()=>{
+ const {system}=makeWorld(),p=enter(system,'velocity'),v=system.variants.velocity;
+ assert.equal(system.interact(p),true);
+ system.update({time:1,dt:.15,position:p,moving:true});
+ assert.ok(Math.abs(v.rotation.x)>1,'runner should visibly rotate during Spin Dash');
+ assert.ok(v.position.y>1,'body-center pivot should lift the foot-origin model instead of rotating it through the ground');
+ system.update({time:2,dt:2,position:p,moving:false});
+ assert.equal(v.rotation.x,0);assert.equal(v.position.y,0);assert.equal(v.position.z,0);
+});

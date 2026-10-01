@@ -176,6 +176,7 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
   }
   for(const i of[4,9,12]){const r=speedRings[i],x=r.x+4,z=r.z,y=heightAt(x,z);const g=new T.Group();g.position.set(x,y,z);for(const d of[-.6,0,.6]){const spike=new T.Mesh(new T.ConeGeometry(.28,1.1,6),mat(0xc6dbea));spike.position.set(d,.55,0);g.add(spike)}root.add(g);spikes.push({g,x,z,y})}
   const debris=[];for(let i=0;i<20;i++){const g=box(root,.6,.6,.6,mat(i%2?0xe4a26b:0x91d7e4));g.visible=false;debris.push({g,life:0,v:new T.Vector3()})}
+  const SPIN_DURATION=1.2,SPIN_TURNS=4,SPIN_PIVOT_Y=1.35;
   let hurtCooldown=0,spinTimer=0,punchTimer=0,elapsed=0,finishTime=null,coinScore=0;
   let active=null,dashTimer=0,jumpCheckpoint=0,speedCheckpoint=0,realmStartedAt=0,combo=0,comboTimer=0,score=0;
   const completed={jump:false,velocity:false,breaker:false},bestTimes={velocity:null},hits={jump:0,velocity:0};
@@ -218,7 +219,7 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
   function interact(position){
     const ret=nearestReturn(position);if(ret){leave(position);return true}
     if(!active){const p=nearestPortal(position);if(p){enter(p,position);return true}return false}
-    if(active==='velocity'){spinTimer=1.2;dashTimer=1.2;onHaptic(15);return true}
+    if(active==='velocity'){spinTimer=SPIN_DURATION;dashTimer=SPIN_DURATION;onHaptic(15);return true}
     const block=nearestSmash(position);if(block){smash(block);return true}
     return false;
   }
@@ -252,7 +253,7 @@ export function createMultiverseIsle(scene,obstacles,{island,heightAt,hero,baseR
   function updateAvatar(time,moving,boosting){
     const v=active?variants[active]:null;if(!v)return;const l=v.userData.limbs;if(!l)return;
     const rate=active==='velocity'?(boosting?18:13):active==='breaker'?7:10,ph=time*rate,walk=moving?1:0,amp=(active==='breaker'?.45:active==='velocity'?.85:.65)*walk,s=Math.sin(ph),ease=.22;
-    l.lA.rotation.x+=(s*amp-l.lA.rotation.x)*ease;l.rA.rotation.x+=(-s*amp-l.rA.rotation.x)*ease;l.lL.rotation.x+=(-s*amp-l.lL.rotation.x)*ease;l.rL.rotation.x+=(s*amp-l.rL.rotation.x)*ease;l.torso.rotation.y+=(-s*amp*.08-l.torso.rotation.y)*ease;if(punchTimer>0){l.lA.rotation.x=-1.7;l.rA.rotation.x=-1.7}v.rotation.x=spinTimer>0?-time*24:0;
+    l.lA.rotation.x+=(s*amp-l.lA.rotation.x)*ease;l.rA.rotation.x+=(-s*amp-l.rA.rotation.x)*ease;l.lL.rotation.x+=(-s*amp-l.lL.rotation.x)*ease;l.rL.rotation.x+=(s*amp-l.rL.rotation.x)*ease;l.torso.rotation.y+=(-s*amp*.08-l.torso.rotation.y)*ease;if(punchTimer>0){l.lA.rotation.x=-1.7;l.rA.rotation.x=-1.7}if(active==='velocity'&&spinTimer>0){const phase=1-spinTimer/SPIN_DURATION,a=-phase*Math.PI*2*SPIN_TURNS;v.rotation.x=a;v.position.y=SPIN_PIVOT_Y*(1-Math.cos(a));v.position.z=-SPIN_PIVOT_Y*Math.sin(a)}else{v.rotation.x=0;v.position.y=0;v.position.z=0}
     if(l.trail)l.trail.visible=active==='velocity'&&moving&&(boosting||dashTimer>0);
   }
   function update({time,dt,position,moving=false,boosting=false,verticalSpeed=0}){
