@@ -1,24 +1,26 @@
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 
 export function computeAudioMix(state={}){
-  const mode=state.mode||'foot',speed=Math.abs(state.speed||0),alt=Math.max(0,state.altitude||0);
+  const mode=state.mode||'foot',speed=Math.abs(state.speed||0),alt=Math.max(0,state.altitude||0),vacuum=!!state.vacuum,throttle=cl(state.throttle||0);
   const ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day,rain=cl(state.rain||0),weatherWind=cl(state.weatherWind||0),storm=cl(state.storm||0);
   return {
-    waterfall:cl((state.waterfall||0)*.20,0,.20),
-    wind:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0)+weatherWind*.11+storm*.05,0,.52),
-    rain:cl(rain*.16+storm*.04,0,.22),
-    ocean:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
-    surf:cl(coast*.12,0,.13),
-    land:cl((1-ocean)*(1-town)*.035,0,.04),
-    town:cl(town*.025,0,.03),
+    waterfall:vacuum?0:cl((state.waterfall||0)*.20,0,.20),
+    wind:vacuum?0:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0)+weatherWind*.11+storm*.05,0,.52),
+    rain:vacuum?0:cl(rain*.16+storm*.04,0,.22),
+    ocean:vacuum?0:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
+    surf:vacuum?0:cl(coast*.12,0,.13),
+    land:vacuum?0:cl((1-ocean)*(1-town)*.035,0,.04),
+    town:vacuum?0:cl(town*.025,0,.03),
     car:mode==='car'?cl(.055+speed/420,0,.14):0,
     road:mode==='car'?cl(speed/280,0,.085):0,
     boat:mode==='boat'?cl(.07+speed/320,0,.145):0,
     wake:mode==='boat'?cl(speed/160,0,.18):0,
     plane:mode==='plane'?cl(.07+speed/500,0,.18):0,
     jet:mode==='plane'?cl(.04+speed/360+alt/3000,0,.22):0,
-    day,
-    night
+    rocket:mode==='rocket'?cl(.025+throttle*.22,0,.24):0,
+    alien:mode==='alien'?cl(.018+throttle*.19,0,.21):0,
+    cabin:(mode==='rocket'||mode==='alien')&&vacuum?cl(.008+throttle*.07,0,.08):0,
+    day,night
   };
 }
 
@@ -70,14 +72,16 @@ export function createWorldAudio(){
         town:loopingNoise(ctx,noise,'bandpass',380,.45),
         road:loopingNoise(ctx,noise,'bandpass',240,.8),
         wake:loopingNoise(ctx,noise,'highpass',430,.35),
-        jet:loopingNoise(ctx,noise,'bandpass',760,.5)
+        jet:loopingNoise(ctx,noise,'bandpass',760,.5),
+        cabin:loopingNoise(ctx,noise,'lowpass',180,.7)
       };
       Object.values(layers).forEach(x=>x.gain.connect(master));
 
       engines={
         car1:oscillator(ctx,'sawtooth',55),car2:oscillator(ctx,'square',110),
         boat1:oscillator(ctx,'sawtooth',38),boat2:oscillator(ctx,'sine',76),
-        plane1:oscillator(ctx,'sawtooth',90),plane2:oscillator(ctx,'sine',310)
+        plane1:oscillator(ctx,'sawtooth',90),plane2:oscillator(ctx,'sine',310),
+        rocket1:oscillator(ctx,'sawtooth',42),rocket2:oscillator(ctx,'sine',84),alien1:oscillator(ctx,'triangle',118),alien2:oscillator(ctx,'sine',236)
       };
       Object.values(engines).forEach(x=>x.gain.connect(master));
       started=true;paused=false;
@@ -124,7 +128,7 @@ export function createWorldAudio(){
     target(layers.wind.gain.gain,mix.wind,.16);target(layers.wind.filter.frequency,700+speed*18+(state.altitude||0)*.8,.2);target(layers.rain.gain.gain,mix.rain,.18);
     target(layers.waterfall.gain.gain,mix.waterfall,.25);target(layers.ocean.gain.gain,mix.ocean,.2);target(layers.surf.gain.gain,mix.surf,.22);
     target(layers.land.gain.gain,mix.land,.3);target(layers.town.gain.gain,mix.town,.3);
-    target(layers.road.gain.gain,mix.road,.08);target(layers.wake.gain.gain,mix.wake,.08);target(layers.jet.gain.gain,mix.jet,.1);
+    target(layers.road.gain.gain,mix.road,.08);target(layers.wake.gain.gain,mix.wake,.08);target(layers.jet.gain.gain,mix.jet,.1);target(layers.cabin.gain.gain,mix.cabin,.12);
     target(layers.wake.filter.frequency,430+speed*32,.1);target(layers.jet.filter.frequency,650+speed*10,.1);
 
     target(engines.car1.gain.gain,mix.car,.07);target(engines.car2.gain.gain,mix.car*.22,.07);
@@ -133,6 +137,10 @@ export function createWorldAudio(){
     target(engines.boat1.osc.frequency,34+speed*1.7,.08);target(engines.boat2.osc.frequency,68+speed*3.4,.08);
     target(engines.plane1.gain.gain,mix.plane*.72,.08);target(engines.plane2.gain.gain,mix.plane*.19,.08);
     target(engines.plane1.osc.frequency,72+speed*2.2,.08);target(engines.plane2.osc.frequency,255+speed*5.8,.08);
+    target(engines.rocket1.gain.gain,mix.rocket,.06);target(engines.rocket2.gain.gain,mix.rocket*.36,.06);
+    target(engines.rocket1.osc.frequency,38+(state.throttle||0)*32,.08);target(engines.rocket2.osc.frequency,76+(state.throttle||0)*64,.08);
+    target(engines.alien1.gain.gain,mix.alien,.06);target(engines.alien2.gain.gain,mix.alien*.42,.06);
+    target(engines.alien1.osc.frequency,105+(state.throttle||0)*95,.08);target(engines.alien2.osc.frequency,210+(state.throttle||0)*190,.08);
 
     if(mode==='foot'&&state.walking&&state.grounded){
       stepClock+=(state.dt||0)*(state.sprinting?2.75:1.9);
@@ -140,7 +148,7 @@ export function createWorldAudio(){
     }else stepClock=Math.min(stepClock,.3);
 
     wildClock-=state.dt||0;
-    if(wildClock<=0&&mode==='foot'&&(state.town||0)<.75&&(state.rain||0)<.35){
+    if(wildClock<=0&&!state.vacuum&&mode==='foot'&&(state.town||0)<.75&&(state.rain||0)<.35){
       const night=mix.night>.58;
       if((night&&mix.night>.58)||(!night&&mix.day>.32&&(state.ocean||0)<.72))chirp(night);
       wildClock=night?1.7+Math.random()*3.8:3.5+Math.random()*7.5;

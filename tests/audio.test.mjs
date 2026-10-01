@@ -41,3 +41,11 @@ test('rain and storm raise weather ambience without exceeding mix bounds',()=>{
   assert.ok(wet.rain>.15&&wet.wind>clear.wind);
   assert.ok(wet.rain<=1&&wet.wind<=1);
 });
+
+test('vacuum suppresses exterior ambience while spacecraft retain internal propulsion sound',()=>{
+  const rocket=computeAudioMix({mode:'rocket',speed:4000,altitude:200000,vacuum:true,throttle:.8,rain:1,weatherWind:1,ocean:1});
+  const alien=computeAudioMix({mode:'alien',speed:8000,altitude:500000,vacuum:true,throttle:.6});
+  assert.equal(rocket.wind,0);assert.equal(rocket.rain,0);assert.equal(rocket.ocean,0);
+  assert.ok(rocket.rocket>0&&rocket.cabin>0);
+  assert.ok(alien.alien>0&&alien.cabin>0);
+});

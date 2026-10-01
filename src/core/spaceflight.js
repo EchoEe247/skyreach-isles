@@ -42,7 +42,7 @@ export function gravityTurnPitch(altitudeM){
   return .22*clamp((h-900)/45000,0,1);
 }
 
-export function stepRocket(state,input,dt){
+export function stepRocket(state,input,dt,profile={}){
   const s={...state};
   const simDt=Math.max(0,Math.min(.05,dt))*ROCKET_TIME_SCALE;
   const throttle=clamp(Number(input.throttle)||0,0,1);
@@ -81,7 +81,7 @@ export function stepRocket(state,input,dt){
     s.heading+=s.yawRate*simDt;
   }
 
-  const thrustAcceleration=throttle*(31+9*(1-density));
+  const baseAcceleration=Math.max(20,profile.acceleration||40),thrustAcceleration=throttle*(baseAcceleration-9+9*(1-density));
   const verticalThrust=thrustAcceleration*Math.cos(s.pitch);
   const horizontalThrust=thrustAcceleration*Math.sin(s.pitch);
   const verticalDrag=.00023*density*s.verticalSpeed*Math.abs(s.verticalSpeed);
@@ -102,8 +102,9 @@ export function stepRocket(state,input,dt){
   if(s.horizontalSpeed>.001)s.velocityHeading=Math.atan2(vx,vz);
 
   if(s.altitude<=0&&s.verticalSpeed<0){
-    s.verticalSpeed=0;
-    s.horizontalSpeed*=Math.exp(-simDt*4);
+    const impactSpeed=Math.hypot(s.verticalSpeed,s.horizontalSpeed);s.impactSpeed=impactSpeed;
+    if(impactSpeed>18){s.crashedBody='earth';s.verticalSpeed=0;s.horizontalSpeed=0}
+    else{s.verticalSpeed=0;s.horizontalSpeed*=Math.exp(-simDt*4);if(impactSpeed<8)s.landedBody='earth'}
   }
   s.altitude=Math.max(0,s.altitude+s.verticalSpeed*simDt);
   return s;

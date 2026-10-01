@@ -9,6 +9,8 @@ export const MOON_MU=4.9048695e12;
 export const SPACE_TIME_SCALE=4;
 export const MOON_RENDER_BASE_Y=12000;
 export const MOON_LOCAL_RADIUS_M=7000;
+export const LANDING_MAX_SPEED_MPS=8;
+export const CRASH_MIN_SPEED_MPS=18;
 
 const MOON_ANGLE=35*Math.PI/180;
 export const MOON_CENTER=Object.freeze([0,Math.cos(MOON_ANGLE)*MOON_DISTANCE_M,-Math.sin(MOON_ANGLE)*MOON_DISTANCE_M]);
@@ -65,9 +67,9 @@ export function initCelestialFromRocket(state){
   return {position:[worldX,EARTH_RADIUS_M+altitude,worldZ],velocity:[Math.sin(vh)*(state.horizontalSpeed||0),state.verticalSpeed||0,Math.cos(vh)*(state.horizontalSpeed||0)],earthSite:[worldX,0,worldZ],heading,pitch:Math.max(0,Number(state.pitch)||0),yawRate:0,pitchRate:0,landedBody:null};
 }
 export function moonLandingTarget(altitude=600){return add(MOON_SITE,mul(MOON_SITE_UP,Math.max(0,altitude)))}
-export function earthReturnTarget(state={},altitude=12000){
-  const site=state.earthSite||[0,0,0];
-  return [site[0],EARTH_RADIUS_M+Math.max(0,altitude),site[2]];
+export function earthReturnTarget(state={},altitude=null){
+  const site=state.earthSite||[0,0,0],targetAltitude=altitude==null?(Number.isFinite(state.earthTargetAltitude)?state.earthTargetAltitude:12000):altitude;
+  return [site[0],EARTH_RADIUS_M+Math.max(0,targetAltitude),site[2]];
 }
 export function targetDistance(state,target='moon'){
   const p=state.position||[0,EARTH_RADIUS_M,0],t=target==='earth'?earthReturnTarget(state):moonLandingTarget();
@@ -115,22 +117,47 @@ export function safeWarp(state,requested=1,target='moon'){
 }
 export function stepCelestial(state,input,dt,profile={}){
   const s={...state,position:[...(state.position||[0,EARTH_RADIUS_M,0])],velocity:[...(state.velocity||[0,0,0])]},requestedWarp=Math.max(1,input.warp||1);
-  const warp=safeWarp(s,requestedWarp,input.target||'moon');
-  let total=Math.max(0,Math.min(.05,dt))*SPACE_TIME_SCALE*warp;
-  const maxStep=warp>100?2.5:warp>10?1.2:.2,steps=Math.max(1,Math.ceil(total/maxStep)),h=total/steps;let auto=null;
+  const safe=safeWarp(s,requestedWarp,input.target||'moon'),warp=input.cruise?safe:Math.min(safe,10);
+  const realControlTime=Math.max(0,Math.min(.05,dt))*SPACE_TIME_SCALE;
+  let total=realControlTime*warp;
+  const maxStep=warp>100?2.5:warp>10?1.2:.2,steps=Math.max(1,Math.ceil(total/maxStep)),h=total/steps,ch=realControlTime/steps;let auto=null;
+  s.yawRate=Number(s.yawRate)||0;s.pitchRate=Number(s.pitchRate)||0;
   for(let i=0;i<steps;i++){
+    if(s.crashedBody){s.velocity=[0,0,0];continue}
     if(input.cruise)auto=cruiseCommand(s,input.target||'moon',profile);
-    if(auto){s.heading+=angleDelta(auto.attitude.heading-s.heading)*Math.min(1,h*.8);s.pitch+=(auto.attitude.pitch-s.pitch)*Math.min(1,h*.8)}
-    else{s.heading-=clamp(input.steerX||0,-1,1)*(profile.turnRate||.55)*h;s.pitch=clamp(s.pitch+clamp(input.steerY||0,-1,1)*(profile.turnRate||.55)*h,-Math.PI,Math.PI)}
+    if(auto){
+      s.heading+=angleDelta(auto.attitude.heading-s.heading)*Math.min(1,h*.8);
+      s.pitch+=angleDelta(auto.attitude.pitch-s.pitch)*Math.min(1,h*.8);
+      s.yawRate*=Math.exp(-h*4);s.pitchRate*=Math.exp(-h*4);
+    }else{
+      const turn=profile.turnRate||.55,steerX=clamp(input.steerX||0,-1,1),steerY=clamp(input.steerY||0,-1,1);
+      if(input.sas!==false){
+        const targetYaw=-steerX*turn,targetPitch=steerY*turn,response=Math.min(1,ch*5.5);
+        s.yawRate+=(targetYaw-s.yawRate)*response;s.pitchRate+=(targetPitch-s.pitchRate)*response;
+      }else{
+        s.yawRate+=-steerX*turn*1.8*ch;s.pitchRate+=steerY*turn*1.8*ch;
+        const damp=Math.exp(-ch*.18);s.yawRate*=damp;s.pitchRate*=damp;
+      }
+      s.heading+=s.yawRate*ch;s.pitch=clamp(s.pitch+s.pitchRate*ch,-Math.PI,Math.PI);
+    }
     const thrustDir=auto?auto.direction:directionFromAttitude(s.position,s.heading,s.pitch),throttle=clamp(auto?auto.throttle:(input.throttle||0),0,1),acc=(profile.acceleration||36)*throttle,g=gravityAt(s.position);
     s.velocity[0]+=(g[0]+thrustDir[0]*acc)*h;s.velocity[1]+=(g[1]+thrustDir[1]*acc)*h;s.velocity[2]+=(g[2]+thrustDir[2]*acc)*h;
     s.position[0]+=s.velocity[0]*h;s.position[1]+=s.velocity[1]*h;s.position[2]+=s.velocity[2]*h;
     const metrics=bodyMetrics(s.position),body=metrics.moonAltitude<metrics.earthAltitude?'moon':'earth',center=body==='moon'?MOON_CENTER:[0,0,0],radius=body==='moon'?MOON_RADIUS_M:EARTH_RADIUS_M,rel=sub(s.position,center),r=len(rel);
-    if(r<radius){const up=norm(rel);s.position=add(center,mul(up,radius));const inward=dot(s.velocity,up);if(inward<0)s.velocity=sub(s.velocity,mul(up,inward));if(len(s.velocity)<3){s.velocity=[0,0,0];s.landedBody=body}}
-    else if(s.landedBody&&r>radius+2)s.landedBody=null;
+    if(r<radius){
+      const up=norm(rel),impactSpeed=len(s.velocity),inward=dot(s.velocity,up),tangent=sub(s.velocity,mul(up,inward));
+      s.position=add(center,mul(up,radius));s.impactSpeed=impactSpeed;s.impactBody=body;
+      if(impactSpeed>CRASH_MIN_SPEED_MPS){
+        s.velocity=[0,0,0];s.crashedBody=body;s.landedBody=null;
+      }else if(impactSpeed<=LANDING_MAX_SPEED_MPS){
+        s.velocity=[0,0,0];s.landedBody=body;s.crashedBody=null;
+      }else{
+        const bounce=Math.max(0,-inward)*.12;s.velocity=add(mul(tangent,.42),mul(up,bounce));s.landedBody=null;s.crashedBody=null;
+      }
+    }else if((s.landedBody||s.crashedBody)&&r>radius+2){s.landedBody=null;s.crashedBody=null}
   }
   const metrics=bodyMetrics(s.position),speed=len(s.velocity),moonUp=radialUp(s.position,MOON_CENTER),earthUp=radialUp(s.position,[0,0,0]);
-  return {...s,...metrics,speed,moonVerticalSpeed:dot(s.velocity,moonUp),earthVerticalSpeed:dot(s.velocity,earthUp),warp,cruise:auto};
+  return {...s,...metrics,speed,moonVerticalSpeed:dot(s.velocity,moonUp),earthVerticalSpeed:dot(s.velocity,earthUp),warp,requestedWarp,cruise:auto};
 }
 export function renderDistance(distanceM){return 1200*Math.log1p(Math.max(0,distanceM)/100000)}
 export function renderRelativeVector(relative){const d=len(relative);return d<1e-6?[0,0,0]:mul(relative,renderDistance(d)/d)}

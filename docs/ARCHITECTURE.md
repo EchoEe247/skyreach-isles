@@ -135,7 +135,7 @@ Explore releases held controls and pauses simulation movement. Blur and visibili
 
 ## PWA and deployment updates
 
-The production build registers `public/sw.js`. Current cache version: `skyreach-v14`.
+The production build registers `public/sw.js`. Current cache version: `skyreach-v15`.
 
 Service-worker behavior:
 
@@ -168,7 +168,7 @@ The current Node test suite covers:
 
 ## Current verification status
 
-As of the current Earth-Moon audit-repair build, the repository test suite is **61/61 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
+As of the current Earth-Moon audit-repair build, the repository test suite is **70/70 passing** and the production Vite build succeeds. git diff --check is clean, npm audit reports 0 vulnerabilities, and local serving has returned HTTP 200 for the current build.
 
 Current regression coverage includes real-scale Earth-Moon separation/radius, deterministic celestial integration, Karman-line velocity handoff, lunar-site projection, render-distance compression, safe warp limits, physical Moon-cruise interception, and both alien GLB assets in addition to the earlier world/vehicle/audio coverage.
 
@@ -184,3 +184,9 @@ Continue extracting only when the boundary is useful and testable:
 4. UI: HUD, minimap, settings
 
 Each extraction should preserve `legacy/skyreach-original.html` as the behavioral reference and be followed by tests, a production build, and an appropriate runtime smoke check.
+
+## Space remediation state
+
+The celestial layer now models explicit landing/crash thresholds, angular inertia with SAS damping, manual-warp safety, fuel/heat presentation, continuous SLS/alien atmospheric handoff, and streamed lunar-local terrain. Earth-only simulation is gated off in deep space/Moon mode. NASA LRO/LOLA Moon maps are shared by the distant Moon and local terrain material path. The runtime SLS uses the 55k-triangle mobile derivative while retaining the original NASA source asset for provenance.
+
+See `SPACE-REMEDIATION.md` for the detailed acceptance record.

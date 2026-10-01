@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "NASA Scientific Visualization Studio CGI Moon Kit",
+  "credit": "NASA's Scientific Visualization Studio; LRO/LROC/LOLA teams",
+  "source_page": "https://svs.gsfc.nasa.gov/4720/",
+  "assets": [
+    {
+      "file": "nasa-lroc-moon-2k.jpg",
+      "source_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg",
+      "usage": "Distant Moon albedo and streamed local terrain albedo"
+    },
+    {
+      "file": "nasa-lola-moon-dem-1k.jpg",
+      "source_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_3_8bit.jpg",
+      "usage": "Streamed local terrain bump/detail map"
+    }
+  ]
+}

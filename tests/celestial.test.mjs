@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,targetGuidance,moonPhysicalFromLocal} from '../src/core/celestial.js';
+import {EARTH_RADIUS_M,MOON_DISTANCE_M,MOON_RADIUS_M,MOON_CENTER,MOON_SITE,bodyMetrics,initCelestialFromRocket,earthReturnTarget,atmosphericStateFromCelestial,stepCelestial,renderDistance,angularRenderRadius,projectMoonLocal,safeWarp,targetDistance,targetGuidance,moonPhysicalFromLocal,MOON_SITE_UP,LANDING_MAX_SPEED_MPS,CRASH_MIN_SPEED_MPS} from '../src/core/celestial.js';
 
 test('Moon uses real-scale Earth-Moon separation and radius',()=>{
   assert.ok(Math.abs(Math.hypot(...MOON_CENTER)-MOON_DISTANCE_M)<1);
@@ -83,4 +83,38 @@ test('Moon guidance points near launch heading and reports the real elevation ch
   assert.ok(g.distance>370_000_000&&g.distance<390_000_000);
   assert.ok(Math.abs(g.relativeHeading)<.02,'Moon should begin close to the launch heading');
   assert.ok(g.relativePitch>.5&&g.relativePitch<.72,'Moon should be roughly 35 degrees off the launch vertical');
+});
+
+test('high-energy lunar impact crashes instead of becoming a safe landing',()=>{
+  const p=moonPhysicalFromLocal(0,0,100),v=MOON_SITE_UP.map(x=>-x*1200);
+  let s={position:p,velocity:v,heading:0,pitch:0,landedBody:null};
+  for(let i=0;i<20&&!s.crashedBody;i++)s=stepCelestial(s,{throttle:0,steerX:0,steerY:0,sas:true,warp:1,target:'moon'},.05,{acceleration:40});
+  assert.equal(s.crashedBody,'moon');
+  assert.equal(s.landedBody,null);
+  assert.ok(s.impactSpeed>CRASH_MIN_SPEED_MPS);
+});
+test('gentle lunar contact is a valid landing',()=>{
+  const p=moonPhysicalFromLocal(0,0,2),v=MOON_SITE_UP.map(x=>-x*2);
+  let s={position:p,velocity:v,heading:0,pitch:0,landedBody:null};
+  for(let i=0;i<20&&!s.landedBody;i++)s=stepCelestial(s,{throttle:0,steerX:0,steerY:0,sas:true,warp:1,target:'moon'},.05,{acceleration:40});
+  assert.equal(s.landedBody,'moon');
+  assert.ok((s.impactSpeed||0)<=LANDING_MAX_SPEED_MPS);
+});
+test('celestial SAS damps attitude while manual mode carries inertia',()=>{
+  const base=initCelestialFromRocket({altitude:140000,verticalSpeed:1000,horizontalSpeed:300,heading:1,velocityHeading:1,pitch:.2});
+  let sas=base,manual=base;
+  for(let i=0;i<90;i++){
+    const steer=i<30?1:0;
+    sas=stepCelestial(sas,{throttle:0,steerX:steer,steerY:0,sas:true,warp:1,target:'moon'},1/60,{turnRate:.6});
+    manual=stepCelestial(manual,{throttle:0,steerX:steer,steerY:0,sas:false,warp:1,target:'moon'},1/60,{turnRate:.6});
+  }
+  assert.notEqual(sas.heading,manual.heading);
+  assert.ok(Math.abs(sas.yawRate)<Math.abs(manual.yawRate));
+});
+test('manual flight cannot receive full 400x warp control amplification',()=>{
+  const base=initCelestialFromRocket({altitude:2_000_000,verticalSpeed:0,horizontalSpeed:0,heading:0,velocityHeading:0,pitch:0});
+  const s=stepCelestial(base,{throttle:1,steerX:1,steerY:1,sas:false,warp:400,target:'moon',cruise:false},1/60,{acceleration:72,turnRate:.72});
+  assert.equal(s.requestedWarp,400);
+  assert.ok(s.warp<=10);
+  assert.ok(Math.abs(s.heading)<1);
 });

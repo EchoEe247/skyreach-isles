@@ -73,3 +73,9 @@ test('horizontal velocity keeps its own heading in space',()=>{
   assert.ok(Math.abs(s.velocityHeading)<1e-6);
   assert.ok(s.horizontalSpeed>499);
 });
+
+test('hard atmospheric impact is a crash, not a safe stop',()=>{
+  const s=stepRocket({altitude:0,verticalSpeed:-80,horizontalSpeed:25,heading:0,velocityHeading:0,pitch:0},{throttle:0,steerX:0,steerY:0,sas:true},1/60);
+  assert.equal(s.crashedBody,'earth');
+  assert.ok(s.impactSpeed>18);
+});

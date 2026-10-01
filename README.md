@@ -104,11 +104,15 @@ Earth return is bidirectional for the SLS: TARGET EARTH + AUTO NAV guides back t
 
 `src/systems/audio.js` owns the adaptive WebAudio mix. Audio starts only after the player's Start gesture to satisfy browser autoplay rules. Mix levels react to movement speed, vehicle type, altitude, coast proximity, town proximity, terrain surface, time of day, rain, and weather wind.
 
+## Space-stack remediation
+
+The SLS/Moon/alien-spacecraft stack received a dedicated correctness and mobile-performance remediation. It now includes real crash thresholds, celestial SAS/manual inertia, safe manual time acceleration, continuous alien Earth reentry, streamed arbitrary lunar landing terrain, physical 1.62 m/s² lunar walking gravity, NASA LRO/LOLA Moon data, dedicated vacuum spacecraft audio, deep-space suspension of Earth-only simulation, fuel/heat state, staged SLS plume behavior, and a 55k-triangle mobile SLS derivative. See [Space Stack Remediation](docs/SPACE-REMEDIATION.md).
+
 ## Current verification
 
 Current master verification after the Claude-audit repair pass:
 
-- **61/61 Node tests pass**.
+- **70/70 Node tests pass**.
 - npm run build passes. The game-owned JS is split to ~97 KB while Three.js is isolated in a cacheable vendor chunk; Vite still reports the known non-fatal >500 kB warning for the Three.js chunk.
 - git diff --check passes.
 - npm audit reports 0 vulnerabilities.
@@ -120,7 +124,7 @@ Current master verification after the Claude-audit repair pass:
 
 ## PWA and update behavior
 
-`public/sw.js` currently uses cache version `skyreach-v14`.
+`public/sw.js` currently uses cache version `skyreach-v15`.
 
 - Navigation requests are network-first, with cached fallback.
 - `.glb` vehicle/aircraft/boat assets are network-first, with cached fallback.

@@ -12,6 +12,16 @@
       "source_url": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/printable/space-launch-system-(sls)-block-1/Space%20Launch%20System%20(SLS)%20Block%201.stl",
       "title": "Space Launch System (SLS) Block 1",
       "unpacked": false
+    },
+    {
+      "bytes": 2750084,
+      "creator": "NASA / Space Launch System Program Office; mobile derivative decimated in Blender 4.0.2",
+      "destination": "public/assets/space/nasa-sls-block1-mobile.stl",
+      "derived_from": "public/assets/space/nasa-sls-block1.stl",
+      "license": "NASA 3D Resources / NASA media usage guidelines",
+      "sha256": "7399d51fe6eb7fa64d0058db73abe6bca587bb08369c0f84a22b3e37a80fdaf7",
+      "title": "Space Launch System (SLS) Block 1 \u2014 Skyreach mobile derivative",
+      "processing": "Blender Decimate from 274,432 to 55,000 triangles; geometry only, runtime colors/normals retained."
     }
   ],
   "version": 1
