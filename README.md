@@ -37,6 +37,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - On-foot exploration with touch joystick, jump, sprint/boost, and drag camera
 - Detailed user-supplied sports car for the player and color-varied town traffic
 - Detailed speedboat using the existing sailing controls and physics, with unrestricted open-ocean travel beyond the island collision field
+- Surface swimming: exit a boat into open water, swim with the normal movement controls, use **Stroke** for a faster burst, and board nearby boats directly from the water
 - Playable user-supplied Abyss submarine with separate Boost, Dive, and Surface controls, live depth telemetry, seabed-aware movement, underwater camera support, and a live Explore-map locator
 - Detailed airliner relocated to the integrated four-runway **LAX International Airport**, with runway-ready spawn placement and a live Explore-map locator
 - Ten playable DAY FORGE ships, aircraft, and a monster truck integrated on the home island; each has a named live Explore locator. See [DAY FORGE Fleet](docs/DAY-FORGE-FLEET.md).
