@@ -9,3 +9,7 @@ test('lighting declarations are executable, not swallowed by a line comment',()=
   assert.doesNotMatch(source,/\/\/ lights & skyconst hemi/);
   assert.match(source,/hemi\.intensity=/);
 });
+test('loopback production QA keeps deterministic inspection local-only',()=>{
+  assert.match(source,/import\.meta\.env\.DEV\|\|location\.hostname==='127\.0\.0\.1'\|\|location\.hostname==='localhost'/);
+  assert.match(source,/globalThis\.__skyreach=/);
+});
