@@ -48,6 +48,27 @@ test('SPI road route is continuous from Port Isabel across the raised causeway t
   assert.equal(boatCanTravel(SOUTH_PADRE.bayProbe.x,SOUTH_PADRE.bayProbe.z),true);
 });
 
+test('causeway joints keep the next segment centerline instead of collapsing into the prior shoulder',()=>{
+  const route=SOUTH_PADRE.route,smooth=t=>t*t*(3-2*t);
+  for(let i=1;i<route.length-1;i++){
+    const a=route[i],b=route[i+1],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz);
+    for(const distance of [4,12,20,25,32]){
+      const t=distance/len,x=a.x+dx*t,z=a.z+dz*t;
+      const expected=a.y+(b.y-a.y)*smooth(t),actual=spiRouteHeight(x,z);
+      assert.ok(Number.isFinite(actual),a.name+' centerline vanished at '+distance);
+      assert.ok(Math.abs(actual-expected)<.02,a.name+' centerline height drifted at '+distance);
+    }
+  }
+});
+
+test('causeway collision does not create invisible shoulders over open bay water',()=>{
+  const route=SOUTH_PADRE.route,a=route[4],b=route[5],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz);
+  const mx=a.x+dx*.35,mz=a.z+dz*.35,nx=-dz/len,nz=dx/len;
+  assert.ok(Number.isFinite(spiRouteHeight(mx+nx*14,mz+nz*14)));
+  assert.equal(spiLandHeight(mx+nx*18,mz+nz*18),null);
+  assert.equal(spiRouteHeight(mx+nx*18,mz+nz*18),null);
+});
+
 test('curved island collision follows the uploaded terrain footprint instead of the old rectangular island',()=>{  for(const [z,center,half] of SOUTH_PADRE.shoreline.filter((_,i)=>i%5===0)){
     assert.ok(spiLandHeight(center,z)>0);
     assert.equal(spiLandHeight(center+half+12,z),null);

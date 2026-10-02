@@ -78,15 +78,21 @@ const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
 
 function routeY(x,z){
  const pts=SOUTH_PADRE.route;
+ let best=null;
  for(let i=0;i<pts.length-1;i++){
   const a=pts[i],b=pts[i+1],dx=b.x-a.x,dz=b.z-a.z,l2=dx*dx+dz*dz;
   const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/l2,0,1),px=a.x+dx*t,pz=a.z+dz*t,d=Math.hypot(x-px,z-pz);
-  if(d<26){
-   const deck=a.y+(b.y-a.y)*smooth(0,1,t),ground=1.75;
-   return d<15.5?deck:deck+(ground-deck)*smooth(15.5,26,d);
-  }
+  if(!best||d<best.d)best={a,b,t,d};
  }
- return null;
+ if(!best||best.d>=26)return null;
+ const deck=best.a.y+(best.b.y-best.a.y)*smooth(0,1,best.t);
+ if(best.d<15.5)return deck;
+ // Keep the physical bridge footprint aligned with the visible ~31-unit deck.
+ // Over land, a short verge blends into terrain; over open bay, no invisible
+ // drivable shoulder is created outside the causeway.
+ const land=spiLandHeight(x,z);
+ if(land===null)return null;
+ return deck+(land-deck)*smooth(15.5,26,best.d);
 }
 
 function shorelineAt(z){
