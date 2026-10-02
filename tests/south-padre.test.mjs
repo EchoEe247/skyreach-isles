@@ -65,8 +65,8 @@ test('SPI region is lazy-loaded, quality-gated and exposed through Explore',asyn
   assert.match(game,/southPadreRegion\.preload/);assert.match(game,/southPadreRegion\.update\(\{position:P,quality\}\)/);
   assert.match(region,/GLTFLoader/);assert.match(region,/R\.model\.path/);assert.match(region,/startsWith\('Water'\)/);assert.match(region,/quality==='high'/);
   const extent=Number(atlas.match(/extent=(\d+)/)?.[1]||0);assert.ok(extent>=100000);
-  assert.ok(spiProximity(SOUTH_PADRE.carSpawn).near);assert.equal(spiProximity({x:0,z:0}).near,false);assert.equal(spiProximity(SOUTH_PADRE.carSpawn).clearFogFar,18000);
-  assert.match(region,/addContext/);assert.match(region,/lighthouseParts/);assert.match(region,/R\.model\.lighthouseYScale/);
+  assert.ok(spiProximity(SOUTH_PADRE.carSpawn).near);assert.equal(spiProximity({x:0,z:0}).near,false);const spiVis=spiProximity(SOUTH_PADRE.carSpawn);assert.equal(spiVis.clearFogNear,12000);assert.equal(spiVis.clearFogFar,79000);assert.equal(spiVis.weatherFogFar,6500);
+  assert.match(region,/addContext/);assert.match(region,/Terrain__vc/);assert.match(region,/0xffefc7/);assert.match(region,/lighthouseParts/);assert.match(region,/R\.model\.lighthouseYScale/);
   assert.match(game,/spiCarFallback\.scale\.setScalar\(HUMAN_SCALE\)/);assert.match(game,/boardRadius:18/);assert.ok(Math.abs(spiRouteHeight(SOUTH_PADRE.carSpawn.x,SOUTH_PADRE.carSpawn.z)-SOUTH_PADRE.carSpawn.y)<1e-9);assert.match(game,/spiProximity\(P\)/);assert.match(game,/clearFogFar/);
   assert.ok(SOUTH_PADRE.destination.name.includes('South Padre'));assert.ok(SOUTH_PADRE.portDestination.name.includes('Port Isabel'));
   assert.equal(SOUTH_PADRE.portDestination.x,SOUTH_PADRE.carSpawn.x);assert.equal(SOUTH_PADRE.portDestination.z,SOUTH_PADRE.carSpawn.z);

@@ -53,7 +53,7 @@
       "yCorrection": 0.8497862942
     },
     "waterMesh": "hidden; Skyreach animated ocean remains authoritative",
-    "performance": "lazy-loaded near SPI; 1.50 human-relative uniform scale; bridge Y correction 23.8/26.43; lighthouse-only Y correction 21.95/25.83; local visibility radius 18000; clear-weather SPI fog extends to 18000; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
+    "performance": "lazy-loaded near SPI; 1.50 human-relative uniform scale; bridge Y correction 23.8/26.43; lighthouse-only Y correction 21.95/25.83; local visibility radius 18000; clear-weather SPI fog 12000→79000, weather fog 350→6500; vegetation and jetties hidden on Auto/Low/Medium and restored on High",
     "autoLowMediumApproxVisibleTriangles": 291478,
     "culledSourceTriangles": {
       "water": 78803,
@@ -67,6 +67,7 @@
       2200,
       0
     ],
-    "anchorNote": "Full-scale Port Isabel is offset east to avoid overlap with the original Skyreach island; internal source geometry and causeway alignment are preserved."
+    "anchorNote": "Full-scale Port Isabel is offset east to avoid overlap with the original Skyreach island; internal source geometry and causeway alignment are preserved.",
+    "terrainReadability": "Terrain__vc keeps source vertex colours with a subtle warm sand multiplier (0xffefc7) to avoid neutral gray/concrete-looking ground under clear coastal lighting."
   }
 }

@@ -70,7 +70,7 @@ export function spiProximity(position){
  const shorelineDistances=SOUTH_PADRE.shoreline.map(([z,c])=>Math.hypot(position.x-c,position.z-z));
  const distance=Math.min(Math.hypot(position.x-ORIGIN.x,position.z-ORIGIN.z),Math.hypot(position.x-destination.x,position.z-destination.z),...SOUTH_PADRE.route.map(p=>Math.hypot(position.x-p.x,position.z-p.z)),...shorelineDistances);
  const outsideMainIsland=Math.hypot(position.x,position.z)>500;
- return Object.freeze({distance,near:outsideMainIsland&&distance<SOUTH_PADRE.model.visibilityRadius,visibilityRadius:SOUTH_PADRE.model.visibilityRadius,clearFogFar:18000});
+ return Object.freeze({distance,near:outsideMainIsland&&distance<SOUTH_PADRE.model.visibilityRadius,visibilityRadius:SOUTH_PADRE.model.visibilityRadius,clearFogNear:12000,clearFogFar:79000,weatherFogNear:350,weatherFogFar:6500});
 }
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

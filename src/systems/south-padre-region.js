@@ -78,6 +78,10 @@ export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
     triangleCount+=index?index.count/3:(pos?pos.count/3:0);
     o.castShadow=false;o.receiveShadow=false;
     const n=o.name||'';
+    if(n==='Terrain__vc'){
+     const mats=Array.isArray(o.material)?o.material:[o.material];
+     for(const m of mats)if(m?.color){m.color.multiply(new T.Color(0xffefc7));if('roughness' in m)m.roughness=1}
+    }
     if(n.startsWith('Water'))o.visible=false; // use Skyreach's animated ocean instead of a duplicate flat ocean.
     if(n.startsWith('Vegetation'))vegetation.push(o);
     if(n.startsWith('Jetties'))jetties.push(o);
