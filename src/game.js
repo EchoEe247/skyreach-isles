@@ -34,7 +34,8 @@ addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);C.aspect=innerW
 const M=(c,e,i)=>new T.MeshLambertMaterial({color:c,flatShading:true,emissive:e||0,emissiveIntensity:i||.5});
 const box=(p,w,h,d,m,x,y,z)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x||0,y||0,z||0);o.castShadow=true;p.add(o);return o};
 const cyl=(p,r1,r2,h,m,x,y,z,seg)=>{const o=new T.Mesh(new T.CylinderGeometry(r1,r2,h,seg||8),m);o.position.set(x||0,y||0,z||0);o.castShadow=true;p.add(o);return o};
-// lights & skyconst hemi=new T.HemisphereLight(0xbfd8ff,0x4a5a3a,.6),sun=new T.DirectionalLight(0xffe0b0,1);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);sun.shadow.bias=-.0006;Object.assign(sun.shadow.camera,{left:-45,right:45,top:45,bottom:-45,far:300});const ambient=new T.AmbientLight(0xb5c7e2,.25),moonlight=new T.DirectionalLight(0xb5d4ff,.5);S.add(hemi,sun,sun.target,ambient,moonlight,moonlight.target);
+// lights & sky
+const hemi=new T.HemisphereLight(0xbfd8ff,0x4a5a3a,.6),sun=new T.DirectionalLight(0xffe0b0,1);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);sun.shadow.bias=-.0006;Object.assign(sun.shadow.camera,{left:-45,right:45,top:45,bottom:-45,far:300});const ambient=new T.AmbientLight(0xb5c7e2,.25),moonlight=new T.DirectionalLight(0xb5d4ff,.5);S.add(hemi,sun,sun.target,ambient,moonlight,moonlight.target);
 const skyU={top:{value:new T.Color()},bot:{value:new T.Color()}};
 const dome=new T.Mesh(new T.SphereGeometry(28000,24,12),new T.ShaderMaterial({uniforms:skyU,side:T.BackSide,depthWrite:false,fog:false,vertexShader:'varying float y;void main(){y=normalize(position).y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 top,bot;varying float y;void main(){gl_FragColor=vec4(mix(bot,top,pow(max(y,0.),.55)),1.);}'}));S.add(dome);
 const sunM=new T.Mesh(new T.SphereGeometry(30,12,8),new T.MeshBasicMaterial({color:0xffe2a0,fog:false})),moonM=new T.Mesh(new T.SphereGeometry(20,12,8),new T.MeshBasicMaterial({color:0xdfe8ff,fog:false}));S.add(sunM,moonM);const gc=document.createElement('canvas');gc.width=gc.height=128;{const x=gc.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,230,170,1)');g.addColorStop(.25,'rgba(255,190,110,.35)');g.addColorStop(1,'rgba(255,160,80,0)');x.fillStyle=g;x.fillRect(0,0,128,128)}
@@ -77,8 +78,7 @@ water.material.onBeforeCompile=shader=>{
  shader.vertexShader='uniform float worldTime;\n'+shader.vertexShader;
  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
  vec2 sea=(modelMatrix*vec4(position,1.)).xz;
- transformed.z+=sin(sea.x*.075+sea.y*.038+worldTime*1.2)*.17+sin(sea.y*.12-sea.x*.02-worldTime*1.7)*.09;`);
-};
+ transformed.z+=sin(sea.x*.075+sea.y*.038+worldTime*1.2)*.17+sin(sea.y*.12-sea.x*.02-worldTime*1.7)*.09;`);};
 
 // town
 const ctex=(fn)=>{const c=document.createElement('canvas');c.width=c.height=64;fn(c.getContext('2d'));const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t};
