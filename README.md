@@ -13,6 +13,7 @@ The original playable single-file prototype is preserved unchanged at `legacy/sk
 - **Veilwater Island:** a basalt terrace with flowing water, spray, proximity-based waterfall sound, and a sea arch with a navigable middle.
 - **Nexus Isle:** a large offshore island split into two dedicated playable districts: Velocity District and Breaker City.
 - **Port Isabel + South Padre Island:** a recognizable mainland town and lighthouse connect by a continuous, drivable Queen Isabella Memorial Causeway to Padre Boulevard, south-city blocks, and a quieter northern shore.
+- **Triple Forge expansion:** Skyhold is a landable floating palace above the home-island airspace; Grovekeep is a climbable titan-tree fortress on a new offshore platform; Arachne guards its outer arena as a persistent boss encounter; and Steelhound can be recruited as a follow/stay companion that assists against Arachne.
 
 Tap **Explore** (or press **M**) to chart a destination, locate your airplane, speedboat, submarine, or any of the ten named DAY FORGE vehicles, choose **Multiverse Nexus**, **LAX International Airport**, **NASA Launch Complex**, **Port Isabel · Causeway Start**, or **South Padre Island** for direct map/compass guidance. The compass follows your selected course; the minimap follows your position offshore. Clear the course to restore automatic objective guidance. The chart pauses movement and releases held controls.
 
@@ -41,6 +42,7 @@ The [curated CC0 asset pass](docs/CURATED-ASSETS.md) adds 25 selected models: pl
 - Playable user-supplied Abyss submarine with separate Boost, Dive, and Surface controls, live depth telemetry, seabed-aware movement, underwater camera support, and a live Explore-map locator
 - Detailed airliner relocated to the integrated four-runway **LAX International Airport**, with runway-ready spawn placement and a live Explore-map locator
 - Ten playable DAY FORGE ships, aircraft, and a monster truck integrated on the home island; each has a named live Explore locator. See [DAY FORGE Fleet](docs/DAY-FORGE-FLEET.md).
+- Four selected Triple Forge assets integrated as gameplay rather than scenery: aircraft can land on Skyhold, Grovekeep exposes model-surface vertical traversal, Arachne has a persistent reactor-health encounter, and Steelhound has persistent Follow/Stay behavior plus boss assist. The imported static meshes are lazy-loaded/batched and their glTF emissive semantics are normalized for standards-compliant loading.
 - User-supplied **Nightweaver LOD0** replaces the procedural player visual; its 104 source meshes are batched by material at runtime while preserving embedded textures
 - Dedicated **JWST VIEW** button loads the user-supplied James Webb Space Telescope on demand and opens an orbitable deep-space observatory view with Earth, Moon, stars, and Sun context
 - Official NASA Space Launch System (SLS) Block 1 model on a launch pad, with continuous player-controlled ascent from the surface through the atmosphere, across the 100 km Karman line, through interbody space, and down to the Moon

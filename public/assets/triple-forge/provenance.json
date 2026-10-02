@@ -1,0 +1,44 @@
+{
+  "source_package": {
+    "name": "TRIPLE-FORGE-BATCH.zip",
+    "sha256": "c8d2e71b962be34f661d495761ecf572730c147366d7243ecf5fb92f98407b63",
+    "provided_by": "user",
+    "received_date": "2026-10-02",
+    "rights_status": "User-supplied. Original third-party redistribution/commercial-use rights were not independently verified by this repository."
+  },
+  "integration": {
+    "date": "2026-10-02",
+    "selection": "Four assets were selected from the 65-asset package because they add distinct gameplay systems rather than duplicating existing vehicles/landmarks.",
+    "processing": "KHR_materials_emissive_strength repair applied where emissiveFactor exceeded the glTF 0..1 core range. Geometry was not remodeled. Runtime batches static meshes by compatible material/attribute signature and disables imported dynamic shadows for mobile performance."
+  },
+  "assets": [
+    {
+      "path": "building/skyhold.glb",
+      "name": "SKYHOLD // FLOATING SKY PALACE",
+      "role": "Airborne explorable destination and aircraft landing site",
+      "sha256": "2e53c06d7e0ee1af52ab65ed3b61bb1dfe2e90726c0c155d5dba81d8201641bd",
+      "emissive_materials_repaired": 0
+    },
+    {
+      "path": "building/grovekeep.glb",
+      "name": "GROVEKEEP // TITAN TREE FORTRESS",
+      "role": "Climbable offshore fortress destination",
+      "sha256": "1c2a898de842ddd8fdcacaeef0c7375c3b09a5e89724b937832dd82b31f4bdd2",
+      "emissive_materials_repaired": 2
+    },
+    {
+      "path": "ai/arachne.glb",
+      "name": "ARACHNE // SENTINEL SPIDER",
+      "role": "Grovekeep perimeter boss encounter",
+      "sha256": "54d407bc9e3ccc5fad4247308db4af1e1661a54f1f12038e2e3f3241953939c6",
+      "emissive_materials_repaired": 2
+    },
+    {
+      "path": "ai/steelhound.glb",
+      "name": "STEELHOUND // ROBO-WARDOG",
+      "role": "Persistent follow/stay companion and Arachne combat assist",
+      "sha256": "52080ef00e99aec0e695fb4f3ccac0dda5b7cc73f22d923e9a2f7e8e48ab1785",
+      "emissive_materials_repaired": 3
+    }
+  ]
+}

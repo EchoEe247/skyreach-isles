@@ -20,8 +20,12 @@ The following files were supplied directly during development and are intentiona
 - `public/assets/world/lax_airport.glb`
 - `public/assets/space/jwst.glb`
 - `public/assets/characters/nightweaver_LOD0.glb`
+- `public/assets/triple-forge/building/skyhold.glb`
+- `public/assets/triple-forge/building/grovekeep.glb`
+- `public/assets/triple-forge/ai/arachne.glb`
+- `public/assets/triple-forge/ai/steelhound.glb`
 
-Their provenance files record hashes and integration details. Public availability in this repository should not be interpreted as a claim that third-party redistribution or commercial-use rights have been independently verified.
+Their provenance files record hashes and integration details. The four Triple Forge selections share `public/assets/triple-forge/provenance.json`, which also records the source-package hash and the standards-compliant emissive repair. Public availability in this repository should not be interpreted as a claim that third-party redistribution or commercial-use rights have been independently verified.
 
 Before distributing a commercial build or reusing these raw models outside this project, confirm their original source/license or replace them with assets whose redistribution terms are documented.
 
