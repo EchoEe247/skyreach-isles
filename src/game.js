@@ -71,15 +71,17 @@ for(let i=0;i<pa.count;i++){const x=pa.getX(i),z=pa.getZ(i),h=hf(x,z),d=Math.hyp
 tg.setAttribute('color',new T.BufferAttribute(col,3));tg.computeVertexNormals();const nc=document.createElement('canvas');nc.width=nc.height=64;const nx=nc.getContext('2d');nx.fillStyle='#e6e6e6';nx.fillRect(0,0,64,64);for(let i=0;i<500;i++){const v=170+rnd()*85|0;nx.fillStyle='rgb('+v+','+v+','+v+')';nx.fillRect(rnd()*64,rnd()*64,3,3)}const nt=new T.CanvasTexture(nc);nt.wrapS=nt.wrapT=T.RepeatWrapping;nt.repeat.set(120,120);
 const terrainMaterial=new T.MeshLambertMaterial({vertexColors:true,map:nt,transparent:true});const ter=new T.Mesh(tg,terrainMaterial);ter.receiveShadow=true;S.add(ter);
 const wc=document.createElement('canvas');wc.width=wc.height=128;const wx=wc.getContext('2d');wx.fillStyle='#808080';wx.fillRect(0,0,128,128);for(let i=0;i<300;i++){wx.fillStyle=rnd()<.5?'rgba(255,255,255,.22)':'rgba(0,0,0,.22)';wx.beginPath();wx.arc(rnd()*128,rnd()*128,3+rnd()*9,0,6.3);wx.fill()}
-const wt=new T.CanvasTexture(wc),WATER_SIZE=40000,RP=5600;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
-const water=new T.Mesh(new T.PlaneGeometry(WATER_SIZE,WATER_SIZE,100,100),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:1,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6,depthWrite:true,side:T.DoubleSide}));water.rotation.x=-Math.PI/2;S.add(water);
+// The ocean follows the camera, so it only needs to extend beyond the 1.4 km fog
+// horizon. A local dense grid keeps the procedural surface smooth at the shoreline.
+const wt=new T.CanvasTexture(wc),WATER_SIZE=3000,WATER_SEGMENTS=128,WATER_REPEAT_PER_M=.14,RP=WATER_SIZE*WATER_REPEAT_PER_M,WATER_BASE_OPACITY=.92;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
+const water=new T.Mesh(new T.PlaneGeometry(WATER_SIZE,WATER_SIZE,WATER_SEGMENTS,WATER_SEGMENTS),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:WATER_BASE_OPACITY,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6,depthWrite:true,side:T.DoubleSide}));water.rotation.x=-Math.PI/2;S.add(water);
 const waterTime={value:0};
 water.material.onBeforeCompile=shader=>{
  shader.uniforms.worldTime=waterTime;
  shader.vertexShader='uniform float worldTime;\n'+shader.vertexShader;
  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
  vec2 sea=(modelMatrix*vec4(position,1.)).xz;
- transformed.z+=sin(sea.x*.075+sea.y*.038+worldTime*1.2)*.17+sin(sea.y*.12-sea.x*.02-worldTime*1.7)*.09;`);};
+ transformed.z+=sin(sea.x*.075+sea.y*.038+worldTime*1.2)*.14+sin(sea.y*.09-sea.x*.018-worldTime*1.7)*.07;`);};
 
 // town
 const ctex=(fn)=>{const c=document.createElement('canvas');c.width=c.height=64;fn(c.getContext('2d'));const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t};
@@ -406,7 +408,7 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
  const spacecraftActive=mode=='veh'&&!!cur?.spacecraft,celestialActive=spacecraftActive&&!!cur?.celestial,earthWorldActive=!telescopeView&&!onMoon&&(!celestialActive||(cur.celestial.earthAltitude??1e12)<250000);
  if(earthWorldActive)lastLiving=livingWorld.update({time:livingTime,dt,position:P});else lastLiving={...lastLiving,lightning:0,event:null};
  const weather=lastLiving.weather||{darkness:0,cloud:0,fog:0,wind:0,roughness:0,rain:0,kind:'clear'},weatherDim=1-weather.darkness;
- const flightAltitude=spacecraftActive?(celestialActive?Math.max(0,Math.min(cur.celestial.earthAltitude??1e12,cur.celestial.moonAltitude??1e12)):(cur.altitude||0)):0,space=(telescopeView||onMoon||celestialActive)?1:spaceBlend(flightAltitude),eb=cl((flightAltitude-10000)/90000,0,1),earthBlend=eb*eb*(3-2*eb),surfaceFade=(onMoon||celestialActive)?0:1-cl((flightAltitude-18000)/52000,0,1);terrainMaterial.opacity=surfaceFade;ter.visible=surfaceFade>.015;water.material.opacity=surfaceFade;water.visible=surfaceFade>.015;airport.visible=earthWorldActive&&surfaceFade>.015;
+ const flightAltitude=spacecraftActive?(celestialActive?Math.max(0,Math.min(cur.celestial.earthAltitude??1e12,cur.celestial.moonAltitude??1e12)):(cur.altitude||0)):0,space=(telescopeView||onMoon||celestialActive)?1:spaceBlend(flightAltitude),eb=cl((flightAltitude-10000)/90000,0,1),earthBlend=eb*eb*(3-2*eb),surfaceFade=(onMoon||celestialActive)?0:1-cl((flightAltitude-18000)/52000,0,1);terrainMaterial.opacity=surfaceFade;ter.visible=surfaceFade>.015;water.material.opacity=surfaceFade*WATER_BASE_OPACITY;water.visible=surfaceFade>.015;airport.visible=earthWorldActive&&surfaceFade>.015;
  let lunarBlend=onMoon?1:(celestialActive?moonLocalBlend(cur.celestial.position):0),lunarSiteVisible=onMoon||lunarBlend>.015;moonSurface.setVisible(lunarSiteVisible);alienA.visible=(cur===alienAV)||(onMoon||lunarBlend>.12);alienB.visible=(cur===alienBV)||(onMoon||lunarBlend>.12);
  skyU.top.value.copy(cN).lerp(cD,k).multiplyScalar(weatherDim).lerp(tmp.setHex(0xdbe9ff),lastLiving.lightning*.68).lerp(tmp.setHex(0x01030a),space);
  skyU.bot.value.copy(cNh).lerp(cDh,k).lerp(cO,du*.85).multiplyScalar(weatherDim).lerp(tmp.setHex(0xeaf2ff),lastLiving.lightning*.54).lerp(tmp.setHex(0x02040b),space);
