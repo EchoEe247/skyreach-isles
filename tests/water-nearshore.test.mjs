@@ -7,14 +7,16 @@ test('camera-follow ocean is dense enough for the nearshore procedural waves',as
   const m=src.match(/WATER_SIZE=(\d+),WATER_SEGMENTS=(\d+),WATER_REPEAT_PER_M=([\d.]+),RP=WATER_SIZE\*WATER_REPEAT_PER_M,WATER_BASE_OPACITY=([\d.]+)/);
   assert.ok(m,'water rendering constants are explicit');
   const size=Number(m[1]),segments=Number(m[2]),repeatPerM=Number(m[3]),opacity=Number(m[4]);
-  assert.ok(size/2>1400,'camera-follow water extends beyond the normal fog horizon');
+  assert.ok(size/2>1800,'camera-follow water extends well beyond the normal fog horizon');
   assert.ok(size/segments<=24,'water vertices sample the shoreline waves at <=24 m spacing');
   assert.ok(Math.abs(repeatPerM-.14)<1e-9,'water bump texture keeps the established world-space scale');
-  assert.ok(opacity>=.9&&opacity<=.95,'water remains mostly opaque while allowing a subtle shallow-water read');
+  assert.equal(opacity,1,'ocean surface stays opaque so tan seabed cannot wash the sea grey');
   assert.match(src,/new T\.PlaneGeometry\(WATER_SIZE,WATER_SIZE,WATER_SEGMENTS,WATER_SEGMENTS\)/);
   assert.match(src,/water\.position\.set\(C\.position\.x,0,C\.position\.z\)/);
   assert.match(src,/wt\.offset\.set\(C\.position\.x\*RP\/WATER_SIZE/);
   assert.match(src,/water\.material\.opacity=surfaceFade\*WATER_BASE_OPACITY/);
+  assert.match(src,/fog:false/,'water opts out of warm scene fog so distant ocean stays blue');
+  assert.match(src,/water\.material\.color\.setHSL\(\.535,\.78/,'water keeps a saturated blue-cyan daytime palette');
 });
 
 test('nearshore wave displacement stays small enough to lap the beach without flooding it',async()=>{

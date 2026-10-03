@@ -73,8 +73,11 @@ const terrainMaterial=new T.MeshLambertMaterial({vertexColors:true,map:nt,transp
 const wc=document.createElement('canvas');wc.width=wc.height=128;const wx=wc.getContext('2d');wx.fillStyle='#808080';wx.fillRect(0,0,128,128);for(let i=0;i<300;i++){wx.fillStyle=rnd()<.5?'rgba(255,255,255,.22)':'rgba(0,0,0,.22)';wx.beginPath();wx.arc(rnd()*128,rnd()*128,3+rnd()*9,0,6.3);wx.fill()}
 // The ocean follows the camera, so it only needs to extend beyond the 1.4 km fog
 // horizon. A local dense grid keeps the procedural surface smooth at the shoreline.
-const wt=new T.CanvasTexture(wc),WATER_SIZE=3000,WATER_SEGMENTS=128,WATER_REPEAT_PER_M=.14,RP=WATER_SIZE*WATER_REPEAT_PER_M,WATER_BASE_OPACITY=.92;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
-const water=new T.Mesh(new T.PlaneGeometry(WATER_SIZE,WATER_SIZE,WATER_SEGMENTS,WATER_SEGMENTS),new T.MeshPhongMaterial({color:0x1e9ab5,transparent:true,opacity:WATER_BASE_OPACITY,shininess:180,specular:0xffd9a0,bumpMap:wt,bumpScale:1.6,depthWrite:true,side:T.DoubleSide}));water.rotation.x=-Math.PI/2;S.add(water);
+const wt=new T.CanvasTexture(wc),WATER_SIZE=4000,WATER_SEGMENTS=176,WATER_REPEAT_PER_M=.14,RP=WATER_SIZE*WATER_REPEAT_PER_M,WATER_BASE_OPACITY=1;wt.wrapS=wt.wrapT=T.RepeatWrapping;wt.repeat.set(RP,RP);
+// Water must not inherit the scene's warm horizon fog. That fog is correct for
+// land/atmosphere, but on the ocean it turns the entire sea grey/tan from the
+// elevated main-island viewpoints. Keep the sea opaque and shade it independently.
+const water=new T.Mesh(new T.PlaneGeometry(WATER_SIZE,WATER_SIZE,WATER_SEGMENTS,WATER_SEGMENTS),new T.MeshPhongMaterial({color:0x168fb5,transparent:true,opacity:WATER_BASE_OPACITY,shininess:190,specular:0xd9f6ff,bumpMap:wt,bumpScale:1.6,depthWrite:true,side:T.DoubleSide,fog:false}));water.rotation.x=-Math.PI/2;S.add(water);
 const waterTime={value:0};
 water.material.onBeforeCompile=shader=>{
  shader.uniforms.worldTime=waterTime;
@@ -425,7 +428,7 @@ function loop(){requestAnimationFrame(loop);const rawDt=Math.min(clock.getDelta(
  }
  hemi.intensity=light.hemisphere*(1-weather.darkness*.28)+lastLiving.lightning*.8;hemi.groundColor.setHex(0x70899d).lerp(tmp.setHex(0x899483),k);
  ambient.intensity=light.ambient+weather.darkness*.06+lastLiving.lightning*1.2;sun.intensity=light.sun*(1-weather.cloud*.72);moonlight.intensity=light.moon*(1-weather.cloud*.30);
- earthGlobe.rotation.y=-Math.PI/2+ang;sun.color.setHSL(.09,.7,.6+.3*k);water.material.color.setHSL(.53,.62,cl(light.waterLightness-weather.darkness*.045,.22,.4));water.material.bumpScale=1.6+weather.roughness*2.5;
+ earthGlobe.rotation.y=-Math.PI/2+ang;sun.color.setHSL(.09,.7,.6+.3*k);water.material.color.setHSL(.535,.78,cl(light.waterLightness-weather.darkness*.035,.28,.43));water.material.bumpScale=1.6+weather.roughness*2.5;
  bm.forEach(m=>m.emissiveIntensity=(1-k)*1.1);lampM.emissiveIntensity=(1-k)*2;stars.material.opacity=Math.max((1-k)*(1-weather.cloud*.78),space*.96);bc.material.opacity=(1-k)*.3*(1-space);beam.rotation.y=tm_*.8;
  const eventId=earthWorldActive?(lastLiving.event?.id||null):null;if(earthWorldActive&&eventId!==lastWorldEvent){if(lastLiving.event&&started)toast('World event: '+lastLiving.event.title,4200);lastWorldEvent=eventId}
  if(earthWorldActive&&lastLiving.event&&!lastLiving.resolved&&started&&distance2D(lastLiving.event,P)<lastLiving.event.radius){
