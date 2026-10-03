@@ -1,6 +1,6 @@
 import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {SOUTH_PADRE as R,spiLandHeight,spiRouteHeight} from '../core/south-padre.js';
+import {SOUTH_PADRE as R,spiLandHeight,spiRouteHeight,spiProximity} from '../core/south-padre.js';
 
 const material=(color)=>new T.MeshLambertMaterial({color,flatShading:true});
 
@@ -60,7 +60,7 @@ function regionDistance(position){
 }
 
 export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
- const group=new T.Group();group.name='South Padre Island + Port Isabel';scene.add(group);
+ const group=new T.Group();group.name='South Padre Island + Port Isabel';group.visible=false;scene.add(group);
  const fallback=addFallback(group),modelHolder=new T.Group(),contextColliders=addContext(group,obstacles);modelHolder.name='Uploaded South Padre GLB';group.add(modelHolder);
  let state='deferred',requested=false,model=null,meshCount=0,triangleCount=0,vegetation=[],jetties=[];
  const loader=new GLTFLoader();
@@ -104,13 +104,15 @@ export function createSouthPadreRegion(scene,obstacles,{onToast=()=>{}}={}){
   });
  }
 
- let visible=true,lastDetail=null;
+ let visible=false,lastDetail=null;
  return {
   group,
   update({position,quality='auto'}){
-   const distance=regionDistance(position),near=distance<R.model.visibilityRadius;
+   const proximity=spiProximity(position),distance=regionDistance(position),near=proximity.near;
    if(near!==visible){visible=near;group.visible=near}
-   if(distance<R.model.loadRadius)requestModel();
+   // The main island is intentionally excluded by spiProximity(). Without this gate,
+   // Port Isabel's large tan loading pad/model was visible across the home-island ocean.
+   if(near&&distance<R.model.loadRadius)requestModel();
    if(model&&state==='ready'){
     // The uploaded source is 724k triangles. On Auto/Low/Medium we retain the exact
     // terrain, Port Isabel, roads, bridge, buildings and landmarks while culling its

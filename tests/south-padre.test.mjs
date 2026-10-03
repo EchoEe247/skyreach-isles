@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {SOUTH_PADRE,spiRouteHeight,isSpiRoute,spiLandHeight,spiProximity} from '../src/core/south-padre.js';
+import {createSouthPadreRegion} from '../src/systems/south-padre-region.js';
+import * as T from 'three';
 import {terrainHeight,boatCanTravel} from '../src/core/world.js';
 
 test('uploaded SPI model contains Port Isabel, Queen Isabella bridge, roads and terrain',async()=>{
@@ -92,4 +94,15 @@ test('SPI region is lazy-loaded, quality-gated and exposed through Explore',asyn
   assert.ok(SOUTH_PADRE.destination.name.includes('South Padre'));assert.ok(SOUTH_PADRE.portDestination.name.includes('Port Isabel'));
   assert.equal(SOUTH_PADRE.portDestination.x,SOUTH_PADRE.carSpawn.x);assert.equal(SOUTH_PADRE.portDestination.z,SOUTH_PADRE.carSpawn.z);
   assert.match(game,/SOUTH_PADRE\.carSpawn/);assert.match(game,/Port Isabel sports car/);
+});
+
+test('SPI renderer stays hidden and deferred while the player is on the main island',()=>{
+  const scene=new T.Scene(),region=createSouthPadreRegion(scene,[]);
+  let status=region.status();
+  assert.equal(status.visible,false);
+  assert.equal(status.state,'deferred');
+  region.update({position:{x:0,z:0},quality:'high'});
+  status=region.status();
+  assert.equal(status.visible,false,'Port Isabel/SPI must not paint a tan land sheet over the main-island ocean');
+  assert.equal(status.state,'deferred','main-island proximity must not preload the 20+ MB SPI GLB');
 });
