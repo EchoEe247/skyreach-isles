@@ -14,6 +14,8 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 #jump{right:112px;bottom:calc(52px + env(safe-area-inset-bottom,0px));width:68px;height:68px}
 #dive{display:none;right:112px;bottom:calc(132px + env(safe-area-inset-bottom,0px));width:68px;height:68px;background:rgba(38,126,170,.78)}
 #boost{right:22px;bottom:calc(40px + env(safe-area-inset-bottom,0px));width:76px;height:76px;background:rgba(255,179,71,.75);color:var(--ink)}
+#jetboost{display:none;right:26px;bottom:calc(240px + env(safe-area-inset-bottom,0px));width:66px;height:66px;background:rgba(34,111,184,.84);border:2px solid rgba(154,235,255,.72);color:#e6fbff;font-size:11px;font-weight:800;line-height:1.05;box-shadow:0 0 16px rgba(70,210,255,.22);z-index:4}
+#jetboost:active,#jetboost.active{transform:scale(.94);background:rgba(44,206,255,.92);color:#07172a;box-shadow:0 0 24px rgba(90,225,255,.72)}
 #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:radial-gradient(circle at 50% 70%,rgba(255,140,60,.55),rgba(20,24,58,.93) 70%);z-index:9}
 #start h1{font:italic 700 clamp(44px,12vw,96px)/1 "Iowan Old Style",Palatino,Georgia,serif;margin:0 0 14px;color:var(--cream)}
 #start p{max-width:420px;line-height:1.5;margin:4px 0;font-size:16px}#start .t{margin-top:26px;color:var(--amber);font-size:20px}
@@ -75,7 +77,7 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 #telescopeHud small{font-size:8px;letter-spacing:.18em;color:#8fe9ff}
 #telescopeHud strong{font:700 14px/1.2 system-ui;color:#ffe29a;letter-spacing:.04em}
 #telescopeHud span{font-size:10px;color:#d7e7ef;opacity:.88}
-#ui.telescope-mode #obj,#ui.telescope-mode #nav,#ui.telescope-mode #map,#ui.telescope-mode #spd,#ui.telescope-mode #joy,#ui.telescope-mode #act,#ui.telescope-mode #jump,#ui.telescope-mode #dive,#ui.telescope-mode #boost,#ui.telescope-mode #rocketCtl,#ui.telescope-mode #atlas-toggle{display:none!important}
+#ui.telescope-mode #obj,#ui.telescope-mode #nav,#ui.telescope-mode #map,#ui.telescope-mode #spd,#ui.telescope-mode #joy,#ui.telescope-mode #act,#ui.telescope-mode #jump,#ui.telescope-mode #dive,#ui.telescope-mode #boost,#ui.telescope-mode #jetboost,#ui.telescope-mode #rocketCtl,#ui.telescope-mode #atlas-toggle{display:none!important}
 #ui.telescope-mode #quality{top:58px}
 #ui.telescope-mode #telescope{top:94px}
 @media (max-width:620px){#telescope{top:240px}#telescopeHud{top:10px;min-width:68vw;max-width:72vw}#ui.telescope-mode #quality{top:64px}#ui.telescope-mode #telescope{top:100px}}
@@ -98,4 +100,4 @@ canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none;padding-top:
 #ui.telescope-mode #nexus,#ui.telescope-mode #realm-hub,#ui.telescope-mode #realm-hud{display:none}
 button.b{color:var(--cream);font:inherit;cursor:pointer}
 @media(max-width:620px){#realm-hub,#realm-hud{left:8px;top:10px;max-width:calc(100vw - 158px);padding:9px;gap:5px}#realm-hud small{font-size:10px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:11px}#ui.realm-mode #nav{top:220px;max-width:calc(100vw - 172px);font-size:10px}#realm-hub>div{flex-direction:column}}
-@media (orientation:landscape) and (max-height:560px){#realm-hub,#realm-hud{left:10px;top:8px;max-width:58vw;padding:8px;gap:3px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:10px}#realm-hud small{font-size:9px;line-height:1.25}#realm-hub button,#realm-hud button{min-height:30px;padding:4px 8px;font-size:10px}#ui.realm-mode #nav{top:150px;left:10px;max-width:42vw;font-size:9px;padding:5px 8px}#map{width:92px;height:92px;right:10px;top:10px}#joy{width:112px;height:112px;left:14px;bottom:14px}#knob{left:35px;top:35px;width:42px;height:42px}#act{right:18px;bottom:135px;width:66px;height:66px}#jump{right:98px;bottom:30px;width:60px;height:60px}#boost{right:18px;bottom:24px;width:68px;height:68px}}
+@media (orientation:landscape) and (max-height:560px){#realm-hub,#realm-hud{left:10px;top:8px;max-width:58vw;padding:8px;gap:3px}#realm-hud strong{font-size:10px}#realm-hud span{font-size:10px}#realm-hud small{font-size:9px;line-height:1.25}#realm-hub button,#realm-hud button{min-height:30px;padding:4px 8px;font-size:10px}#ui.realm-mode #nav{top:150px;left:10px;max-width:42vw;font-size:9px;padding:5px 8px}#map{width:92px;height:92px;right:10px;top:10px}#joy{width:112px;height:112px;left:14px;bottom:14px}#knob{left:35px;top:35px;width:42px;height:42px}#act{right:18px;bottom:135px;width:66px;height:66px}#jump{right:98px;bottom:30px;width:60px;height:60px}#boost{right:18px;bottom:24px;width:68px;height:68px}#jetboost{right:174px;bottom:28px;width:62px;height:62px;font-size:9px}}
