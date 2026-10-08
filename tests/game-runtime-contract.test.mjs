@@ -13,3 +13,11 @@ test('loopback production QA keeps deterministic inspection local-only',()=>{
   assert.match(source,/import\.meta\.env\.DEV\|\|location\.hostname==='127\.0\.0\.1'\|\|location\.hostname==='localhost'/);
   assert.match(source,/globalThis\.__skyreach=/);
 });
+
+
+test('service worker refreshes same-URL 3D assets and falls back safely offline',()=>{
+ const sw=readFileSync(new URL('../public/sw.js',import.meta.url),'utf8');
+ assert.match(sw,/glb\|gltf\|stl\|bin/);
+ assert.match(sw,/networkFirst\(request/);
+ assert.match(sw,/new Response\('Asset unavailable offline'/);
+});

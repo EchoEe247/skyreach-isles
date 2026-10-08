@@ -91,3 +91,18 @@ test('Velocity full loop carries the runner vertically and exits back onto the c
  for(let i=0;i<100&&system.stats().loopActive;i++){system.update({time:20+i*.02,dt:.02,position:p,moving:true});max.push(p.y)}
  assert.equal(system.stats().loopDone,true);assert.ok(Math.max(...max)>startY+system.speedLoop.radius*1.5);assert.ok(Math.abs(p.y-system.speedLoop.y)<1);
 });
+
+
+test('procedural district scenery merges without discarding incompatible geometry',()=>{
+ const warnings=[],original=console.error;
+ let scene;
+ try{
+  console.error=(...args)=>warnings.push(args.map(String).join(' '));
+  ({scene}=makeWorld());
+ }finally{console.error=original}
+ assert.deepEqual(warnings.filter(message=>message.includes('mergeGeometries')),[]);
+ let meshes=0,vertices=0;
+ scene.traverse(o=>{if(o.isMesh&&o.geometry?.getAttribute('position')){meshes++;vertices+=o.geometry.getAttribute('position').count}});
+ assert.ok(meshes>100,'expected populated Nexus districts');
+ assert.ok(vertices>10000,'expected nonempty procedural scenery');
+});

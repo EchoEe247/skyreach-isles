@@ -1,4 +1,4 @@
-const CACHE='skyreach-v26';
+const CACHE='skyreach-v27';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',event=>{
@@ -17,7 +17,7 @@ const networkFirst=async(request,timeoutMs=5000)=>{
     const response=await fetch(request,{signal:controller.signal});
     if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
     return response;
-  }catch{return caches.match(request)}
+  }catch{return (await caches.match(request))||new Response('Asset unavailable offline',{status:503,statusText:'Offline'})}
   finally{clearTimeout(timer)}
 };
 
@@ -26,8 +26,8 @@ self.addEventListener('fetch',event=>{
   if(request.method!=='GET')return;
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
-  if(request.mode==='navigate'||url.pathname.endsWith('.glb')){
-    event.respondWith(networkFirst(request,url.pathname.endsWith('.glb')?3500:5000));
+  if(request.mode==='navigate'||/\.(?:glb|gltf|stl|bin)$/i.test(url.pathname)){
+    event.respondWith(networkFirst(request,request.mode==='navigate'?5000:15000));
     return;
   }
   event.respondWith(

@@ -36,8 +36,27 @@ export function addRealmScenery(root,{cx,cz,heightAt,trackPoints,city,smashables
 
  // Batch static scenery by material to keep mobile draw calls bounded.
  art.updateMatrixWorld(true);const batches=new Map();
- art.traverse(m=>{if(!m.isMesh)return;const g=m.geometry.clone().applyMatrix4(m.matrixWorld),list=batches.get(m.material)||[];list.push(g);batches.set(m.material,list)});
- for(const [m,geometries] of batches){const merged=mergeGeometries(geometries,false);if(merged){const obj=new T.Mesh(merged,m);obj.receiveShadow=true;root.add(obj)}for(const g of geometries)g.dispose()}
+ art.traverse(m=>{
+  if(!m.isMesh)return;
+  let g=m.geometry.clone().applyMatrix4(m.matrixWorld);
+  // Three.js cannot combine indexed and non-indexed primitives in one batch.
+  if(g.index){const flat=g.toNonIndexed();g.dispose();g=flat}
+  const signature=Object.keys(g.attributes).sort().map(name=>{
+   const a=g.getAttribute(name);return name+':'+a.itemSize+':'+Number(a.normalized)+':'+a.array.constructor.name;
+  }).join('|');
+  const key=m.material.uuid+'|'+signature,entry=batches.get(key)||{material:m.material,geometries:[]};
+  entry.geometries.push(g);batches.set(key,entry);
+ });
+ for(const {material,geometries} of batches.values()){
+  const merged=geometries.length===1?geometries[0]:mergeGeometries(geometries,false);
+  if(merged){
+   const obj=new T.Mesh(merged,material);obj.receiveShadow=true;root.add(obj);
+   if(geometries.length>1)for(const g of geometries)g.dispose();
+  }else{
+   // Unexpected geometry layouts must not silently erase district scenery.
+   for(const g of geometries){const obj=new T.Mesh(g,material);obj.receiveShadow=true;root.add(obj)}
+  }
+ }
  const sources=new Set();art.traverse(m=>{if(m.isMesh)sources.add(m.geometry)});for(const g of sources)g.dispose();
 }
 
