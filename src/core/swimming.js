@@ -17,6 +17,10 @@ export function boatExitRadius(vehicle){
 export function vehicleBoardDistance(vehicle,position){
   const p=vehicle?.g?.position;
   if(!p||!position)return Infinity;
-  if(vehicle.type==='boat')return Math.hypot(p.x-position.x,p.z-position.z);
+  if(vehicle.type==='boat'){
+    const maxRise=vehicle.dayForge?14:4;
+    if(position.y-p.y>maxRise||position.y-p.y< -3)return Infinity;
+    return Math.hypot(p.x-position.x,p.z-position.z);
+  }
   return Math.hypot(p.x-position.x,p.y-position.y,p.z-position.z);
 }

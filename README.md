@@ -281,3 +281,12 @@ See [Asset rights status](docs/ASSET-RIGHTS.md) for documented sources and the u
 ## World expansion verification
 
 See [verification and boundaries](docs/WORLD-EXPANSION.md) for checks and remaining limitations.
+
+
+## Gameplay QA: collisions, vehicle exits and crash recovery
+
+Run `npm ci`, `npm test` and `npm run build` before deploying. The collision regression suite uses swept movement for characters, cars, boats, submarines and low-altitude aircraft; it covers causeway shoulders, safe disembarkation and spacecraft reset.
+
+For an optional **live** runtime smoke test on the local Pixel/Termux device, launch `npm run dev -- --host 127.0.0.1`, open `http://127.0.0.1:5173/` in the dedicated Local Workspace Chromium runtime with CDP at `127.0.0.1:9230`, then run `npm run qa:runtime`. This exercises each non-spacecraft vehicle's boarding/exiting behavior, both portals, an Earth crash recovery, and real frame progression. It reports pass/fail per scenario and requires the local dev-only `__skyreach` hook; it is not a visual or GPU performance benchmark.
+
+The local debug snapshot exposes frame age/count, collision blocking counters, mode, active portal realm and vehicle state; inspect hooks are absent from the public production build. Hardware/WebGL capture and human visual checks remain separate requirements before claiming complete graphical QA.

@@ -23,7 +23,7 @@ test('large DAY FORGE boats exit outside their hull while the small boat keeps i
 
 test('boats can be boarded by planar distance from the water surface',()=>{
   const pos={x:0,y:-.72,z:0};
-  const boat={type:'boat',g:{position:{x:12,y:20,z:5}}};
+  const boat={type:'boat',g:{position:{x:12,y:0,z:5}}};
   const car={type:'car',g:{position:{x:12,y:20,z:5}}};
   assert.ok(Math.abs(vehicleBoardDistance(boat,pos)-13)<1e-9);
   assert.ok(vehicleBoardDistance(car,pos)>20);
