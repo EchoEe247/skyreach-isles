@@ -290,3 +290,15 @@ Run `npm ci`, `npm test` and `npm run build` before deploying. The collision reg
 For an optional **live** runtime smoke test on the local Pixel/Termux device, launch `npm run dev -- --host 127.0.0.1`, open `http://127.0.0.1:5173/` in the dedicated Local Workspace Chromium runtime with CDP at `127.0.0.1:9230`, then run `npm run qa:runtime`. This exercises each non-spacecraft vehicle's boarding/exiting behavior, both portals, an Earth crash recovery, and real frame progression. It reports pass/fail per scenario and requires the local dev-only `__skyreach` hook; it is not a visual or GPU performance benchmark.
 
 The local debug snapshot exposes frame age/count, collision blocking counters, mode, active portal realm and vehicle state; inspect hooks are absent from the public production build. Hardware/WebGL capture and human visual checks remain separate requirements before claiming complete graphical QA.
+
+## Gameplay and performance improvements
+
+This revision improves five systems without adding heavyweight asset dependencies:
+
+- **Vehicle dynamics and follow camera:** shared frame-rate-independent acceleration, braking, reverse, steering response and speed caps for cars/boats/submarines/aircraft; aircraft pitch and lift; speed-sensitive chase distance, look-ahead, field of view and follow damping. These are approachable arcade controls, not a full rigid-body suspension or aerodynamic simulator.
+- **Spaceflight reliability:** AUTO NAV rejects crashed, fuel-starved or already-arrived targets, reports flight phases, disengages on fuel exhaustion and avoids repeated crash notices. Safe base landings resupply the ship. The lunar/Earth surface flag follows actual spacecraft departure and arrival.
+- **Environmental grounding:** the Queen Isabella causeway has a small instanced, terrain-conforming reflector set at its outer deck edges; the markers are hidden away from the South Padre region and do not obstruct the driveable lane.
+- **Optional connected exploration:** a five-stop journey connects South Padre, LAX, Nexus Isle, lunar touchdown and Earth return. Progress persists independently of existing collectibles, and the Journey HUD can set a destination without restricting free play.
+- **Mobile rendering:** Auto quality adapts pixel resolution and shadows with hysteresis under sustained frame-time pressure; manual choices are respected. Default shadow-map load is lower; anti-aliasing is reserved for manual Medium/High; the mini radar redraws at ~8 Hz.
+
+Verification: `npm test` includes long-route geometry and two-leg spaceflight simulations, collision and physics tests, persistence, quality adaptation and instanced-prop positioning. `npm run qa:runtime` exercises 22 local browser gameplay checks through the separate QA profile. **These checks do not prove graphical fidelity, touch ergonomics or target hardware frame rate**; review visually and profile on a physical Pixel 6a before declaring those aspects finished.

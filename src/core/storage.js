@@ -28,3 +28,14 @@ export function loadSettings(){
 export function saveSettings(settings){
   try{globalThis.localStorage?.setItem?.(SETTINGS_KEY,JSON.stringify(settings))}catch{}
 }
+
+const JOURNEY_KEY='skyreach-journey-v1';
+export function loadJourney(){
+ const data=read(JOURNEY_KEY,{});
+ return Math.max(0,Math.min(5,Number.isInteger(data.stage)?data.stage:0));
+}
+export function saveJourney(stage){
+ const value=Math.max(0,Math.min(5,Math.floor(Number(stage)||0)));
+ try{globalThis.localStorage?.setItem?.(JOURNEY_KEY,JSON.stringify({stage:value}))}catch{}
+ return value;
+}

@@ -32,6 +32,8 @@ test('mobile HUD and runtime wire a separate hold-to-use jet boost without repla
   assert.match(game,/jetBoostEligible\(c\)/);
   assert.match(game,/jetBoostProfile\(c\)/);
   assert.match(game,/c\.spacecraft/);
-  assert.match(game,/jet\?jetProfile\.maxSpeed/);
+  assert.match(game,/updateVehicleKinematics\(c,/);
+  const dynamics=await readFile(new URL('../src/core/vehicle-dynamics.js',import.meta.url),'utf8');
+  assert.match(dynamics,/jetProfile\?\.maxSpeed/);
   assert.match(game,/· JET/);
 });
