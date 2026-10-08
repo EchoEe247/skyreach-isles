@@ -107,3 +107,7 @@ button.b{color:var(--cream);font:inherit;cursor:pointer}
 #journey{display:block;margin-top:8px;max-width:195px;text-align:left;border:1px solid rgba(255,196,104,.4);border-radius:8px;background:rgba(13,31,52,.84);color:#ffdda2;padding:5px 8px;font:700 11px system-ui;pointer-events:auto;cursor:pointer;touch-action:manipulation}
 #journey:hover,#journey:focus{border-color:#ffe0a2}
 @media(max-height:480px){#journey{max-width:155px;font-size:10px}#obj{max-width:158px;font-size:11px}}
+
+#lunarMission{position:absolute;left:10px;top:200px;display:block;padding:7px 10px;font:700 11px system-ui;color:#c1faff;border-color:rgba(120,210,255,.55);letter-spacing:.06em}
+#lunarMission[hidden]{display:none}
+@media(max-width:620px){#lunarMission{left:10px;top:205px;max-width:135px;font-size:10px}}

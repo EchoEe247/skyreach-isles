@@ -2,24 +2,24 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 
 export function computeAudioMix(state={}){
   const mode=state.mode||'foot',speed=Math.abs(state.speed||0),alt=Math.max(0,state.altitude||0),vacuum=!!state.vacuum,throttle=cl(state.throttle||0);
-  const ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day,rain=cl(state.rain||0),weatherWind=cl(state.weatherWind||0),storm=cl(state.storm||0);
+  const slip=cl(Math.abs(state.slip||0)),underwater=!!state.underwater,wet=cl(state.rain||0),ocean=cl(state.ocean||0),coast=cl(state.coast||0),town=cl(state.town||0),day=cl(state.daylight??1),night=1-day,rain=cl(state.rain||0),weatherWind=cl(state.weatherWind||0),storm=cl(state.storm||0);
   return {
     waterfall:vacuum?0:cl((state.waterfall||0)*.20,0,.20),
-    wind:vacuum?0:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0)+weatherWind*.11+storm*.05,0,.52),
-    rain:vacuum?0:cl(rain*.16+storm*.04,0,.22),
-    ocean:vacuum?0:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
-    surf:vacuum?0:cl(coast*.12,0,.13),
+    wind:vacuum||underwater?0:cl(.025+speed/180+alt/900+(mode==='plane'?.08:0)+weatherWind*.11+storm*.05,0,.52),
+    rain:vacuum||underwater?0:cl(rain*.16+storm*.04,0,.22),
+    ocean:vacuum||underwater?0:cl(ocean*.095+(mode==='boat'?.09:0),0,.20),
+    surf:vacuum||underwater?0:cl(coast*.12,0,.13),
     land:vacuum?0:cl((1-ocean)*(1-town)*.035,0,.04),
     town:vacuum?0:cl(town*.025,0,.03),
-    car:mode==='car'?cl(.055+speed/420,0,.14):0,
-    road:mode==='car'?cl(speed/280,0,.085):0,
-    boat:mode==='boat'?cl(.07+speed/320,0,.145):0,
+    car:mode==='car'||mode==='rover'?cl((mode==='rover'?.023:.055)+speed/420,0,.14):0,
+    road:mode==='car'?cl(speed/500+slip*.055+wet*.02,0,.125):0,
+    boat:mode==='boat'||mode==='submarine'?cl((underwater?.027:.07)+speed/320,0,.145):0,
     wake:mode==='boat'?cl(speed/160,0,.18):0,
     plane:mode==='plane'?cl(.07+speed/500,0,.18):0,
     jet:mode==='plane'?cl(.04+speed/360+alt/3000,0,.22):0,
     rocket:mode==='rocket'?cl(.025+throttle*.22,0,.24):0,
     alien:mode==='alien'?cl(.018+throttle*.19,0,.21):0,
-    cabin:(mode==='rocket'||mode==='alien')&&vacuum?cl(.008+throttle*.07,0,.08):0,
+    cabin:underwater?cl(.018+speed/1400,0,.06):(mode==='rocket'||mode==='alien'||mode==='rover')&&vacuum?cl(.008+throttle*.07,0,.08):0,
     day,night
   };
 }
@@ -157,5 +157,5 @@ export function createWorldAudio(){
 
   const suspend=()=>{paused=true;try{if(ctx&&ctx.state==='running')ctx.suspend()}catch{}};
   const resume=()=>{paused=false;try{if(started&&ctx&&ctx.state==='suspended')ctx.resume()}catch{}};
-  return {start,update,suspend,resume};
+  return {start,update,suspend,resume,impact:(surface='stone',strength=.5)=>transient(surface,Math.min(1,Math.max(.05,strength)))};
 }

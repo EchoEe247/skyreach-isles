@@ -302,3 +302,17 @@ This revision improves five systems without adding heavyweight asset dependencie
 - **Mobile rendering:** Auto quality adapts pixel resolution and shadows with hysteresis under sustained frame-time pressure; manual choices are respected. Default shadow-map load is lower; anti-aliasing is reserved for manual Medium/High; the mini radar redraws at ~8 Hz.
 
 Verification: `npm test` includes long-route geometry and two-leg spaceflight simulations, collision and physics tests, persistence, quality adaptation and instanced-prop positioning. `npm run qa:runtime` exercises 22 local browser gameplay checks through the separate QA profile. **These checks do not prove graphical fidelity, touch ergonomics or target hardware frame rate**; review visually and profile on a physical Pixel 6a before declaring those aspects finished.
+
+## Living-world and lunar-expedition expansion
+
+The current release extends the five world-polish phases:
+
+- **Environmental variety:** biome-colored instanced foliage across the four offshore islands, main-island terrain-conforming stone props, nearshore foam details, and context-sensitive night lighting. Each collection is visibility-gated.
+- **Living world:** four obstacle-aware ambient traffic vehicles, pedestrians with collision-aware walking and a talk/wave interaction, and existing ferries/wildlife/weather preserved.
+- **Vehicle behavior:** sampled four-wheel slope and suspension feedback, wet-road traction and visual drift, weather-dependent boat heave/roll, smoother submarine dive pitch, bounded low-speed aerodynamic stall and additional terrain/building camera clearance.
+- **Lunar expedition:** a six-wheel drivable rover, ECHO-1 outpost, four individually scan-able locations and persistent lunar research progress. The HUD points to the nearest unscanned site and does not send the Moon explorer back toward Earth beacons.
+- **Cinematic response:** context-aware impact sounds and bounded camera impulse from bumps/landings, separate muffled underwater audio, rover cabin audio and exposure feedback during lightning.
+
+**Quality/limits:** simulation remains lightweight arcade-oriented rather than full rigid-body tire and flight dynamics. The screenshot-based local browser uses Mesa software WebGL rather than the Pixel's native GPU. Code, WebGL capture, simulated routes and CDP gameplay checks are regression evidence, not a claim that the entire world has undergone a frame-by-frame art review or a physical-device performance pass.
+
+Regression: `npm test`, `npm run build`, and (in the isolated local browser) `npm run qa:runtime`. The runtime suite includes rover boarding, lunar scans, rover travel, traffic, vehicles, portals, causeway and crash recovery. The existing uncommitted NASA mobile STL must not be staged or committed without explicit authorization.

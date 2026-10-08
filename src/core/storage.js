@@ -39,3 +39,14 @@ export function saveJourney(stage){
  try{globalThis.localStorage?.setItem?.(JOURNEY_KEY,JSON.stringify({stage:value}))}catch{}
  return value;
 }
+
+const LUNAR_KEY='skyreach-lunar-discoveries-v1';
+export function loadLunarSites(){
+ const data=read(LUNAR_KEY,[]);
+ return Array.isArray(data)?[...new Set(data.filter(x=>typeof x==='string'))].slice(0,16):[];
+}
+export function saveLunarSites(ids=[]){
+ const clean=[...new Set(ids.filter(x=>typeof x==='string'))].slice(0,16);
+ try{globalThis.localStorage?.setItem?.(LUNAR_KEY,JSON.stringify(clean))}catch{}
+ return clean;
+}

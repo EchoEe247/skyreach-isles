@@ -144,6 +144,47 @@ await check('actual causeway driving stays on its elevated deck',async()=>{
  return travel.toFixed(2)+' m';
 });
 
+await check('world polish and ambient traffic initialize without expensive new render entities',async()=>{
+ const e=await qa('environment()');
+ assert.ok(e.polish.grounded>40&&e.polish.biomePlants>200);
+ assert.equal(e.traffic.cars,4);
+ return e.polish.biomePlants+' biome plants · '+e.traffic.cars+' ambient vehicles';
+});
+await check('lunar discovery sites can all be visited and persist',async()=>{
+ const sites=await qa('lunarSites()');
+ assert.equal(sites.length,4);
+ for(const p of sites){
+  await qa('inspectMoonFoot('+p.x+','+p.z+')');
+  const result=await qa('action()');
+  assert.equal(result.mode,'foot');
+ }
+ const final=await qa('lunar()');
+ assert.equal(final.visited,4);
+ return final.visited+'/'+final.total+' sites scanned';
+});
+await check('lunar rover moves over real lunar terrain',async()=>{
+ const rover=vehicles.find(v=>v.type==='rover');
+ assert.ok(rover);
+ const [x,y,z]=rover.position;
+ await qa('inspect('+[x,z,JSON.stringify(rover.id),y,false].join(',')+')');
+ const before=await qa('snapshot()');
+ assert.equal(before.space.moon,true);
+ await qa('heading(0)');
+ await qa('flightInput({y:1,boost:true})');
+ let after=before;
+ for(let i=0;i<12;i++){
+  await sleep(1500);
+  after=await qa('snapshot()');
+  if(Math.hypot(after.position[0]-before.position[0],after.position[2]-before.position[2])>.25)break;
+ }
+ await qa('flightRelease()');
+ const distance=Math.hypot(after.position[0]-before.position[0],after.position[2]-before.position[2]);
+ assert.ok(distance>.25,'rover failed to travel');
+ assert.ok(after.position.every(Number.isFinite));
+ assert.equal(after.space.moon,true);
+ return distance.toFixed(2)+' m';
+});
+
 ws.close();
 console.log('QA RECEIPT '+JSON.stringify({passed,failed:failures,vehicleCount:vehicles.length}));
 if(failures)process.exitCode=1;
