@@ -316,3 +316,14 @@ The current release extends the five world-polish phases:
 **Quality/limits:** simulation remains lightweight arcade-oriented rather than full rigid-body tire and flight dynamics. The screenshot-based local browser uses Mesa software WebGL rather than the Pixel's native GPU. Code, WebGL capture, simulated routes and CDP gameplay checks are regression evidence, not a claim that the entire world has undergone a frame-by-frame art review or a physical-device performance pass.
 
 Regression: `npm test`, `npm run build`, and (in the isolated local browser) `npm run qa:runtime`. The runtime suite includes rover boarding, lunar scans, rover travel, traffic, vehicles, portals, causeway and crash recovery. The existing uncommitted NASA mobile STL must not be staged or committed without explicit authorization.
+
+
+## Sustained traffic and camera QA
+
+Town traffic is now planned once against the actual world collision circles using a bounded grid search. The resulting closed route is checked segment-by-segment, with a verified safe-ring fallback where needed. Cars ease into acceleration and turns, yield to the player and each other, and remain stopped at an obstruction instead of skipping through an unverified route segment.
+
+The follow-camera clearance check filters irrelevant distant structures before ray sampling and uses the actual height of generated town buildings. Lunar rover wheel and hub meshes rotate together about their axles.
+
+After running the local Vite dev server and its isolated Chromium QA tab, use `npm run qa:runtime` for a timed traffic-progress check along with boarding, portal, crash-recovery and lunar tests. For targeted state inspection, `node scripts/qa-inspect.mjs 'globalThis.__skyreach.environment().traffic'` reports route validity, per-car distance and stopped state. This is development-only localhost instrumentation.
+
+Native Pixel 6a frame-rate and touchscreen acceptance remain **unverified** when Android ADB is disconnected; software-rendered Chromium cannot substitute for a real phone performance test.

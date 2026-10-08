@@ -42,10 +42,13 @@ export function createLunarActivities(scene,{heightAt,load=()=>[],save=()=>{}}){
  }
  const wheels=[];
  for(const x of [-2.65,2.65])for(const z of [-2.48,0,2.48]){
-  const support=add(rover,new T.BoxGeometry(.9,.14,.15),metal,x*.72,.97,z);
-  const wheel=add(rover,new T.CylinderGeometry(.88,.88,.58,12),dark,x,.84,z);wheel.rotation.z=Math.PI/2;
-  const hub=add(rover,new T.CylinderGeometry(.35,.35,.61,12),metal,x,.84,z);hub.rotation.z=Math.PI/2;
-  wheels.push(wheel);
+  add(rover,new T.BoxGeometry(.9,.14,.15),metal,x*.72,.97,z);
+  // Rotate the axle pivot around world X. The tire meshes remain oriented
+  // sideways, so steering does not make the cylindrical wheels wobble.
+  const axle=new T.Group();axle.position.set(x,.84,z);rover.add(axle);
+  const wheel=add(axle,new T.CylinderGeometry(.88,.88,.58,12),dark,0,0,0);wheel.rotation.z=Math.PI/2;
+  const hub=add(axle,new T.CylinderGeometry(.35,.35,.61,12),metal,0,0,0);hub.rotation.z=Math.PI/2;
+  wheels.push(axle);
  }
  add(rover,new T.BoxGeometry(2.1,.45,1.5),dark,0,1.85,-3.0);
  const mast=add(rover,new T.CylinderGeometry(.09,.1,2.2,7),metal,1.3,3.86,-1.7);

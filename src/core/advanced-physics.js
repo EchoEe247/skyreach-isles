@@ -39,12 +39,17 @@ export function submarineAttitude({pitch=0,depth=0,depthDelta=0,dt=0}={}){
 }
 export function cameraClearance(target,want,{terrainAt,colliders=[],radius=.55,samples=16}={}){
  const start={x:target.x,y:target.y,z:target.z},end={x:want.x,y:want.y,z:want.z};
+ // Reject distant colliders once, rather than checking every building at every
+ // ray sample (performed twice per frame by the follow camera).
+ const obstacles=colliders.filter(b=>Number.isFinite(b.x)&&Number.isFinite(b.z)&&Number.isFinite(b.r)&&
+   b.x+b.r+radius>=Math.min(start.x,end.x)&&b.x-b.r-radius<=Math.max(start.x,end.x)&&
+   b.z+b.r+radius>=Math.min(start.z,end.z)&&b.z-b.r-radius<=Math.max(start.z,end.z));
  let safe={...start};
  for(let i=1;i<=samples;i++){
   const t=i/samples,x=start.x+(end.x-start.x)*t,y=start.y+(end.y-start.y)*t,z=start.z+(end.z-start.z)*t;
   const h=terrainAt?.(x,z);
   if(Number.isFinite(h)&&y<h+radius)break;
-  if(colliders.some(b=>Math.hypot(x-b.x,z-b.z)<b.r+radius&&y<(b.height??28)))break;
+  if(obstacles.some(b=>Math.hypot(x-b.x,z-b.z)<b.r+radius&&y<(b.height??28)))break;
   safe={x,y,z};
  }
  const atEnd=Math.hypot(safe.x-end.x,safe.y-end.y,safe.z-end.z)<.001;

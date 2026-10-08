@@ -150,6 +150,22 @@ await check('world polish and ambient traffic initialize without expensive new r
  assert.equal(e.traffic.cars,4);
  return e.polish.biomePlants+' biome plants · '+e.traffic.cars+' ambient vehicles';
 });
+await check('sustained obstacle-aware town traffic movement',async()=>{
+ await qa('inspect(0,12,"foot",null,false)');
+ const before=await qa('environment().traffic');
+ assert.equal(before.routeValid,true,'town route contains blocked road links');
+ assert.ok(before.routePoints>=8,'route has too few usable nodes');
+ let after=before;
+ for(let i=0;i<10;i++){
+  await sleep(1600);
+  after=await qa('environment().traffic');
+  if(after.actors.every((a,j)=>a.distance-before.actors[j].distance>.2))break;
+ }
+ const deltas=after.actors.map((a,j)=>a.distance-before.actors[j].distance);
+ assert.ok(deltas.every(d=>d>.12),'ambient vehicles failed to move: '+JSON.stringify(deltas));
+ assert.equal(after.unreachable,0);
+ return after.actors.length+' cars advanced on '+after.routePoints+' validated waypoints';
+});
 await check('lunar discovery sites can all be visited and persist',async()=>{
  const sites=await qa('lunarSites()');
  assert.equal(sites.length,4);
