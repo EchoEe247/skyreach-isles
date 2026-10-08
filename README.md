@@ -327,3 +327,12 @@ The follow-camera clearance check filters irrelevant distant structures before r
 After running the local Vite dev server and its isolated Chromium QA tab, use `npm run qa:runtime` for a timed traffic-progress check along with boarding, portal, crash-recovery and lunar tests. For targeted state inspection, `node scripts/qa-inspect.mjs 'globalThis.__skyreach.environment().traffic'` reports route validity, per-car distance and stopped state. This is development-only localhost instrumentation.
 
 Native Pixel 6a frame-rate and touchscreen acceptance remain **unverified** when Android ADB is disconnected; software-rendered Chromium cannot substitute for a real phone performance test.
+
+
+## 100 km NASA SLS freeze fix
+
+At the Kármán line (100 km), the simulation switches from atmospheric to celestial physics. An earlier version accessed optional alien visual FX through `vehicleState.userData.fx`, but `userData` belongs to the Three.js scene graph instead. The resulting `TypeError` interrupted every frame just after transition, making the rocket appear to freeze. Flight FX are now read through a null-safe scene-graph accessor. The fix applies to both NASA SLS (which has no alien FX) and spacecraft with optional visual effects.
+
+The warp button now distinguishes **requested** speed from **applied** speed. At ~100 km, ×400 is automatically limited to ×10 to prevent unsafe planetary approach steps; this is expected, not a frozen flight. The Moon compass/locator now updates immediately on the handoff frame.
+
+`npm test` includes `tests/flight-crash-regression.test.mjs` with a screenshot-equivalent numerical simulation. Local WebGL QA via `npm run qa:runtime` directly reproduces the transition at 99,850 m, approximately 8,150 km/h, requested ×400 Auto Nav, and verifies that the rendering frame counter continues, altitude progresses, HUD labels are correct and no runtime exception or graphics-context loss occurs. The release increments the service-worker cache so existing browser installs pick up the correction. Native device thermal/performance stability still needs hardware verification.

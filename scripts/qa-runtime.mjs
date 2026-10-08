@@ -201,6 +201,36 @@ await check('lunar rover moves over real lunar terrain',async()=>{
  return distance.toFixed(2)+' m';
 });
 
+await check('Karman-line freeze regression at 100 km, 8150 km/h, requested x400',async()=>{
+ const start=await qa('rocketBoundaryProbe()');
+ assert.ok(start.altitude>=99000&&start.altitude<100000);
+ assert.equal(start.warpRequested,400);
+ let status=null;
+ for(let i=0;i<15;i++){
+  await sleep(1200);
+  status=await qa('flightStatus()');
+  if(status.rocket.mode==='space'&&status.frame>3)break;
+ }
+ assert.ok(status?.rocket?.mode==='space','rocket did not cross Karman line');
+ assert.equal(status.warp.requested,400);
+ assert.ok(status.warp.effective<=10,'unsafe effective warp near Earth');
+ assert.equal(status.errors.length,0,'flight produced uncaught JS exceptions: '+status.errors.join(', '));
+ assert.equal(status.contextLost,false);
+ const frameAtSpace=status.frame,altAtSpace=status.rocket.earthAltitude;
+ for(let i=0;i<7;i++){
+  await sleep(900);
+  status=await qa('flightStatus()');
+  if(status.frame>=frameAtSpace+3&&status.rocket.earthAltitude>altAtSpace+1000)break;
+ }
+ assert.ok(status.frame>=frameAtSpace+3,'render loop froze after crossing 100 km');
+ assert.ok(status.rocket.earthAltitude>altAtSpace+1000,'spacecraft did not move after handoff');
+ assert.deepEqual(status.errors,[],'no exceptions allowed after handoff');
+ const hud=await evaluate("({warp:document.getElementById('warp').textContent,nav:document.getElementById('navText').textContent})");
+ assert.ok(hud.warp.includes('×400')&&hud.warp.includes('×10'),hud.warp);
+ assert.ok(hud.nav.includes('MOON')&&!hud.nav.includes('Compass clear'),'stale navigation after Karman: '+hud.nav);
+ return 'post-handoff frame '+status.frame+'; ALT '+Math.round(status.rocket.earthAltitude/1000)+' km; '+hud.warp;
+});
+
 ws.close();
 console.log('QA RECEIPT '+JSON.stringify({passed,failed:failures,vehicleCount:vehicles.length}));
 if(failures)process.exitCode=1;

@@ -25,3 +25,23 @@ export function landedBaseService(craft,body,previousBody=null){
  craft.fuel=1;craft.heat=0;craft.autoThrottle=0;
  return true;
 }
+
+export function warpDisplay(requested,effective,{atmospheric=false}={}){
+ const selected=[1,10,50,100,400].includes(requested)?requested:1;
+ const active=atmospheric?1:Math.max(1,Math.min(selected,Math.round(Number(effective)||1)));
+ const limited=active<selected;
+ return {
+  requested:selected,
+  effective:active,
+  limited,
+  label:limited?'TIME ×'+selected+' (×'+active+')':'TIME ×'+selected,
+  reason:atmospheric?'High warp begins after the 100 km space transition.':
+    limited?'Time warp is automatically limited near a planet or landing.':'Requested warp is active.'
+ };
+}
+
+// Flight state is not a Three.js object; visual effects live on the vehicle's
+// scene graph. Rockets without optional FX must remain safe at the Karman handoff.
+export function getVehicleVisualFx(vehicle){
+ return vehicle?.g?.userData?.fx??null;
+}
